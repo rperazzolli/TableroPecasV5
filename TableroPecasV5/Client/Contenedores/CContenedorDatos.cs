@@ -276,8 +276,8 @@ namespace TableroPecasV5.Client.Contenedores
     public static CInformacionAlarmaCN AlarmaIndicadorDesdeGlobal(Int32 Indicador, Int32 Dimension)
     {
       List<CInformacionAlarmaCN> DatosLocales = (from A in gAlarmasIndicador
-                                                 where A.CodigoIndicador == Indicador.Codigo &&
-                                                   A.ElementoDimension == ElementoDimension
+                                                 where A.CodigoIndicador == Indicador &&
+                                                   A.ElementoDimension == Dimension
                                                  orderby A.Periodo
                                                  select A).ToList();
       if (DatosLocales != null && DatosLocales.Count > 0)

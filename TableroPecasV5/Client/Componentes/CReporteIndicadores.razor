@@ -1,31 +1,47 @@
 ﻿@using TableroPecasV5.Shared
 @using Blazorise
-@inherits Logicas.CLogicaMimico
+@inherits Logicas.CLogicaReporteIndicadores
 
 <div style="width: 100%; height: 100%; position: absolute; background: rgba(128, 128, 128, 0.3); text-align: center;">
-   <div style="width: 80%; height: 50%; margin: 10%;">
-     <Table Striped="true" Bordered="true" Hoverable="true" FullWidth="true">
-       <TableHeader ThemeContrast="ThemeContrast.Light">
-         <TableRow>
-           <TableHeaderCell style="width: 120px;">Referencia</TableHeaderCell>
-           <TableHeaderCell style="width: 120px;">Indicador</TableHeaderCell>
-           <TableHeaderCell style="width: 60px;">Período</TableHeaderCell>
-           <TableHeaderCell style="width: 60px;">Valor</TableHeaderCell>
-           <TableHeaderCell style="width: 45px;">Unidad</TableHeaderCell>
-           <TableHeaderCell style="width: 40px;">Tend.</TableHeaderCell>
-           <TableHeaderCell style="width: 60px;">Mínimo</TableHeaderCell>
-           <TableHeaderCell style="width: 60px;">Satisfactorio</TableHeaderCell>
-           <TableHeaderCell style="width: 60px;">Sobresaliente</TableHeaderCell>
-         </TableRow>
-       </TableHeader>
-       @foreach (Clases.CLineaReporte Linea in Lineas)
-			 {
-         <TableRow>
-           <TableRowCell>@Linea.Referencia</TableRowCell>
-           <TableRowCell>@Linea.Indicador.Descripcion</TableRowCell>
-         </TableRow>
-			 }
-     </Table>
-     <strong style="background: lightgray;"></strong>
+   <div style="width: 80%; height: 50%; margin: 10%; background: white;">
+     <div style="height: calc(100% - 40px);">
+     <table>
+       <tr style="background: lightgray;">
+         <th style="width: 120px;">Referencia</th>
+         <th style="width: 120px;">Indicador</th>
+         <th style="width: 60px;">Período</th>
+         <th style="width: 60px;">Valor</th>
+         <th style="width: 45px;">Unidad</th>
+         <th style="width: 40px;">Tend.</th>
+         <th style="width: 60px;">Mínimo</th>
+         <th style="width: 60px;">Satisfactorio</th>
+         <th style="width: 60px;">Sobresaliente</th>
+       </tr>
+       @foreach (Logicas.LineaImpresion Linea in LineasImpresion)
+       {
+     <tr style="@Linea.Estilo">
+       <td>@Linea.Nombre</td>
+       <td>@Linea.Indicador</td>
+       <td>@Linea.Periodo</td>
+       <td>@Linea.Valor</td>
+       <td>@Linea.Unidades</td>
+       @if (Linea.Imagen.Length > 0)
+       {
+       <td><img src="@Linea.UrlImagen" style="width: 21px; height: 21px; overflow: hidden;" /></td>
+       }
+       else
+       {
+       <td></td>
+       }
+       <td>@Linea.Minimo</td>
+       <td>@Linea.Satisfactorio</td>
+       <td>@Linea.Sobresaliente</td>
+     </tr>
+       }
+      </table>
    </div>
+  <div style="width: 100%; height: 40px; margin-left: 10%; text-align: center;">
+      <button style="width: 80px; height: 25px; border-radius: 0.3rem; padding: 0px; vertical-align: central;" @onclick="@Cerrar">Cerrar</button>
+    </div>
+  </div>
 </div>

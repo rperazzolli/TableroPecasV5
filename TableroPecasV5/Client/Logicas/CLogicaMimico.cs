@@ -41,10 +41,32 @@ namespace TableroPecasV5.Client.Logicas
         if (value != mbEditandoReporte)
 				{
           mbEditandoReporte = value;
+          if (value)
+					{
+            mbMostrandoReporte = false;
+					}
           StateHasChanged();
 				}
 			}
 		}
+
+    private bool mbMostrandoReporte = false;
+    public bool MostrandoReporte
+    {
+      get { return mbMostrandoReporte; }
+      set
+      {
+        if (value != mbMostrandoReporte)
+        {
+          mbMostrandoReporte = value;
+          if (value)
+          {
+            mbEditandoReporte = false;
+          }
+          StateHasChanged();
+        }
+      }
+    }
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
@@ -498,13 +520,15 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+    public List<CLineaReporte> LineasReporte { get; set; }
+
     public async void VerReporte()
     {
       // Leer las jerarquias.
       List<CJerarquiaCN> Jerarquias = await LeerJerarquiasAsync();
-      List<CLineaReporte> LineasReporte = new List<CLineaReporte>();
+      LineasReporte = new List<CLineaReporte>();
       await AgregarTareasAReporteAsync(Jerarquias, "", 0, LineasReporte, DateTime.Now);
-
+      MostrandoReporte = true;
     }
 
     public List<CTareaGraficaCN> TareasEnProceso

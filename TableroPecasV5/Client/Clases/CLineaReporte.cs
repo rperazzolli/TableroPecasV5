@@ -8,8 +8,8 @@ namespace TableroPecasV5.Client.Clases
 {
 	public class CLineaReporte
 	{
-		public Int32 TabReferencia { get; set; }
-		public string Referencia { get; set; }
+		public Int32 TabReferencia { get; set; } = 0;
+		public string Referencia { get; set; } = "";
 		public CDatoIndicador Indicador { get; set; }
 		public CInformacionAlarmaCN DatosIndicador { get; set; }
 

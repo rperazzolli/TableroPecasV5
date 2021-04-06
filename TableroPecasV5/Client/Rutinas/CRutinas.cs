@@ -80,6 +80,60 @@ namespace TableroPecasV5.Client.Rutinas
       Anios = 4
     }
 
+    public static string ColorAlarma(CInformacionAlarmaCN Datos)
+		{
+      if (Datos == null)
+			{
+        return COLOR_GRIS;
+			}
+      else
+			{
+        if (Datos.Minimo == Datos.Sobresaliente)
+				{
+          return COLOR_GRIS;
+				}
+        else
+				{
+          if (Datos.Sobresaliente > Datos.Minimo)
+          {
+            if (Datos.Valor < Datos.Minimo)
+            {
+              return COLOR_ROJO;
+            }
+            else
+            {
+              if (Datos.Valor < Datos.Satisfactorio)
+              {
+                return COLOR_AMARILLO;
+              }
+              else
+              {
+                return (Datos.Valor < Datos.Sobresaliente ? COLOR_VERDE : COLOR_AZUL);
+              }
+            }
+          }
+          else
+          {
+            if (Datos.Valor > Datos.Minimo)
+            {
+              return COLOR_ROJO;
+            }
+            else
+            {
+              if (Datos.Valor > Datos.Satisfactorio)
+              {
+                return COLOR_AMARILLO;
+              }
+              else
+              {
+                return (Datos.Valor > Datos.Sobresaliente ? COLOR_VERDE : COLOR_AZUL);
+              }
+            }
+          }
+        }
+			}
+		}
+
     public static string FechaATexto(DateTime Fecha)
     {
       return Fecha.ToString("yyyyMMddHHmmss");
@@ -1812,6 +1866,70 @@ namespace TableroPecasV5.Client.Rutinas
         case SaltoEscalaFechas.Meses: return "MM/yyyy";
         case SaltoEscalaFechas.Horas: return "dd/MM/yy HH";
         default: return "dd/MM/yy";
+      }
+    }
+
+    public static string FormatoFechaPorFrecuencia(string Frecuencia)
+    {
+      switch (Frecuencia)
+      {
+        case FREC_ANUAL: return "yyyy";
+        case FREC_MENSUAL:
+        case FREC_MENSUAL_AC:
+        case FREC_BIMESTRAL:
+        case FREC_TRIMESTRAL:
+        case FREC_CUATRIMESTRAL:
+        case FREC_SEMESTRAL: return "MM/yyyy";
+        case FREC_DIARIA:
+        case FREC_SEMANAL: return "dd/MM/yyyy";
+        case FREC_HORARIA: return "dd/MM/yyyy HH";
+        case FREC_MINUTOS: return "dd/MM/yyyy HH:mm";
+        default: return "dd/MM/yyyy";
+      }
+    }
+
+    public static string ImagenDesdeTendencia(CInformacionAlarmaCN Datos)
+    {
+      switch (Datos.Color)
+      {
+        case CRutinas.COLOR_ROJO:
+          if (Datos.Valor > Datos.ValorAnterior)
+          {
+            return "rojo_crec";
+          }
+          else
+          {
+            return (Datos.Valor == Datos.ValorAnterior ? "rojo_igu" : "rojo_dec");
+          }
+        case COLOR_AMARILLO:
+          if (Datos.Valor > Datos.ValorAnterior)
+          {
+            return "am_crec";
+          }
+          else
+          {
+            return (Datos.Valor == Datos.ValorAnterior ? "am_igu" : "am_dec");
+          }
+        case COLOR_VERDE:
+          if (Datos.Valor > Datos.ValorAnterior)
+          {
+            return "ver_crec";
+          }
+          else
+          {
+            return (Datos.Valor == Datos.ValorAnterior ? "ver_igu" : "ver_dec");
+          }
+        case COLOR_AZUL:
+          if (Datos.Valor > Datos.ValorAnterior)
+          {
+            return "azu_crec";
+          }
+          else
+          {
+            return (Datos.Valor == Datos.ValorAnterior ? "azu_igu" : "azu_dec");
+          }
+        default:
+          return "am_igu";
       }
     }
 

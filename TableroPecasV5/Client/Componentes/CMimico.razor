@@ -83,6 +83,11 @@ else
         <CCfgJerarquias Mimico="Mimico.MimicoPropio.Codigo"
                         Tareas="TareasEnProceso"/>
 		  }
+      @if (MostrandoReporte)
+			{
+        <CReporteIndicadores NombreReporte="@Mimico.MimicoPropio.Nombre"
+                             LineasReporte="@LineasReporte"/>
+			}
     </CascadingValue>
   </div>
 
