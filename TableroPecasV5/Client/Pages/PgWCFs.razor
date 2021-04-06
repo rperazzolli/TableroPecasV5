@@ -1,0 +1,76 @@
+﻿@page "/"
+@using TableroPecasV5.Client.Logicas
+@inherits Logicas.CLogicaWCFs
+
+<Modal @ref="Dialogo" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Seleccionar el server de datos</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <FieldLabel>Server</FieldLabel>
+      <Field>
+        <Select TValue="string" @bind-SelectedValue="@PaqueteSeleccionado">
+          <SelectItem TValue="string" Value="@SinNombre">No seleccionado</SelectItem>
+          @if (Paquetes != null)
+          {
+            @foreach (CPaqueteWCF Paquete in Paquetes)
+            {
+              <SelectItem TValue="string" Value="@Paquete.Nombre">@Paquete.Nombre</SelectItem>
+            }
+          }
+          /**/
+        </Select>
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@Editar">Editar</Button>
+      <Button style="width: 50px;" Disabled="@NoPuedeSeleccionar" Color="Color.Primary" Clicked="@Seleccionar">Ingresar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+<Modal @ref="DialogoEdicion" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Definir servers de datos</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <FieldLabel>Server</FieldLabel>
+      <Field>
+        <Select TValue="string" @bind-SelectedValue="@PaqueteEnEdicion">
+          <SelectItem TValue="string" Value="@SinNombre">No seleccionado</SelectItem>
+          @if (Paquetes != null)
+          {
+            @foreach (CPaqueteWCF Paquete in Paquetes)
+            {
+              <SelectItem TValue="string" Value="@Paquete.Nombre">@Paquete.Nombre</SelectItem>
+            }
+            /**/
+          }
+          /**/
+        </Select>
+      </Field>
+      <Field>
+        <FieldLabel>Nombre</FieldLabel>
+        <TextEdit @bind-Text="@NombreLocal" />
+      </Field>
+      <Field>
+        <FieldLabel>URL Tablero</FieldLabel>
+        <TextEdit @bind-Text="@UrlBPILocal" />
+      </Field>
+      <Field>
+        <FieldLabel>URL Estructura</FieldLabel>
+        <TextEdit @bind-Text="@UrlEstructuraLocal" />
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 50px;" Color="Color.Secondary" Clicked="@Salir">Salir</Button>
+      <Button style="width: 50px;" Disabled="@NoPuedeRegistrar" Color="Color.Primary" Clicked="@Registrar">Registrar</Button>
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@Nuevo">Nuevo</Button>
+      <Button style="width: 50px;" Disabled="@NoPuedeBorrar" Color="Color.Primary" Clicked="@Borrar">Borrar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>

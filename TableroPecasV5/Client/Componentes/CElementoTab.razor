@@ -1,0 +1,6 @@
+﻿@inherits Logicas.CLogicaTab
+
+<div style="@Estilo" @onmouseover="@((e) => {EstaEncima(true);})" @onmouseout="@((e) => { EstaEncima(false); })"
+     @onmouseup="@((e) => {Seleccionar(true);})">
+  <Blazor.Extensions.Canvas.BECanvas Width="@AnchoTotal" Height="@AltoTotal" @ref="@CanvasTab" />
+</div>

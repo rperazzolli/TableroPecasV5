@@ -1,0 +1,357 @@
+﻿<navigation:Page x:Class="IndicadoresV2.Paginas.pgAgregarElem" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:Cmp="clr-namespace:IndicadoresV2.Componentes"
+           mc:Ignorable="d"
+           xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation"
+           d:DesignWidth="840" d:DesignHeight="680"
+           Title="pgAgregarElem Page" Loaded="Page_Loaded">
+  <Grid x:Name="LayoutRoot"  Background="#a0FFFFFF">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="45"/>
+      <RowDefinition Height="136"/>
+      <RowDefinition/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="45"/>
+      <ColumnDefinition Width="136"/>
+      <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+    <Grid Grid.Column="1" Grid.Row="1">
+      <Ellipse HorizontalAlignment="Center" VerticalAlignment="Center" Width="99" Height="99"
+         Fill="Transparent" Stroke="LightGray" StrokeThickness="2" Opacity="0.5"/>
+      <Cmp:COpcionAgregarElemento CodigoOpcion="1" HorizontalAlignment="Center" VerticalAlignment="Top"
+                                  MouseLeftButtonUp="COpcionAgregarElemento_MouseLeftButtonUp">
+        <Image Name="ImgIndic" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <ToolTipService.ToolTip>
+          Indicador
+        </ToolTipService.ToolTip>
+      </Cmp:COpcionAgregarElemento>
+      <Cmp:COpcionAgregarElemento CodigoOpcion="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,30,0,0"
+                                 MouseLeftButtonUp="COpcionAgregarElemento_MouseLeftButtonUp">
+        <Border Width="28" Height="15" Background="Gray" CornerRadius="2"/>
+        <ToolTipService.ToolTip>
+          Ficha
+        </ToolTipService.ToolTip>
+      </Cmp:COpcionAgregarElemento>
+      <Cmp:COpcionAgregarElemento CodigoOpcion="3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="96,30,0,0"
+                                  MouseLeftButtonUp="COpcionAgregarElemento_MouseLeftButtonUp">
+        <Image Name="ImgTend" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <ToolTipService.ToolTip>
+          Evolutivo
+        </ToolTipService.ToolTip>
+      </Cmp:COpcionAgregarElemento>
+      <Cmp:COpcionAgregarElemento CodigoOpcion="4" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,75,0,0"
+                                  MouseLeftButtonUp="COpcionAgregarElemento_MouseLeftButtonUp">
+        <Image Name="ImgGraf" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <ToolTipService.ToolTip>
+          Gráficos
+        </ToolTipService.ToolTip>
+      </Cmp:COpcionAgregarElemento>
+      <Cmp:COpcionAgregarElemento CodigoOpcion="10" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="96,75,0,0"
+                                  MouseLeftButtonUp="COpcionAgregarElemento_MouseLeftButtonUp">
+        <Image Name="ImgMenu" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <ToolTipService.ToolTip>
+          Más
+        </ToolTipService.ToolTip>
+      </Cmp:COpcionAgregarElemento>
+      <Cmp:COpcionAgregarElemento CodigoOpcion="5" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                  MouseLeftButtonUp="COpcionAgregarElemento_MouseLeftButtonUp">
+        <Image Name="ImgBing" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <ToolTipService.ToolTip>
+          Mapas
+        </ToolTipService.ToolTip>
+      </Cmp:COpcionAgregarElemento>
+      <Cmp:COpcionAgregarElemento CodigoOpcion="-1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  MouseLeftButtonUp="COpcionAgregarElemento_MouseLeftButtonUp">
+        <Image Name="ImgRegistrar" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <ToolTipService.ToolTip>
+          Registrar
+        </ToolTipService.ToolTip>
+      </Cmp:COpcionAgregarElemento>
+    </Grid>
+    
+    <!-- Definicion de indicador a incorporar -->
+    <Border Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Margin="45,25,0,0" Width="299" Height="399" CornerRadius="8" BorderBrush="#FFBFBFBF" BorderThickness="2"
+            Background="White" Visibility="{Binding VerIndicador}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border Background="#FFBFBFBF" CornerRadius="6,6,0,0">
+          <TextBlock HorizontalAlignment="Left" Margin="10,4,2,4" Text="{Binding NombreOpcion}" FontWeight="SemiBold"/>
+        </Border>
+        
+        <Border Grid.Row="1" BorderBrush="#FFBFBFBF" BorderThickness="1" CornerRadius="4" Width="241"
+                HorizontalAlignment="Left" VerticalAlignment="Center" Margin="12,5,5,5">
+          <TextBox Name="tbFiltroIndicador" VerticalAlignment="Center">
+            <TextBox.Clip>
+              <RectangleGeometry Rect="0,0,241,25" RadiusX="5" RadiusY="5"/>
+            </TextBox.Clip>
+          </TextBox>
+        </Border>
+        <Button Name="CmdFiltroIndic" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" Width="25" Height="25"
+                Margin="5,2" Click="CmdFiltroIndic_Click" >
+          <Image Name="ImgBuscarIndic" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                 Stretch="UniformToFill"/>
+        </Button>
+        
+        <ListBox Name="lbIndic" Grid.Row="2" ItemsSource="{Binding ListaIndicadores}" SelectionMode="Multiple" SelectedItem="{Binding IndicadorSeleccionado,Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Descripcion}"/>
+          </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        
+        <StackPanel Orientation="Horizontal" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right"
+                    Margin="10,5">
+          <Button Name="CmdOKIndic" Content="Agregar" Width="75" Height="25" IsEnabled="{Binding HayIndicador}" Click="CmdOKIndic_Click"/>
+          <Button Content="Cancelar" Width="75" Height="25" Margin="5,0,0,0" Click="Button_Click"/>
+        </StackPanel>
+        
+      </Grid>
+      
+    </Border>
+    
+    <!-- Seleccion de graficos -->
+    <Border Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Margin="45,25,0,0" Width="449" Height="399" CornerRadius="8" BorderBrush="#FFBFBFBF" BorderThickness="2"
+            Background="White" Visibility="{Binding VerGraficos}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border Background="#FFBFBFBF" CornerRadius="6,6,0,0">
+          <TextBlock HorizontalAlignment="Left" Margin="10,4,2,4" Text="Agregar gráfico" FontWeight="SemiBold"/>
+        </Border>
+        
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="12,5,0,5">
+          <TextBlock Text="Tipo de gráfico" VerticalAlignment="Center"/>
+          <Image Name="ImgFTorta" Tag="1" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFTorta_MouseLeftButtonUp"/>
+          <Image Name="ImgFBarras" Tag="2" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFTorta_MouseLeftButtonUp"/>
+          <Image Name="ImgFPareto" Tag="3" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFTorta_MouseLeftButtonUp"/>
+          <Image Name="ImgFBarrasH" Tag="4" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFTorta_MouseLeftButtonUp"/>
+          <Image Name="ImgFHisto" Tag="5" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFTorta_MouseLeftButtonUp"/>
+          <Image Name="ImgFPiramide" Tag="6" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFTorta_MouseLeftButtonUp"/>
+          <Canvas Name="cvConjuntos" Tag="7" Width="20" Height="20" Margin="25,0,0,0" MouseLeftButtonUp="ImgFTorta_MouseLeftButtonUp"/>
+        </StackPanel>
+
+        <Border Grid.Row="2" BorderBrush="#FFBFBFBF" BorderThickness="1" CornerRadius="4" Width="299"
+                HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,5,5,5">
+          <TextBox Name="tbFiltroGrafico" VerticalAlignment="Center">
+            <TextBox.Clip>
+              <RectangleGeometry Rect="0,0,299,25" RadiusX="5" RadiusY="5"/>
+            </TextBox.Clip>
+          </TextBox>
+        </Border>
+        <Button Name="CmdFiltroGrafico" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Width="25" Height="25"
+                Margin="5,2,45,2" Click="CmdFiltroGrafico_Click"  >
+          <Image Name="ImgBuscarGrafico" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                 Stretch="UniformToFill"/>
+        </Button>
+
+        <ListBox Grid.Row="3" ItemsSource="{Binding ListaGraficos}" SelectedItem="{Binding GraficoSeleccionado,Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Image Width="20" Height="20" VerticalAlignment="Center" Margin="5,1"
+                       Stretch="Uniform" Source="{Binding Imagen}"/>
+                <TextBlock Text="{Binding Nombre}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="4" Visibility="{Binding VerNombreGrafico}">
+          <TextBlock Text="Denominación" VerticalAlignment="Center" Margin="10,2,5,2"/>
+          <TextBox Text="{Binding NombreGrafico, Mode=TwoWay}" Width="299" Margin="0,5"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="4" Visibility="{Binding VerMuestraFiltro}">
+          <CheckBox Content="El filtro se mantiene oculto" Margin="10,5" IsChecked="{Binding OcultarFiltro, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="5" Visibility="{Binding VerNombreGrafico}">
+          <CheckBox Content="Emplea filtros propios" Margin="10,5" IsChecked="{Binding FiltroPropio, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="6" VerticalAlignment="Center" HorizontalAlignment="Right"
+                    Margin="10,5">
+          <Button Name="CmdOKGraf" Content="Agregar" Width="75" Height="25" IsEnabled="{Binding HayGrafico}" Click="CmdOKGraf_Click" />
+          <Button Content="Cancelar" Width="75" Height="25" Margin="5,0,0,0" Click="ButtonGraf_Click"/>
+        </StackPanel>
+        
+        <Grid Background="#25C0C0C0" Grid.RowSpan="7" Visibility="{Binding AguardandoGraf}">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Procesando...." HorizontalAlignment="Center"/>
+            <ProgressBar Width="120" Height="8" IsIndeterminate="true"/>
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Border>
+
+    <!-- Seleccion de mapas -->
+    <Border Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Margin="45,25,0,0" Width="449" Height="399" CornerRadius="8" BorderBrush="#FFBFBFBF" BorderThickness="2"
+            Background="White" Visibility="{Binding VerMapas}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border Background="#FFBFBFBF" CornerRadius="6,6,0,0">
+          <TextBlock HorizontalAlignment="Left" Margin="10,4,2,4" Text="Agregar mapa" FontWeight="SemiBold"/>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="12,5,0,5">
+          <TextBlock Text="Tipo de mapa" VerticalAlignment="Center"/>
+          <Image Name="ImgFCalor" Tag="1" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFCalor_MouseLeftButtonUp" />
+          <Image Name="ImgFControl" Tag="2" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFCalor_MouseLeftButtonUp"/>
+          <Image Name="ImgFGradiente" Tag="3" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFCalor_MouseLeftButtonUp"/>
+        </StackPanel>
+
+        <Border Grid.Row="2" BorderBrush="#FFBFBFBF" BorderThickness="1" CornerRadius="4" Width="299"
+                HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,5,5,5">
+          <TextBox Name="tbFiltroMapa" VerticalAlignment="Center">
+            <TextBox.Clip>
+              <RectangleGeometry Rect="0,0,299,25" RadiusX="5" RadiusY="5"/>
+            </TextBox.Clip>
+          </TextBox>
+        </Border>
+        <Button Name="CmdFiltroMapa" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Width="25" Height="25"
+                Margin="5,2,45,2" Click="CmdFiltroMapa_Click" >
+          <Image Name="ImgBuscarMapa" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                 Stretch="UniformToFill"/>
+        </Button>
+
+        <ListBox Grid.Row="3" ItemsSource="{Binding ListaMapas}" SelectedItem="{Binding MapaSeleccionado,Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Image Width="20" Height="20" VerticalAlignment="Center" Margin="5,1"
+                       Stretch="Uniform" Source="{Binding Imagen}"/>
+                <TextBlock Text="{Binding Nombre}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="4" Visibility="{Binding VerFiltrosMapa}">
+          <CheckBox Content="Emplea filtros propios" Margin="10,5" IsChecked="{Binding FiltroPropio, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="5" VerticalAlignment="Center" HorizontalAlignment="Right"
+                    Margin="10,5">
+          <Button Name="CmdOKMapa" Content="Agregar" Width="75" Height="25" IsEnabled="{Binding HayMapa}" Click="CmdOKMapa_Click" />
+          <Button Content="Cancelar" Width="75" Height="25" Margin="5,0,0,0" Click="ButtonGraf_Click"/>
+        </StackPanel>
+
+        <Grid Background="#25C0C0C0" Grid.RowSpan="6" Visibility="{Binding AguardandoMapas}">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Procesando...." HorizontalAlignment="Center"/>
+            <ProgressBar Width="120" Height="8" IsIndeterminate="true"/>
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Border>
+
+    <!-- Seleccion de otros -->
+    <Border Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Margin="45,25,0,0" Width="449" Height="399" CornerRadius="8" BorderBrush="#FFBFBFBF" BorderThickness="2"
+            Background="White" Visibility="{Binding VerOtros}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border Background="#FFBFBFBF" CornerRadius="6,6,0,0">
+          <TextBlock HorizontalAlignment="Left" Margin="10,4,2,4" Text="Agregar otro elemento" FontWeight="SemiBold"/>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="12,5,0,5">
+          <TextBlock Text="Tipo de elemento" VerticalAlignment="Center"/>
+          <Image Name="ImgFMimico" Tag="1" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFMimico_MouseLeftButtonUp">
+            <ToolTipService.ToolTip>
+              Mímico
+            </ToolTipService.ToolTip>
+          </Image>
+          <Image Name="ImgFGrilla" Tag="2" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFMimico_MouseLeftButtonUp">
+            <ToolTipService.ToolTip>
+              Grilla de datos
+            </ToolTipService.ToolTip>
+          </Image>
+          <Image Name="ImgFSubC" Tag="3" Width="20" Height="20" Stretch="UniformToFill" Margin="25,0,0,0" MouseLeftButtonUp="ImgFMimico_MouseLeftButtonUp">
+            <ToolTipService.ToolTip>
+              Consulta de análisis (sin parámetros)
+            </ToolTipService.ToolTip>
+          </Image>
+        </StackPanel>
+
+        <Border Grid.Row="2" BorderBrush="#FFBFBFBF" BorderThickness="1" CornerRadius="4" Width="299"
+                HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,5,5,5">
+          <TextBox Name="tbFiltroOtros" VerticalAlignment="Center">
+            <TextBox.Clip>
+              <RectangleGeometry Rect="0,0,299,25" RadiusX="5" RadiusY="5"/>
+            </TextBox.Clip>
+          </TextBox>
+        </Border>
+        <Button Name="CmdFiltroOtros" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Width="25" Height="25"
+                Margin="5,2,45,2" Click="CmdFiltroOtros_Click" >
+          <Image Name="ImgBuscarOtro" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                 Stretch="UniformToFill"/>
+        </Button>
+
+        <ListBox Grid.Row="3" ItemsSource="{Binding ListaOtros}" SelectedItem="{Binding OtroSeleccionado,Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Image Width="20" Height="20" VerticalAlignment="Center" Margin="5,1"
+                       Stretch="Uniform" Source="{Binding Imagen}"/>
+                <TextBlock Text="{Binding Nombre}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="5" VerticalAlignment="Center" HorizontalAlignment="Right"
+                    Margin="10,5">
+          <Button Name="CmdOKOtro" Content="Agregar" Width="75" Height="25" IsEnabled="{Binding HayOtro}" Click="CmdOKOtro_Click" />
+          <Button Content="Cancelar" Width="75" Height="25" Margin="5,0,0,0" Click="ButtonGraf_Click"/>
+        </StackPanel>
+
+        <Grid Background="#25C0C0C0" Grid.RowSpan="6" Visibility="{Binding AguardandoOtros}">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Procesando...." HorizontalAlignment="Center"/>
+            <ProgressBar Width="120" Height="8" IsIndeterminate="true"/>
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Border>
+    <Grid Visibility="{Binding VerAguarda}" Grid.ColumnSpan="3" Grid.RowSpan="3" Background="#80C0C0C0">
+      <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <TextBlock Text="Registrando" HorizontalAlignment="Center"/>
+        <ProgressBar Width="128" Height="8" IsIndeterminate="true"/>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</navigation:Page>

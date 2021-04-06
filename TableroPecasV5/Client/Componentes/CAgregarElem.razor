@@ -1,0 +1,292 @@
+﻿@using TableroPecasV5.Client.Componentes
+@using Blazorise
+@using TableroPecasV5.Client.Listas
+@using TableroPecasV5.Shared
+@inherits Logicas.CLogicaAgregarElem
+
+<div style="width: 100%; height: 100%; background: rgba( 192, 192, 192, 0.75); position: absolute; z-index: 10;">
+  <svg width="100%" height="100%" style="position: absolute;">
+    @foreach (Clases.CRect Rect0 in Rectangulos)
+    {
+      <rect x="@Rect0.Abscisa" y="@Rect0.Ordenada" width="@Rect0.Ancho" height="@Rect0.Alto"
+            style="fill:gray;" />
+    }
+  </svg>
+  <div style="width: 136px; height: 136px; margin-left: 45px; margin-top: 45px; position: absolute;">
+    <svg width="99" height="99" style="margin: 19px; position: absolute;">
+      <ellipse cx="49.5" cy="49.5" rx="49" ry="49"
+               stroke="gray" stroke-width="1" fill="transparent" />
+    </svg>
+    <div style="width: 40px; height: 27px; position: absolute; margin-left: 48px; cursor: pointer;"
+         @onclick="((e) => { AgregarModalIndicador(true); })">
+      <COpcionAgregar />
+      <img width="25" height="18" src="Imagenes/IndicPend.png"
+           style="margin-left: 7px; margin-top: 3px; position: absolute;" />
+    </div>
+    <div style="width: 40px; height: 27px; position: absolute; margin-top: 30px; cursor: pointer;"
+         @onclick="@AgregarModalTarjeta">
+      <COpcionAgregar />
+      <div style="position: absolute;">
+        <svg width="40" height="27" style="position: absolute;">
+          <rect rx="2" ry="2" width="28" height="15" fill="gray" x="6" y="6" />
+        </svg>
+      </div>
+    </div>
+    <div style="width: 40px; height: 27px; position: absolute; margin-left: 96px; margin-top: 30px; cursor: pointer;"
+         @onclick="((e) => { AgregarModalIndicador(false); })">
+      <COpcionAgregar />
+      <img width="20" height="20" src="Imagenes/Tendencia.png"
+           style="margin-left: 10px; margin-top: 3px; position: absolute;" />
+    </div>
+    <div style="width: 40px; height: 27px; position: absolute; margin-top: 75px; cursor: pointer;"
+         @onclick="((e) => { AgregarModalGraficos(); })">
+      <COpcionAgregar />
+      <img width="20" height="20" src="Imagenes/Torta.png"
+           style="margin-left: 10px; margin-top: 3px; position: absolute;" />
+    </div>
+    <div style="width: 40px; height: 27px; position: absolute; margin-left: 96px; margin-top: 75px; cursor: pointer;"
+      @onclick="@AgregarModalVarios">
+      <COpcionAgregar />
+      <img width="20" height="20" src="Imagenes/Menu.png"
+           style="margin-left: 10px; margin-top: 3px; position: absolute;" />
+    </div>
+    <div style="width: 40px; height: 27px; position: absolute; margin-left: 48px; margin-top: 109px; cursor: pointer;"
+         @onclick="((e) => { AgregarModalMapas(); })">
+      <COpcionAgregar />
+      <img width="20" height="20" src="Imagenes/Bing.png"
+           style="margin-left: 10px; margin-top: 3px; position: absolute;" />
+    </div>
+    <div style="width: 40px; height: 27px; position: absolute; margin-left: 48px; margin-top: 54px; cursor: pointer;"
+         @onclick="@Registrar">
+      <COpcionAgregar />
+      <img width="20" height="20" src="Imagenes/Guardar.png"
+           style="margin-left: 10px; margin-top: 3px; position: absolute;" />
+    </div>
+  </div>
+  @if (Posicionando)
+  {
+    <div style="width: 100%; height: 100%; z-index: 29;">
+      <CDefinirRectangulos @ref="DefinidorPosiciones" />
+    </div>
+  }
+</div>
+
+
+@*Agregar gráfico*@
+<Modal @ref="ModalGrafico" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar gráfico</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Gráfico a agregar</FieldLabel>
+        <Select TValue="string" @bind-SelectedValue="@NombreGraficoAgregar">
+          <SelectItem TValue="string" Value="@SinDatos">Sin datos</SelectItem>
+          @foreach (Clases.CElementoXML Elemento in ListaGraficos)
+          {
+            <SelectItem TValue="string" Value="@Elemento.Nombre">@Elemento.Nombre</SelectItem>
+          }
+        </Select>
+      </Field>
+      <Field>
+        <FieldLabel>Ubicación</FieldLabel>
+        <TextEdit @bind-Text="@Posicion" Disabled="true" />
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 60px;" Color="Color.Secondary" Clicked="@ObtenerPosicion">Posicionar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Secondary" Clicked="@CerrarVentanaGrafico">Cerrar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Primary" Disabled="@NoHayGrafico" Clicked="@AgregarGrafico">Agregar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+@*Agregar mapa*@
+<Modal @ref="ModalMapa" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar mapa</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      @if (Cargando)
+      {
+        <div style="width: 100%; text-align: center;">
+          <i class="fa fa-spinner fa-pulse"></i>
+          <p>Aguarde por favor - listando mapas</p>
+        </div>
+      }
+      else
+      {
+        <Field>
+          <FieldLabel>Mapas a agregar</FieldLabel>
+          <Select TValue="int" @bind-SelectedValue="@CodigoMapaAgregar">
+            <SelectItem TValue="int" Value="-1">Sin datos</SelectItem>
+            @if (ListaMapas != null)
+            {
+              @foreach (Plantillas.CDatosMapaLista Elemento in ListaMapas)
+              {
+                <SelectItem TValue="int" Value="@Elemento.Codigo">@Elemento.Nombre</SelectItem>
+              }
+            }
+          </Select>
+        </Field>
+      }
+      <Field>
+        <FieldLabel>Ubicación</FieldLabel>
+        <TextEdit @bind-Text="@Posicion" Disabled="true" @onclick="@ObtenerPosicion" />
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 60px;" Color="Color.Secondary" Clicked="@ObtenerPosicion">Posicionar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Secondary" Clicked="@CerrarVentanaMapa">Cerrar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Primary" Disabled="@NoHayMapa" Clicked="@AgregarMapa">Agregar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+@*Agregar mapa*@
+<Modal @ref="ModalVarios" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar otros</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <div style="width: 100%; text-align: center;">
+        <Button style="width: 50px;" Color="Color.Link" Clicked="@PonerMimicos">Mímicos</Button>
+        <Button style="width: 50px; margin-left: 5px;" Color="Color.Link" Clicked="@PonerSubconsultas">Subconsultas</Button>
+      </div>
+      @if (ListaVarios != null)
+      {
+       <Field>
+         <FieldLabel>Mapas a agregar</FieldLabel>
+         <Select TValue="int" @bind-SelectedValue="@CodigoVariosAgregar">
+           <SelectItem TValue="int" Value="-1">Sin datos</SelectItem>
+           @if (ListaVarios != null)
+           {
+             @foreach (Listas.CListaTexto Elemento in ListaVarios)
+             {
+               <SelectItem TValue="int" Value="@Elemento.Codigo">@Elemento.Descripcion</SelectItem>
+             }
+           }
+          </Select>
+        </Field>
+      }
+      <Field>
+        <FieldLabel>Ubicación</FieldLabel>
+        <TextEdit @bind-Text="@Posicion" Disabled="true" @onclick="@ObtenerPosicion" />
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 60px;" Color="Color.Secondary" Clicked="@ObtenerPosicion">Posicionar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Secondary" Clicked="@CerrarVentanaVarios">Cerrar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Primary" Disabled="@NoHayVarios" Clicked="@AgregarVarios">Agregar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+@*Agregar indicador/tendencia*@
+<Modal @ref="ModalIndicador" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar @IndicadorTendencia</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Filtro</FieldLabel>
+        <TextEdit @bind-Text="@FiltroIndicador" />
+      </Field>
+      <Field>
+        <FieldLabel>@IndicadorTendencia a agregar</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@IndicadorAgregar">
+          <SelectItem TValue="int" Value="-1">..No definido..</SelectItem>
+          @foreach (CDatoIndicador Elemento in ListaIndicadores)
+          {
+            <SelectItem TValue="int" Value="@Elemento.Codigo">@Elemento.Descripcion</SelectItem>
+          }
+        </Select>
+      </Field>
+      <Field>
+        <FieldLabel>Ubicación</FieldLabel>
+        <TextEdit @bind-Text="@Posicion" Disabled="true" />
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 60px;" Color="Color.Secondary" Clicked="@ObtenerPosicion">Posicionar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Secondary" Clicked="@CerrarVentanaIndicador">Cerrar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Primary" Disabled="@NoHayIndicador" Clicked="@AgregarIndicador">Agregar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+@*Agregar tarjeta*@
+<Modal @ref="ModalTarjeta" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar tarjeta</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Filtro</FieldLabel>
+        <TextEdit @bind-Text="@FiltroTarjetas" />
+      </Field>
+      <Field>
+        <FieldLabel>Tarjeta a agregar</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@TarjetaAgregar">
+          <SelectItem TValue="int" Value="-1">..No definida..</SelectItem>
+          @foreach (CListaTexto Elemento in ListaTarjetas)
+          {
+            <SelectItem TValue="int" Value="@Elemento.Codigo">@Elemento.Descripcion</SelectItem>
+          }
+        </Select>
+      </Field>
+      @if (Dimensiones != null)
+      {
+        <Field>
+          <FieldLabel>Dimensión asociada</FieldLabel>
+          <Select TValue="int" @bind-SelectedValue="@DimensionAgregar">
+            <SelectItem TValue="int" Value="-1">..No corresponde..</SelectItem>
+            @foreach (Clases.CListaElementosDimension Elemento in Dimensiones)
+            {
+              <SelectItem TValue="int" Value="@Elemento.CodigoDimension">@Elemento.Descripcion</SelectItem>
+            }
+          </Select>
+        </Field>
+      }
+      @if (ElementosDimension != null)
+      {
+        <Field>
+          <FieldLabel>Elemento en la dimensión</FieldLabel>
+          <Select TValue="int" @bind-SelectedValue="@ElementoDimensionAgregar">
+            <SelectItem TValue="int" Value="-1">..No definido..</SelectItem>
+            @foreach (Clases.CListaElementosDimension Elemento in ElementosDimension)
+            {
+              <SelectItem TValue="int" Value="@Elemento.CodigoDimension">@Elemento.Descripcion</SelectItem>
+            }
+          </Select>
+        </Field>
+      }
+      <Field>
+        <FieldLabel>Ubicación</FieldLabel>
+        <TextEdit @bind-Text="@Posicion" Disabled="true" />
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 60px;" Color="Color.Secondary" Clicked="@ObtenerPosicion">Posicionar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Secondary" Clicked="@CerrarVentanaTarjeta">Cerrar</Button>
+      <Button style="width: 50px; margin-left: 5px;" Color="Color.Primary" Disabled="@NoHayTarjeta" Clicked="@AgregarTarjeta">Agregar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+@if (PidiendoPrms)
+			{
+        <CPrmSubconsultas Codigo="@SubconsultaEnEdicion"
+                          @ref="@ModalPrms"/>
+			}
+

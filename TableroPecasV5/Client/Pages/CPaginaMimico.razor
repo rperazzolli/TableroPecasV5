@@ -1,0 +1,10 @@
+﻿@page "/Mimicos/{Codigo:int}"
+@using Componentes;
+@using TableroPecasV5.Shared
+@inherits Logicas.CLogicaPaginaMimico
+
+<div id="ContenedorMimico" style="@EstiloMimico">
+  <TableroPecasV5.Client.Componentes.CMimico @ref="Mimico" CodigoUnico="@Codigo" />
+</div>
+
+

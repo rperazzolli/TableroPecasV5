@@ -1,0 +1,38 @@
+﻿@using TableroPecasV5.Shared;
+@inherits Logicas.CLogicaBingMaps
+
+
+<div id="@Direccion" style="@EstiloMapaComponente">
+  @if (Proyecto == null)
+  {
+    <a>Por favor aguarde unos segundos</a>
+  }
+</div>
+
+<Modal @ref="ModalMenu">
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Moverse a detalle</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <Select TValue="string" @bind-SelectedValue="@PreguntaElegida">
+          @*<SelectItem Value="-1">No corresponde</SelectItem>*@
+          @if (Preguntas != null)
+{
+        @foreach (CPreguntaPreguntaWISCN Pregunta in Preguntas)
+{
+        <SelectItem Style="@EstiloPregunta(Pregunta)" Value="@CodigoPregunta(Pregunta)">@TextoPregunta(Pregunta)</SelectItem>
+}
+      /**/
+}
+      /**/
+        </Select>
+      </Field>
+    </ModalBody>
+    <ModalFooter>
+      <Button Color="Color.Secondary" Clicked="@CerrarMenu">Cerrar</Button>
+      <Button Color="Color.Primary" Clicked="@Moverse">Abrir</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>

@@ -1,0 +1,101 @@
+﻿@using Microsoft.JSInterop
+@using WCFBPI
+@inherits Logicas.LogicaContenedorFiltros
+
+<div style="height: 25px;">
+  <img style="@EstiloImagen" @onclick="@AbrirGrafico" src="/Imagenes/Torta.PNG" />
+  <img style="@EstiloImagen" @onclick="@AbrirGrilla" src="/Imagenes/FiltroGrilla.PNG" />
+</div>
+
+<div style="@EstiloLista">
+
+  @if (Columnas != null)
+  {
+    @foreach (Logicas.LineaFiltro Linea in Lineas)
+    {
+      <div class="BaseLineaContenedorFiltros" style="@EstiloLinea(Linea)" />
+      <div class="LineaContenedorFiltros">
+        <span class="far fa-list-alt" />
+        <p style="display: inline-block; margin-left: 5px; font-size: 12px; cursor: pointer;" @onclick="@(e => FncSeleccionFila(Linea.Columna.Orden))">@Linea.Columna.Nombre</p>
+      </div>
+    }
+  }
+</div>
+
+<Modal @ref="ModalCrearGrafico">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar un gráfico</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        @*<FieldLabel >Clase de gráfico</FieldLabel>*@
+        <CheckEdit RadioGroup="grGraf" @bind-Checked="@EsTortas" IsInline="true">Tortas</CheckEdit>
+        <CheckEdit RadioGroup="grGraf" @bind-Checked="@EsBarras" IsInline="true">Barras</CheckEdit>
+        <CheckEdit RadioGroup="grGraf" @bind-Checked="@EsHistograma" IsInline="true">Histograma</CheckEdit>
+        <CheckEdit RadioGroup="grGraf" @bind-Checked="@EsBarrasApiladas" IsInline="true">Barras apiladas</CheckEdit>
+        <CheckEdit RadioGroup="grGraf" @bind-Checked="@EsPuntos" IsInline="true">Puntos</CheckEdit>
+      </Field>
+      <Field>
+        <FieldLabel>Campo de valores</FieldLabel>
+        <SelectEdit @bind-SelectedValue="@OrdenColumnaValor">
+          <SelectItem Value="-1">No corresponde</SelectItem>
+          @foreach (IndicadoresV2.Datos.CColumnaBase Columna in Proveedor.Columnas)
+{
+        @if (CumpleCondicionReal(Columna.Clase))
+{
+        <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+}
+      /**/
+}
+      /**/
+          /**/
+        </SelectEdit>
+      </Field>
+      @if (!EsHistograma)
+      {
+        <Field>
+          <FieldLabel>Campo agrupador</FieldLabel>
+          <SelectEdit @bind-SelectedValue="@OrdenColumnaAbscisa">
+            <SelectItem Value="-1">No corresponde</SelectItem>
+            @foreach (IndicadoresV2.Datos.CColumnaBase Columna in Proveedor.Columnas)
+{
+          @if (CumpleCondicionReal(Columna.Clase))
+{
+          <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+}
+        /**/
+}
+        /**/
+          </SelectEdit>
+        </Field>
+      }
+      @if (EsBarrasApiladas)
+      {
+        <Field>
+          <FieldLabel>Campo agrupador</FieldLabel>
+          <SelectEdit @bind-SelectedValue="@OrdenColumnaSexo">
+            <SelectItem Value="-1">No corresponde</SelectItem>
+            @foreach (IndicadoresV2.Datos.CColumnaBase Columna in Proveedor.Columnas)
+{
+          <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+}
+        /**/
+          </SelectEdit>
+        </Field>
+      }
+    </ModalBody>
+    <ModalFooter>
+      <Button Color="Color.Secondary" Clicked="@CerrarVentanaGrafico">Cerrar</Button>
+      <Button Color="@ColorBoton(1)" Style="@EstiloBoton(1)" Clicked="@(e => AgregarGrafico(1))">Acumulado</Button>
+      <Button Color="@ColorBoton(2)" Style="@EstiloBoton(2)" Clicked="@(e => AgregarGrafico(2))">Media</Button>
+      <Button Color="@ColorBoton(3)" Style="@EstiloBoton(3)" Clicked="@(e => AgregarGrafico(3))">@OpcionCantidad</Button>
+      <Button Color="@ColorBoton(4)" Style="@EstiloBoton(4)" Clicked="@(e => AgregarGrafico(4))">Mínimo</Button>
+      <Button Color="@ColorBoton(5)" Style="@EstiloBoton(5)" Clicked="@(e => AgregarGrafico(5))">Máximo</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+
+

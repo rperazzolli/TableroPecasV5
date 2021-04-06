@@ -1,0 +1,44 @@
+﻿@using TableroPecasV5.Client.Logicas
+@inherits Logicas.CLogicaCfgJerarquias
+
+<div style="width: 100%; height: 100%; position: absolute; background-color: rgba(128,128,128,0.3); overflow: hidden;">
+  <div style="@EstiloBloque">
+    <div style="background: #007DFF; height: 25px; width: calc(100% - 10px); text-align: left; margin: 5px; position: absolute;">
+      <label style="vertical-align: central; margin-left: 5px; font-size: 15px; position: absolute; color: white;">Configuración del reporte</label>
+      <div style="width: 25px; height: 25px; color: white; position: absolute; margin-left: calc(100% - 25px); margin-top: 0px; text-align: center; vertical-align: central; font-size: 15px; cursor: pointer;" @onclick="@Cerrar">X</div>
+    </div>
+    <div style="@EstiloSubBloque">
+      @if (Lineas != null)
+      {
+        @foreach (LineaTV Linea in Lineas)
+        {
+          @if (Linea.Superior == null || Linea.Superior.Abierto)
+          {
+            <div style="cursor: pointer; width: 100%; height: 28px; position: relative;" draggable="true" @ondragstart="@(() => IniciarDragLinea(Linea))"
+                 ondragover="event.preventDefault();" @ondrop="@(() => RecibirDrop(Linea))">
+              @if (Linea.TieneDependientes)
+              {
+                <div style="@EstiloMasMenos(Linea)" @onclick="@(() => AbrirCerrar(Linea))">
+                  <label>@Linea.TextoMasMenos</label>
+                </div>
+                <label style="display: inline-block; margin-left: 5px;">@Linea.Nombre</label>
+              }
+              else
+              {
+                <label style="@EstiloLinea(Linea)">@Linea.Nombre</label>
+              }
+            </div>
+          }
+        }
+      }
+    </div>
+
+    <div style="text-align: right; height: 29px; padding: 0px;">
+      <button style="border-radius: 0.3rem; margin-right: 5px; margin-top: 2px; width: 75px; height: 25px; padding: 0px;" @onclick="@RegistrarReporte">Registrar</button>
+      <button style="border-radius: 0.3rem; margin-right: 5px; margin-top: 2px; width: 75px; height: 25px; padding: 0px;" @onclick="@Cerrar">Cerrar</button>
+    </div>
+
+  </div>
+
+</div>
+

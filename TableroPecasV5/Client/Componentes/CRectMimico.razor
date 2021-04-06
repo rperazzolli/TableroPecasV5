@@ -1,0 +1,28 @@
+﻿@using TableroPecasV5.Client.Componentes
+@using Blazorise
+@using TableroPecasV5.Client.Listas
+@using TableroPecasV5.Shared
+@inherits Logicas.CLogicaRectMimico
+
+<div style="@EstiloRectangulo" @onclick="@FuncionClick" @onmouseenter="@Entrando" @onmouseleave="@Saliendo">
+  <svg width="@AnchoPantalla" height="@AltoPantalla" style="position: absolute;">
+    @if (!EsProceso)
+    {
+      @if (Configurando)
+      {
+        <rect x="0" y="0" width="@AnchoPantalla" height="@AltoPantalla"
+              style="fill: rgb(204,212,240);" />
+      }
+      @if (Adentro)
+      {
+        <rect x="0" y="0" width="@Ancho1" height="@Alto1"
+              style="fill: transparent;stroke-width:1;stroke: rgb(64,86,141);" />
+      }
+      @if (Configurando || Adentro)
+      {<text>
+        <text x="5" y="20" alignment-baseline="baseline" text-anchor="start">@Texto</text>
+       </text>
+      }
+    }
+  </svg>
+</div>

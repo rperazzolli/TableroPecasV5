@@ -1,0 +1,175 @@
+﻿@using Microsoft.JSInterop
+@using TableroPecasV5.Shared
+@inherits TableroPecasV5.Client.Logicas.CLogicaContenedorFiltros
+
+<div style="height: 25px;">
+  <img style="@EstiloImagen" @onclick="@AbrirGrafico" src="Imagenes/Torta.PNG" />
+  <img style="@EstiloImagen" @onclick="@AbrirGrilla" src="Imagenes/FiltroGrilla.PNG" />
+</div>
+
+<div style="@EstiloLista">
+
+  @if (Columnas != null)
+  {
+    <CascadingValue Value="this">
+      @if (Lineas != null)
+      {
+        @foreach (Logicas.LineaFiltro Linea in Lineas)
+        {
+          <TableroPecasV5.Client.Componentes.CLineaFiltro Linea="@Linea" />
+        }
+      }
+      </CascadingValue>
+  }
+</div>
+
+
+<Modal @ref="ModalCrearGrafico" Style="position: fixed; z-index: 99999999;" Closing="@Cerrando">
+<ModalBackdrop />
+<ModalContent IsCentered="true">
+  <ModalHeader>
+    <ModalTitle>Agregar un gráfico</ModalTitle>
+  </ModalHeader>
+  <ModalBody>
+    <Field>
+      <FieldLabel>Gráfico seleccionado: @GraficoSeleccionado</FieldLabel>
+      <br/>
+      <RadioGroup TValue="int" @bind-CheckedValue="@ClaseGraficoElegido" Buttons="true">
+        <Radio TValue="int" Value="@((int)ClaseGrafico.Torta)">Tortas</Radio>
+        <Radio TValue="int" Value="@((int)ClaseGrafico.Barras)">Barras</Radio>
+        <Radio TValue="int" Value="@((int)ClaseGrafico.Histograma)">Histograma</Radio>
+        <Radio TValue="int" Value="@((int)ClaseGrafico.BarrasH)">Barras apiladas</Radio>
+        <Radio TValue="int" Value="@((int)ClaseGrafico.Puntos)">Puntos</Radio>
+      </RadioGroup>
+    </Field>
+    @if (Proveedor != null && Proveedor.Columnas != null)
+    {
+    <Field>
+      <FieldLabel>Campo de valores</FieldLabel>
+      <Select TValue="int" @bind-SelectedValue="@OrdenColumnaValor">
+        <SelectItem Value="-1">No corresponde</SelectItem>
+        @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+        {
+          @if (CumpleCondicionReal(Columna.Clase))
+          {
+            <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+          }
+        }
+      </Select>
+    </Field>
+    @if (!EsHistograma)
+    {
+      <Field>
+        <FieldLabel>Campo agrupador</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@OrdenColumnaAbscisa">
+          <SelectItem Value="-1">No corresponde</SelectItem>
+          @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+          {
+            @if (CumpleCondicionReal(Columna.Clase))
+            {
+              <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+            }
+          }
+        </Select>
+      </Field>
+    }
+    @if (EsBarrasApiladas)
+    {
+      <Field>
+        <FieldLabel>Segundo campo agrupador</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@OrdenColumnaSexo">
+          <SelectItem Value="-1">No corresponde</SelectItem>
+          @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+          {
+            <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+          }
+        </Select>
+      </Field>
+    }
+    }
+  </ModalBody>
+  <ModalFooter Style="display: inline-block;">
+    <Button Color="Color.Secondary" Clicked="@CerrarVentanaGrafico" Style="width: 50px;">Cerrar</Button>
+    @if (Proveedor != null && Proveedor.Columnas != null)
+    {
+    <Button Color="@ColorBoton(1)" Style="@EstiloBoton(1, 75)" Clicked="@(e => AgregarGrafico(1))">Acumulado</Button>
+    <Button Color="@ColorBoton(2)" Style="@EstiloBoton(2)" Clicked="@(e => AgregarGrafico(2))">Media</Button>
+    <Button Color="@ColorBoton(3)" Style="@EstiloBoton(3, 75)" Clicked="@(e => AgregarGrafico(3))">@OpcionCantidad</Button>
+    <Button Color="@ColorBoton(4)" Style="@EstiloBoton(4)" Clicked="@(e => AgregarGrafico(4))">Mínimo</Button>
+    <Button Color="@ColorBoton(5)" Style="@EstiloBoton(5)" Clicked="@(e => AgregarGrafico(5))">Máximo</Button>
+    }
+  </ModalFooter>
+</ModalContent>
+</Modal>
+
+@*<Modal @ref="ModalCrearGrafico">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar un gráfico</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+          <FieldLabel >Clase de gráfico</FieldLabel>
+          <Check TValue="bool" RadioGroup="grGraf" @bind-Check="@EsTortas" IsInline="true">Tortas</Check>
+          <Check TValue="bool" RadioGroup="grGraf" @bind-Check="@EsBarras" IsInline="true">Barras</Check>
+          <Check TValue="bool" RadioGroup="grGraf" @bind-Check="@EsHistograma" IsInline="true">Histograma</Check>
+          <Check TValue="bool" RadioGroup="grGraf" @bind-Check="@EsBarrasApiladas" IsInline="true">Barras apiladas</Check>
+          <Check TValue="bool" RadioGroup="grGraf" @bind-Check="@EsPuntos" IsInline="true">Puntos</Check>
+        </Field>
+      <Field>
+        <FieldLabel>Campo de valores</FieldLabel>
+        <Select TValue="int" SelectedValue="@OrdenColumnaValor">
+          <SelectItem Value="-1">No corresponde</SelectItem>
+          @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+          {
+            @if (CumpleCondicionReal(Columna.Clase))
+            {
+              <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+            }
+          }
+        </Select>
+      </Field>
+      @if (!EsHistograma)
+              {
+                <Field>
+                  <FieldLabel>Campo agrupador</FieldLabel>
+                  <Select TValue="int" SelectedValue="@OrdenColumnaAbscisa">
+                    <SelectItem Value="-1">No corresponde</SelectItem>
+                    @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+        {
+                  @if (CumpleCondicionReal(Columna.Clase))
+        {
+                  <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+        }
+        }
+                  </Select>
+                </Field>
+              }
+              @if (EsBarrasApiladas)
+              {
+                <Field>
+                  <FieldLabel>Campo agrupador</FieldLabel>
+                  <Select TValue="int" SelectedValue="@OrdenColumnaSexo" >
+                    <SelectItem Value="-1">No corresponde</SelectItem>
+                    @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+        {
+                  <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+        }
+                  </Select>
+                </Field>
+              }
+    </ModalBody>
+    <ModalFooter Style="display: inline-block;">
+      <Button Color="Color.Secondary" Clicked="@CerrarVentanaGrafico">Cerrar</Button>
+        <Button Color="@ColorBoton(1)" Style="@EstiloBoton(1)" Clicked="@(e => AgregarGrafico(1))">Acumulado</Button>
+        <Button Color="@ColorBoton(2)" Style="@EstiloBoton(2)" Clicked="@(e => AgregarGrafico(2))">Media</Button>
+        <Button Color="@ColorBoton(3)" Style="@EstiloBoton(3)" Clicked="@(e => AgregarGrafico(3))">@OpcionCantidad</Button>
+        <Button Color="@ColorBoton(4)" Style="@EstiloBoton(4)" Clicked="@(e => AgregarGrafico(4))">Mínimo</Button>
+        <Button Color="@ColorBoton(5)" Style="@EstiloBoton(5)" Clicked="@(e => AgregarGrafico(5))">Máximo</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>*@
+
+
+

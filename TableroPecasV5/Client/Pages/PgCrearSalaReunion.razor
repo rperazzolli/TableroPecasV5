@@ -1,0 +1,41 @@
+﻿@page "/CrearSalaReunion"
+@using System.Threading.Tasks;
+@using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Componentes
+@inherits TableroPecasV5.Client.Logicas.CLogicaCrearSalaReunion
+@inject IJSRuntime JSRuntime
+
+<Modal @ref="ModalCrearSala" Style="position: fixed; z-index: 99999999;" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar una sala de reunión</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Nombre de la sala</FieldLabel>
+        <TextEdit Placeholder="Denominación de la sala" @bind-Text="@Nombre" />
+      </Field>
+      <Field>
+        <FieldLabel>Comité</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@Comite">
+          @if (GruposPuestos != null)
+          {
+            @foreach (CGrupoPuestosCN Grupo in GruposPuestos)
+            {
+              <SelectItem Value="@Grupo.Codigo">@Grupo.Descripcion</SelectItem>
+            }
+          }
+        </Select>
+      </Field>
+      <Field>
+        <Check TValue="bool" @bind-Checked="@Exclusiva">Únicamente yo o el administrador pueden editarla</Check>
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button Color="Color.Primary" Disabled="@DesHabilitado" Clicked="@Registrar" Style="width: 50px;">Registrar</Button>
+      <Button Color="Color.Secondary" Clicked="@Salir" Style="width: 50px; margin-left: 10px;">Abortar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+

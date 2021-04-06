@@ -1,0 +1,119 @@
+﻿@using Microsoft.JSInterop
+@using Blazorise
+@using TableroPecasV5.Client.Datos; 
+@inherits Logicas.CLogicaFiltroTextos
+
+<div style="height: 25px; text-align: left; margin-left: 5px; width: 100%; " @onmousedown="@EventoMouseAbajo">
+  <a class="TextoNombreFiltro" style="@EstiloNombre">@Filtrador.Columna.Nombre</a>
+</div>
+
+<div class="ContenedorComandosFiltro">
+  <div class="BarraComandosFiltro">
+    @if (!ColumnaFecha)
+    {
+    <a class="fa fa-bars EstiloBoton" @onclick="@Agrupar"></a>
+    }
+    <a class="fas fa-filter EstiloBoton" @onclick="@Filtrar"></a>
+    <a class="far fa-window-close EstiloBoton" @onclick="@Cerrar"></a>
+  </div>
+</div>
+
+@if (!ColumnaReal && !ColumnaFecha && FilasEnPantalla != null)
+{
+  <div class="ListaFiltros" style="@EstiloLista" ondragover="event.preventDefault();" @ondrop="RecibirDrop">
+
+    @foreach (CElementoFilaAsociativa Fila in FilasEnPantalla)
+    {
+      <div style="width: 100%;">
+        <div class="BarraColorFiltro" style="@EstiloBandaAbajo(Fila)" />
+        <div class="BarraColorFiltro BarraColorFiltroSuperpuesta" style="@EstiloBandaAzul(Fila)" />
+        <div class="DivTextoFiltroDerecha" style="@EstiloFilaValor(Fila)">
+          <a class="TextoFiltroDerecha">@ValorDerecha(Fila)</a>
+        </div>
+        <div class="DivTextoFiltro" style="@EstiloFilaTexto(Fila)">
+          <a class="TextoFiltro">@Fila.Nombre</a>
+        </div>
+        <div class="DivCheckFiltro">
+          <input type="checkbox"
+                 class="CheckFiltro"
+                 @bind="@Fila.Seleccionado" />
+        </div>
+      </div>
+    }
+
+  </div>
+}
+
+@if (ColumnaReal)
+{
+  <div class="container" style="font-size: 11px; text-align: left;" ondragover="event.preventDefault();" @ondrop="RecibirDrop">
+    <label for="minimo" style="margin-bottom: 0px;"><b>Mínimo</b></label>
+    <input type="text" class="TextBoxEntrada" style="padding: 0px; margin-bottom: 15px; margin-top: 5px;" placeholder="Ingrese el mínimo" name="minimo" required @bind-value="@MinimoRango" />
+
+    <label for="maximo" style="margin-bottom: 0px; margin-top: 0px;"><b>Maximo</b></label>
+    <input type="text" class="TextBoxEntrada" style="padding: 0px; margin-top: 5px;" placeholder="Ingrese el máximo" name="maximo" required @bind-value="@MaximoRango" />
+
+  </div>
+}
+
+@if (ColumnaFecha)
+{
+  <div class="ListaFiltros" style="@EstiloLista" ondragover="event.preventDefault();" @ondrop="RecibirDrop">
+
+    @foreach (CElementoFilaAsociativaFecha Fila in FilasFechaEnPantallaVisibles)
+    {
+    <div style="width: 100%;">
+      <div class="BarraColorFiltro" style="@EstiloBandaAbajo(Fila)" />
+      <div class="DivTextoFiltro" style="@EstiloFilaTexto(Fila)">
+        <a class="TextoFiltro" style="@EstiloFilaTextoFecha(Fila)">@Fila.Nombre</a>
+      </div>
+      <div class="DivMasFiltro" style="@EstiloMasFecha(Fila)">
+        <a @onclick="@(e => FncAbrirCerrar(Fila))">@Fila.TextoMas</a>
+      </div>
+      <div class="DivCheckFiltro" style="@EstiloCheckFecha(Fila)">
+        <input type="checkbox"
+               class="CheckFiltro"
+               @bind="@Fila.Seleccionado" />
+      </div>
+    </div>
+    }
+
+  </div>
+}
+
+<Modal @ref="ModalAgrupar" Style="text-align: left;">
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agrupar valores</ModalTitle>
+      <div style="text-align: right; margin-top: 2px; margin-right: 2px;">
+        <CloseButton Clicked="@CerrarVentanaAgrupar" />
+      </div>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Columna</FieldLabel>
+        <Select TValue="string" @bind-SelectedValue="@ColumnaAgrupadora">
+          <SelectItem Value="-1">No corresponde</SelectItem>
+          @foreach (CColumnaBase ColumnaLocal in Filtrador.Proveedor.Columnas)
+          {
+            if (ColumnaLocal.Orden != Filtrador.Columna.Orden)
+            {
+              <SelectItem TValue="string" Value="@ColumnaLocal.Nombre">@ColumnaLocal.Nombre</SelectItem>
+            }
+          }
+        </Select>
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block;">
+      <Button Style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarVentanaAgrupar">Cerrar</Button>
+      <Button Color="Color.Primary" Style="@EstiloBoton(1, 75)" Clicked="@(e => FncAgrupar(1))">Acumulado</Button>
+      <Button Color="Color.Primary" Style="@EstiloBoton(2)" Clicked="@(e => FncAgrupar(2))">Media</Button>
+      <Button Color="Color.Primary" Style="@EstiloBoton(3, 75)" Clicked="@(e => FncAgrupar(3))">Cantidad</Button>
+      <Button Color="Color.Primary" Style="@EstiloBoton(4)" Clicked="@(e => FncAgrupar(4))">Mínimo</Button>
+      <Button Color="Color.Primary" Style="@EstiloBoton(5)" Clicked="@(e => FncAgrupar(5))">Máximo</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+
+

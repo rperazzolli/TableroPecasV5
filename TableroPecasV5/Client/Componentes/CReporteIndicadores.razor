@@ -1,0 +1,31 @@
+﻿@using TableroPecasV5.Shared
+@using Blazorise
+@inherits Logicas.CLogicaMimico
+
+<div style="width: 100%; height: 100%; position: absolute; background: rgba(128, 128, 128, 0.3); text-align: center;">
+   <div style="width: 80%; height: 50%; margin: 10%;">
+     <Table Striped="true" Bordered="true" Hoverable="true" FullWidth="true">
+       <TableHeader ThemeContrast="ThemeContrast.Light">
+         <TableRow>
+           <TableHeaderCell style="width: 120px;">Referencia</TableHeaderCell>
+           <TableHeaderCell style="width: 120px;">Indicador</TableHeaderCell>
+           <TableHeaderCell style="width: 60px;">Período</TableHeaderCell>
+           <TableHeaderCell style="width: 60px;">Valor</TableHeaderCell>
+           <TableHeaderCell style="width: 45px;">Unidad</TableHeaderCell>
+           <TableHeaderCell style="width: 40px;">Tend.</TableHeaderCell>
+           <TableHeaderCell style="width: 60px;">Mínimo</TableHeaderCell>
+           <TableHeaderCell style="width: 60px;">Satisfactorio</TableHeaderCell>
+           <TableHeaderCell style="width: 60px;">Sobresaliente</TableHeaderCell>
+         </TableRow>
+       </TableHeader>
+       @foreach (Clases.CLineaReporte Linea in Lineas)
+			 {
+         <TableRow>
+           <TableRowCell>@Linea.Referencia</TableRowCell>
+           <TableRowCell>@Linea.Indicador.Descripcion</TableRowCell>
+         </TableRow>
+			 }
+     </Table>
+     <strong style="background: lightgray;"></strong>
+   </div>
+</div>

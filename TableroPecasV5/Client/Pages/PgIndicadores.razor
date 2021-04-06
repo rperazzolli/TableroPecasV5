@@ -1,0 +1,44 @@
+﻿@page "/Indicadores"
+@inject NavigationManager NavigationManager
+
+@using TableroPecasV5.Shared
+@inherits TableroPecasV5.Client.Logicas.CLogicaIndicadores
+
+@*<div style="margin: 0px; height: 25px; display: inline-block; width: 100%;" class="tab">
+  <button style="@EstiloComando(1)" class="tab">Indicadores</button>
+  <button style="@EstiloComando(2)" class="tab">Salas de reunión</button>
+  <button style="@EstiloComando(3)" class="tab">Mapas</button>
+  <button style="@EstiloComando(4)" class="tab">Mímicos</button>
+</div>*@
+
+<div style="margin: 0px; height: 50px">
+  <div class="form" style="margin: 10px 25px 10px 25px; height: 25px;">
+    <div style="display: inline-block; font-size: 12px; position: absolute; float: left;">
+      <label for="uname" style="margin-left: 25px;"><b>Filtro</b></label>
+      <input type="text" style="margin-left: 10px; display: inline-block; width: 199px; height: 20px;"
+             placeholder="Ingrese el filtro" name="uname" required @bind-value="@Filtro" />
+      <button class="vertical-center" style="padding: 5px 0px 0px 0px; margin-left: 20px; width: 25px;" @onclick="@FiltrarIndicadores">
+        <span class="oi oi-reload" />
+      </button>
+    </div>
+  </div>
+</div>
+
+<div style="padding-left: 25px; width: 100%; bottom: 0px; height: calc(100vh - 74px); overflow: auto; display: block; box-sizing: inherit;">
+  @foreach (CDatoIndicador Indicador in ListaIndicadores)
+  {
+    <div>
+      <span class="fa fa-pie-chart" />
+      <p style="display: inline-block; margin-left: 5px; width: 400px; font-size: 12px; cursor: pointer;" @onclick="@(e => @Navegar(Indicador.Codigo))">@Indicador.Descripcion</p>
+    </div>
+  }
+</div>
+
+@code{
+  private void Navegar(Int32 Codigo)
+  {
+    //    NavigationManager.NavigateTo("JSInterop");
+    NavigationManager.NavigateTo("DetalleIndicador/" + Codigo.ToString(), false);
+  }
+}
+

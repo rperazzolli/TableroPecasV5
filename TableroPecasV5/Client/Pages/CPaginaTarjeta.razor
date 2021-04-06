@@ -1,0 +1,54 @@
+﻿@page "/Tarjeta/{Codigo:int}"
+@using TableroPecasV5.Shared
+@using TableroPecasV5.Client.Plantillas
+@inherits Logicas.CLogicaPaginaTarjeta
+
+@if (PreguntasIndicadores == null)
+{
+  <p>Aguarde unos segundos por favor</p>
+}
+else
+{
+  <div style="width: 100%; height: 100%; overflow: auto; position: relative;">
+<div style="@EstiloCompleto">
+
+
+  @if (IndicadoresEnTarjeta)
+  {
+  @foreach (Logicas.CPreguntaIndicadorConAlarmas Indicador in PreguntasIndicadores)
+  {
+    <div style="@EstiloIndicador(Indicador.Indicador)" @onclick="@((e) => { MoverseAIndicador(Indicador.Indicador); })">
+      <div class="ui-widget-content"
+           style=@EstiloReloj>
+        <b>@Indicador.NombreIndicador</b>
+        <br />
+        @Indicador.Unidades
+        <p />
+        @if (Contenedores.CContenedorDatos.SiempreTendencia)
+        {
+          <div class="Centrada" style="width: 350px; height: 180px;">
+            <TableroPecasV5.Client.Componentes.CTendRed @ref="@Indicador.Reloj"
+                                                      Indicador="@Indicador.DatosIndicador"
+                                                      Alarmas="@Indicador.Alarmas" @key="@Indicador.CodigoUnico"
+                                                      CodigoElementoDimension="@Indicador.Indicador.ElementoDimension"
+                                                      CodigoUnico="@Indicador.CodigoUnico" />
+          </div>
+        }
+        else
+        {
+          <div class="Centrada" style="width: 110px; height: 60px;">
+            <TableroPecasV5.Client.Componentes.CReloj @ref="@Indicador.Reloj"
+                                                      Indicador="@Indicador.DatosIndicador"
+                                                      Alarmas="@Indicador.Alarmas" @key="@Indicador.CodigoUnico"
+                                                      CodigoElementoDimension="@Indicador.Indicador.ElementoDimension"
+                                                      CodigoUnico="@Indicador.CodigoUnico" />
+          </div>
+        }
+        <p>@Indicador.ValorIndicador</p>
+      </div>
+     </div>
+    }
+  }
+    </div>
+  </div>
+}

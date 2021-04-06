@@ -1,0 +1,223 @@
+﻿@using TableroPecasV5.Shared;
+@inherits Logicas.CLogicaMimico
+
+@if (Mimico == null)
+{
+  <a>Por favor aguarde unos segundos</a>
+}
+else
+{
+  <div style="position: absolute; width: 100%; height: 100%;">
+    <CascadingValue Value="this">
+    @if (Contenedores.CContenedorDatos.EsAdministrador)
+    {
+      <div style="width: 100%; height: 28px; position: absolute; background: #CCD4F0; display: inline-block;">
+        <input type="checkbox" @bind="@Configurando" value="Configurar" style="margin-left: 5px; margin-top: 4px;" />
+        <label>Configurar</label>
+        @if (Configurando)
+        {
+          @if (HayImagen)
+          {
+            <input type="checkbox" @bind="@Ajustar" style="margin-left: 15px; margin-top: 4px;" />
+            <label>Ajustar contenido</label>
+          }
+          <button style="border-radius: 0.3rem; margin-left: 15px; margin-top: 1px; width: 160px; height: 25px; padding: 0px;" @onclick="@ImponerContenido">Contenido mímico</button>
+          @if (HayImagen)
+          {
+            <button style="border-radius: 0.3rem; margin-left: 15px; margin-top: 1px; width: 140px; height: 25px; padding: 0px;" @onclick="@AgregarElemento">Agregar link</button>
+          }
+          @if (HayProceso)
+          {
+            <button style="border-radius: 0.3rem; margin-left: 15px; margin-top: 1px; width: 99px; height: 25px; padding: 0px;" @onclick="@CfgReporte">Cfg Reporte</button>
+            <button style="border-radius: 0.3rem; margin-left: 5px; margin-top: 1px; width: 99px; height: 25px; padding: 0px;" @onclick="@VerReporte">Ver Reporte</button>
+          }
+          <button style="border-radius: 0.3rem; margin-left: 45px; margin-top: 1px; width: 99px; height: 25px; padding: 0px;" @onclick="@Registrar">Registrar</button>
+          <button style="border-radius: 0.3rem; margin-left: 5px; margin-top: 1px; width: 99px; height: 25px; padding: 0px;" @onclick="@Borrar">Borrar</button>
+        }
+        else
+        {
+          @if (HayProceso)
+          {
+            <button style="border-radius: 0.3rem; margin-left: 5px; margin-top: 1px; width: 99px; height: 25px; padding: 0px;" @onclick="@VerReporte">Ver Reporte</button>
+          }
+        }
+      </div>
+    }
+    <div style=@EstiloMimico>
+      <div style="@EstiloContenido" transform="@Escala">
+        @if (HayImagen)
+        {
+          <img style="@EstiloImagen" src="@ContenidoImagen">
+        }
+        @if (HayProceso)
+        {
+          <div style="width: 100%; height: 100%; position: absolute; overflow: auto; margin-left: 0px; margin-top: 0px;" >
+            <div style="position: absolute; margin-left: 0px; margin-top: 0px;">
+              <Blazor.Extensions.Canvas.BECanvas Width="@AnchoCanvas" Height="@AltoCanvas" @ref="@CanvasGrafico"/>
+            </div>
+            <div style="@EstiloDivCanvas" @onmouseup="@UbicarElemento"/>
+          </div>
+        }
+        @if (Mimico != null)
+        {
+          @foreach (CElementoPreguntasCN Pregunta in Mimico.GruposDePreguntasDelMimico)
+          {
+            <div style="@Estilo(Pregunta)">
+              <TableroPecasV5.Client.Componentes.CRectMimico AlHacerClick="@ClickEnArea"
+                                                           Configurando="@Configurando"
+                                                           Abscisa="Pregunta.Abscisa"
+                                                           Ordenada="Pregunta.Ordenada"
+                                                           Ancho="Pregunta.Ancho"
+                                                           Alto="Pregunta.Alto"
+                                                           Texto="@Pregunta.Nombre"
+                                                           Factor="@FactorEscala"
+                                                           CodigoPropio="Pregunta.Codigo"
+                                                           EsProceso="@HayProceso"/>
+              </div>
+          }
+        }
+      </div>
+    </div>
+      @if (EditandoReporte)
+			{
+        <CCfgJerarquias Mimico="Mimico.MimicoPropio.Codigo"
+                        Tareas="TareasEnProceso"/>
+		  }
+    </CascadingValue>
+  </div>
+
+  @if (Posicionando)
+  {
+    <TableroPecasV5.Client.Componentes.CDefinirRectangulos @ref="@DefinidorRectangulos" />
+  }
+
+  <Modal @ref="ModalMenu">
+    <ModalContent IsCentered="true">
+      <ModalHeader>
+        <ModalTitle>Moverse a detalle</ModalTitle>
+      </ModalHeader>
+      <ModalBody>
+        <Field>
+          <Select TValue="string" @bind-SelectedValue="@PreguntaElegida">
+            <SelectItem Value="-1">No corresponde</SelectItem>
+            @if (Preguntas != null)
+            {
+              @foreach (CDetallePreguntaCN Pregunta in Preguntas)
+              {
+                <SelectItem Style="@EstiloPregunta(Pregunta)" Value="@CodigoPregunta(Pregunta)">@TextoPregunta(Pregunta)</SelectItem>
+              }
+              /**/
+            }
+            /**/
+          </Select>
+        </Field>
+      </ModalBody>
+      <ModalFooter Style="display: inline-block; text-align: center;">
+        <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarMenu">Cerrar</Button>
+        <Button style="width: 50px;" Color="Color.Primary" Clicked="@Moverse">Abrir</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+
+  <Modal @ref="ModalContenido">
+    <ModalContent IsCentered="true">
+      <ModalHeader>
+        <ModalTitle>Definir contenido mímico</ModalTitle>
+      </ModalHeader>
+      <ModalBody>
+        <Field>
+          <Label>Contenido</Label>
+          <FileEdit Filter="*.jpeg, *.png, *.gif, *.xpdl" Changed="@ImponerArchivo" />
+        </Field>
+      </ModalBody>
+      <ModalFooter Style="display: inline-block; text-align: center;">
+        <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarMenu">Cerrar</Button>
+        <Button style="width: 50px;" Color="Color.Primary" Disabled="NoHayArchivo" Clicked="@AjustarContenido">Abrir</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+
+  <Modal @ref="ModalDefinir">
+    <ModalContent IsCentered="true">
+      <ModalHeader>
+        <ModalTitle>Nuevo mímico</ModalTitle>
+      </ModalHeader>
+      <ModalBody>
+        <Field>
+          <Label>Denominación</Label>
+          <TextEdit TValue="string" @bind-Text="@Denominacion" />
+        </Field>
+        <Field>
+          <Label>Comité</Label>
+          <Select TValue="int" @bind-SelectedValue="@Comite">
+            @if (Contenedores.CContenedorDatos.gComitesUsuario != null)
+            {
+              @foreach (CGrupoPuestosCN Comites in Contenedores.CContenedorDatos.gComitesUsuario)
+              {
+                <SelectItem Value="@Comites.Codigo">@Comites.Descripcion</SelectItem>
+              }
+              /**/
+            }
+            /**/
+          </Select>
+        </Field>
+        <Field>
+          <Label>Imagen</Label>
+          <FileEdit Filter=".jpeg, .png, .gif, .xpdl" Changed="@ImponerArchivo" />
+        </Field>
+      </ModalBody>
+      <ModalFooter Style="display: inline-block; text-align: center;">
+        <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarMenu">Cerrar</Button>
+        <Button style="width: 50px;" Color="Color.Primary" Disabled="NoHayMimico" Clicked="@CrearMimico">Crear</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+
+  <Modal @ref="ModalElementos">
+    <ModalContent IsCentered="true">
+      <ModalHeader>
+        <ModalTitle>Nuevo link</ModalTitle>
+      </ModalHeader>
+      <ModalBody>
+        <Field>
+          <Label>Nombre</Label>
+          <TextEdit @bind-Text="@NombreDelElemento"/>
+        </Field>
+        <Field>
+        <Label>Categorías</Label>
+        <Select TValue="int" @bind-SelectedValue="@Categoria">
+          @foreach (Listas.CListaTexto Elemento in Categorias)
+          {
+            <SelectItem TValue="int" Value="@Elemento.Codigo">@Elemento.Descripcion</SelectItem>
+          }
+        </Select>
+        </Field>
+        <Field>
+          <Label>Filtro</Label>
+          <TextEdit @bind-Text="@Filtro" />
+        </Field>
+        <Field>
+          <Label>Elementos a agregar</Label>
+          <Select TValue="int" @bind-SelectedValue="@ElementoSeleccionado">
+            @foreach (Listas.CListaTexto Elemento in ElementosFiltrados)
+            {
+              <SelectItem TValue="int" Value="@Elemento.Codigo">@Elemento.Descripcion</SelectItem>
+            }
+          </Select>
+        </Field>
+
+        <Label><b>Elementos Incluídos</b></Label><br />
+        @foreach (Logicas.ElementoIncluido E in ElementosIncluidos)
+        {
+          <label>@E.Text</label><br />
+        }
+      </ModalBody>
+      <ModalFooter Style="display: inline-block; text-align: center;">
+        <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarMenu">Cerrar</Button>
+        <Button style="width: 50px;" Color="Color.Primary" Disabled="NoHayElementos" Clicked="@CrearEntrada">Crear</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+
+}
+

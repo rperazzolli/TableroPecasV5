@@ -1,0 +1,21 @@
+﻿@inherits Logicas.CLogicaMapaCalor
+
+
+<div id="@Direccion" style="@Estilo">
+  @if (!DatosCompletos)
+  {
+  <div style="@EstiloAguarda">
+    <p/>
+    <p/>
+    <i class="fa fa-spinner fa-pulse"></i>
+    <a>Por favor aguarde unos segundos</a>
+  </div>
+  }
+  else
+  {
+    @if (SinDatos)
+    {
+      <a>No hay datos disponibles</a>
+    }
+  }
+</div>

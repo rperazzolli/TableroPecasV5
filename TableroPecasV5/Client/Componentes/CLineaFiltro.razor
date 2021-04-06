@@ -1,0 +1,7 @@
+﻿@inherits Logicas.CLogicaLineaFiltro
+
+<div class="BaseLineaContenedorFiltros" style="@EstiloLinea(Linea)"/>
+<div class="LineaContenedorFiltros" draggable="true"  @ondragstart="@(() => IniciarDragLinea(Linea))">
+  <span class="far fa-list-alt" />
+  <p style="display: inline-block; margin-left: 5px; font-size: 12px; cursor: pointer;" >@Linea.Columna.Nombre</p>
+</div>

@@ -1,0 +1,38 @@
+﻿@page "/Login"
+@inherits TableroPecasV5.Client.Logicas.CLogicaLogin
+
+  <div style="margin: 20px 20% 0% 20%; max-width: 400px; align-content: center;">
+    @if (TableroPecasV5.Client.Contenedores.CContenedorDatos.HabilitarLogin)
+    {
+      <div class="form" style="background-color: #ffffff; padding-top: 20px; border-color: gray; border-width: 1px;">
+
+        <div class="imgcontainer" style="margin-top: 20px;">
+          <img src="Imagenes/Login_Red.png">
+        </div>
+
+        <div class="container">
+          <label for="uname"><b>Usuario</b></label>
+          <input type="text" placeholder="Ingrese el usuario" name="uname" required @bind-value="@Usuario" />
+          <p/>
+          <label for="psw"><b>Clave</b></label>
+          <input type="password" placeholder="Clave de acceso" name="psw" required @bind-value="@Clave" />
+             <p/>
+          <button style="border-radius: 0.3rem;" @onclick="@LoginUsuarioAsync">Login</button>
+
+          @if (MensajeLogin!=null && MensajeLogin.Length>0)
+          {
+          <div>
+            <i class="fa fa-spinner fa-pulse"></i>
+            <p style="display: inline-block; margin-left: 5px;">@MensajeLogin</p>
+          </div>
+          }
+
+        </div>
+
+      </div>
+    }
+    else
+    {
+    }
+  </div>
+

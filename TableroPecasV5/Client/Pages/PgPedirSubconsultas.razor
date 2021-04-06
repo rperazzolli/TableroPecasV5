@@ -1,0 +1,134 @@
+﻿@page "/PedirPrmsSubconsulta/{Codigo:int}"
+@using System.Threading.Tasks;
+@using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Logicas
+@using TableroPecasV5.Client.Listas;
+@inherits TableroPecasV5.Client.Logicas.CLogicaPedirSubconsultas
+@inject IJSRuntime JSRuntime
+
+<Modal @ref="Dialogo" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>@Nombre</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      @if (Parametros != null)
+      {
+        @foreach (DatosPrmSubconsulta Dato in Parametros)
+        {
+          <FieldLabel>@Dato.Parametro.Nombre</FieldLabel>
+          @if (Dato.Parametro.TieneQuery)
+          {
+            if (Dato.Lista != null)
+            {
+              @if (Dato.Lista != null)
+              {
+                <Select TValue="string" @bind-SelectedValue="@Dato.ValorLista">
+                @foreach (CListaDoble Elemento in Dato.Lista)
+                {
+                  <SelectItem TValue="string" Value="@Elemento.Descripcion">@Elemento.Detalle</SelectItem>
+                }
+                </Select>
+              }
+            }
+          }
+          else
+          {
+            @if (Dato.EsEntero)
+            {
+               <NumericEdit Disabled="@Aguardando" TValue="int" @bind-Value="@Dato.ValorEntero"/>
+            }
+            else
+            {
+              @if (Dato.EsReal)
+              {
+                <NumericEdit Disabled="@Aguardando" TValue="double" @bind-Value="@Dato.ValorReal" />
+              }
+              else
+              {
+                @if (Dato.EsFecha)
+                {
+                  <DateEdit Disabled="@Aguardando" TValue="DateTime?" Date="@Dato.ValorFecha"/>
+                }
+                else
+                {
+                  <TextEdit Disabled="@Aguardando" TValue="string" @bind-Text="@Dato.ValorTexto" />
+                }
+              }
+            }
+          }
+          <p/>
+        }
+      }
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@Abrir">Abrir</Button>
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@Ignorar">Salir</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+
+@*<div style="width: 100%; align-content: center;">
+  <dialog open style="width: 180px;">
+    <p></p>
+    <p></p>
+    <p />
+    <p />
+    <p style="font-size: 18px; font-weight: 400;">@Nombre</p>
+    <p />
+    <p />
+    <div style="align-content: start; width: 100%; background-color: blue;">
+      @if (Parametros != null)
+      {
+        @foreach (DatosPrmSubconsulta Dato in Parametros)
+        {
+          <label for="@Dato.Parametro.Nombre">@Dato.Parametro.Nombre</label><br />
+          @if (Dato.Parametro.TieneQuery)
+          {
+            if (Dato.Lista != null)
+            {
+              @if (Dato.Lista != null)
+              {
+                <select disabled="@Aguardando" id="@Dato.Parametro.Nombre" @onchange="@Dato.CambioValor">
+                  @foreach (CListaDoble Elemento in Dato.Lista)
+                  {
+                    <option value="@Elemento.Descripcion">@Elemento.Detalle</option>
+                  }
+                </select>
+              }
+            }
+          }
+          else
+          {
+            @if (Dato.EsEntero)
+            {
+              <input id="@Dato.Parametro.Nombre" disabled="@Aguardando" type="number" @bind="@Dato.ValorEntero" />
+            }
+            else
+            {
+              @if (Dato.EsReal)
+              {
+                <input id="@Dato.Parametro.Nombre" disabled="@Aguardando" type="number" @bind="@Dato.ValorReal" />
+              }
+              else
+              {
+                @if (Dato.EsFecha)
+                {
+                  <input id="@Dato.Parametro.Nombre" disabled="@Aguardando" type="date" @bind="@Dato.ValorFecha" />
+                }
+                else
+                {
+                  <input id="@Dato.Parametro.Nombre" disabled="@Aguardando" type="text" @bind="@Dato.ValorTexto" />
+                }
+              }
+            }
+          }
+          <p />
+        }
+      }
+    </div>
+  </dialog>
+</div>*@
+

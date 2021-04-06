@@ -1,0 +1,141 @@
+﻿@using TableroPecasV5.Shared
+@inherits Logicas.CLogicaGrafico
+
+<div class="dropdown" style="width: 100%; height: 100%; text-align: left; display: block; overflow: hidden; position: absolute; margin: 0px; z-index: 2;"
+     @onload="@AlCompletar" @onmousedown="@EventoMouseAbajo" ondragover="event.preventDefault();" @ondrop="RecibirDrop">
+  @if (PuedeCrearGraficoDependiente || (Clase == ClaseGrafico.BarrasH || Clase == ClaseGrafico.Histograma))
+  {
+  <Dropdown Style="font-size: 9px; padding: 2px 4px; cursor: pointer;">
+    <DropdownToggle Color="Color.Primary">
+      Menu
+    </DropdownToggle>
+    <DropdownMenu>
+      @if (Clase != ClaseGrafico.BarrasH && PuedeCrearGraficoDependiente)
+      {
+        <DropdownItem Style="font-size: 9px; padding: 2px 4px; cursor: pointer;" Clicked="@AbrirVentanaGraficoAsociado">Crear gráfico asociado</DropdownItem>
+      }
+      @*@if (Clase == ClaseGrafico.Barras || Clase == ClaseGrafico.Histograma)
+    {
+      <DropdownDivider />
+      <DropdownItem Clicked="@AbrirReferenciasBarras">Configurar referencias</DropdownItem>
+    }*@
+      @if (Clase == ClaseGrafico.Histograma)
+      {
+        <DropdownDivider />
+        <DropdownItem Clicked="@AbrirVentanaCfgHistograma">Configurar incrementos</DropdownItem>
+      }
+      @if (Clase == ClaseGrafico.BarrasH)
+      {
+        <DropdownDivider />
+        @if (Detallado)
+        {
+          <DropdownItem Clicked="@AjustarDetallado">Ver en block</DropdownItem>
+        }
+        else
+        {
+          <DropdownItem Clicked="@AjustarDetallado">Ver discriminado</DropdownItem>
+        }
+      }
+      <DropdownDivider />
+      <DropdownItem Clicked="@GuardarXML">Crear XML</DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+  }
+
+  <div class="ContenedorComandosFiltro" style="margin-top: 0px;">
+    <div class="BarraComandosFiltro" style="font-size: 16px; padding: 0px;">
+      @if (Ampliado)
+      {
+        <a class="far fa-clone EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+           @onclick="@Reducir"></a>
+      }
+      else
+      {
+        <a class="far fa-square EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+           @onclick="@Maximizar"></a>
+      }
+      @if (PuedeCrearGraficoDependiente)
+      {
+      <a class="far fa-window-close EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+         @onclick="@Cerrar"></a>
+      }
+    </div>
+  </div>
+
+  @if (Clase == ClaseGrafico.BarrasH)
+  {
+    <div style="width: 100%; height: calc(100% - 32px); overflow: hidden; display: inline-block; float: left; background-color: red; position: relative; margin: 30px 0px 0px 0px; background-color: white;">
+      <div id="@NombreElemento" style="@EstiloCanvasApiladas"
+           @onclick="@EventoMouseUp" @onscroll="@FncScroll">
+        <Blazor.Extensions.Canvas.BECanvas Width="@AnchoGraficoApilado" Height="@AltoCanvas" @ref="@CanvasGrafico" />
+      </div>
+      <div style="@EstiloCanvasApiladasDer"
+           @onclick="@EventoMouseUp" @onscroll="@FncScroll">
+        <Blazor.Extensions.Canvas.BECanvas Width="@AnchoGraficoApiladoDer" Height="@AltoCanvasDer" @ref="@CanvasGraficoDer" />
+      </div>
+    </div>
+  }
+  else
+  {
+    <div id="@NombreElemento" style="@Estilo"
+         @onclick="@EventoMouseUp" @onscroll="@FncScroll">
+      @if (Ampliado)
+      {
+        <Blazor.Extensions.Canvas.BECanvas Width="@AnchoGrafico" Height="@AltoGrafico" @ref="@CanvasGrafico" />
+      }
+      else
+      {
+        <Blazor.Extensions.Canvas.BECanvas Width="@AnchoGrafico" Height="@AltoGrafico" @ref="@CanvasGrafico" />
+      }
+    </div>
+  }
+
+</div>
+
+<Modal @ref="ModalCfgHistograma" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Configurar rangos</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Incremento</FieldLabel>
+        <TextEdit @bind-Text="@SaltoHistograma" />
+      </Field>
+    </ModalBody>
+    <ModalFooter>
+      <Button Color="Color.Secondary" Clicked="@CerrarVentanaCfgHistograma">Cerrar</Button>
+      <Button Color="Color.Primary" Clicked="@AjustarHistograma">Imponer</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+<Modal @ref="ModalGraficoDependiente" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar gráfico dependiente</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Variable independiente</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@VariableIndependienteGraficoDependiente">
+          <SelectItem TValue="int" Value="-1">No corresponde</SelectItem>
+          @foreach (Datos.CColumnaBase Columna in VariablesIndependientesGraficoDependiente)
+            {
+          <SelectItem TValue="int" Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+            }
+        </Select>
+      </Field>
+    </ModalBody>
+    <ModalFooter>
+      <Button Color="Color.Secondary" Clicked="@CerrarVentanaGraficoDependiente">Cerrar</Button>
+      <Button Color="Color.Primary" Clicked="@AbrirVentanaGraficoDependiente">Agregar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+
+
+

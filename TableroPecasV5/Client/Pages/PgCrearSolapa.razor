@@ -1,0 +1,34 @@
+﻿@page "/CrearSolapa/{Sala:int}"
+@using System.Threading.Tasks;
+@using Radzen; 
+@using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Componentes
+@inherits TableroPecasV5.Client.Logicas.CLogicaCrearSolapa
+@inject IJSRuntime JSRuntime
+
+<Modal @ref="ModalCrearSolapa" Style="position: fixed; z-index: 99999999;" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar una solapa</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Nombre de la solapa</FieldLabel>
+        <TextEdit Placeholder="Denominación de la solapa" @bind-Text="@Nombre" />
+      </Field>
+      <Field>
+        <FieldLabel>Color</FieldLabel>
+        <ColorEdit @bind-Color="@ColorSolapa"/>
+      </Field>
+      <Field>
+        <Check TValue="bool" @bind-Checked="@MultiInstrumentos">Multi-instrumentos</Check>
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button Color="Color.Primary" Disabled="@DesHabilitado" Clicked="@Registrar" Style="width: 50px;">Registrar</Button>
+      <Button Color="Color.Secondary" Clicked="@Salir" Style="width: 50px; margin-left: 10px;">Abortar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+

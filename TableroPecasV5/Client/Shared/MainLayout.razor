@@ -1,0 +1,165 @@
+﻿@using Radzen;
+@using Radzen.Blazor;
+@using Blazorise;
+@using Microsoft.JSInterop
+@using TableroPecasV5;
+@using TableroPecasV5.Client.Listas;
+@using TableroPecasV5.Client.Componentes;
+@using TableroPecasV5.Shared;
+
+
+@inherits Logicas.CLogicaMainMenu
+
+<div class="row" style="width: 100%; height: calc(100vh - 0px); position: relative; margin: 0px; overflow-x: hidden; overflow-y: auto; display: inline-block;">
+  <div style="width: 40px;
+    height: calc(100vh - 0px);
+    background-color: #edf0f8;">
+    <Comando Imagen="Imagenes/Busqueda.png" Funcion="@AbrirBusqueda" />
+    @if (HayMenuSalasReunion)
+    {
+      <Comando Imagen="Imagenes/SalaReunion.png" Funcion="@AbrirMenuReunion" />
+    }
+    @if (HayMenuMapasBing)
+    {
+      <Comando Imagen="Imagenes/Maps.png" Funcion="@AbrirMenuMapasBing" />
+    }
+    @if (HayMenuMimicos)
+    {
+      <Comando Imagen="Imagenes/Mimicos.png" Funcion="@AbrirMenuMimicos" />
+    }
+    @if (HaySubconsultas)
+    {
+      <Comando Imagen="Imagenes/FiltroGrilla.png" Funcion="@AbrirMenuSubconsultas" />
+    }
+  </div>
+  <div style="width: calc(100vw - 40px);
+    height: calc(100vh - 0px);
+    position: absolute;
+    left: 40px;
+    top: 0px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: block;">
+    @Body
+    @if (HayMsg)
+    {
+      <div class="container" style="font-size: 11px; text-align: center; margin-top: -250px; width: 80%; height: 200px; background-color: lightgray; position: relative;">
+        @*<label style="margin-bottom: 0px;"><b>@LineaMsg1</b></label><br /><br />
+          <label style="margin-bottom: 0px;"><b>@LineaMsg2</b></label><br /><br />*@
+        <a>@Contenedores.CContenedorDatos.MsgUsuario</a>
+        <button style="width: 150px;" @onclick="@OcultarMsg">
+          Cerrar
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+@if (HayMenu)
+{
+  <div style="background-color: transparent; position: absolute; left: 0px; top: 0px; width: 100vw; height: 100vh;" @onclick="@CerrarMenues" />
+}
+
+<Dropdown @ref="MenuSalasReunion" Style="@EstiloSalas">
+  <DropdownMenu>
+    @if (Contenedores.CContenedorDatos.EstructuraIndicadores != null)
+    {
+      @if (Contenedores.CContenedorDatos.EsAdministrador)
+      {
+        <DropdownItem Value="-1" Clicked="@(e => @AbrirSalaReunion(-1))" Style="font-size: 12px; font-weight: bold;">..Nueva sala..</DropdownItem>
+      }
+      @foreach (CPuntoSala Sala in Contenedores.CContenedorDatos.EstructuraIndicadores.Salas)
+      {
+        <DropdownItem Value="Sala.Sala.Codigo" Clicked="@(e => @AbrirSalaReunion(Sala.Sala.Codigo))" Style="font-size: 12px; font-weight: bold;">@Sala.Sala.Nombre</DropdownItem>
+      }
+    }
+  </DropdownMenu>
+</Dropdown>
+
+<Dropdown @ref="MenuMapasBing" Style="@EstiloMapasBing">
+  <DropdownMenu>
+    @if (Contenedores.CContenedorDatos.ListaMapas != null)
+    {
+      @foreach (CMapaBingCN Mapa in Contenedores.CContenedorDatos.ListaMapas)
+      {
+        <DropdownItem Value="Mapa.Codigo" Clicked="@(e => @AbrirMapaBing(Mapa.Codigo))" Style="font-size: 12px; font-weight: bold;">@Mapa.Descripcion</DropdownItem>
+      }
+    }
+  </DropdownMenu>
+</Dropdown>
+
+<Dropdown @ref="MenuMimicos" Style="@EstiloMimicos">
+  <DropdownMenu>
+    @if (Contenedores.CContenedorDatos.EsAdministrador)
+    {
+      <DropdownItem Value="-1" Clicked="@(e => @AbrirMimico(-1))" Style="font-size: 12px; font-weight: bold;">Nuevo mímico</DropdownItem>
+    }
+    @if (Contenedores.CContenedorDatos.ListaMimicos != null)
+    {
+      @foreach (CElementoMimicoCN Mimico in Contenedores.CContenedorDatos.ListaMimicos)
+      {
+        <DropdownItem Value="Mimico.Codigo" Clicked="@(e => @AbrirMimico(Mimico.Codigo))" Style="font-size: 12px; font-weight: bold;">@Mimico.Nombre</DropdownItem>
+      }
+    }
+  </DropdownMenu>
+</Dropdown>
+
+<Dropdown @ref="MenuSubconsultas" Style="@EstiloSubconsulta">
+  <DropdownMenu>
+    @if (Contenedores.CContenedorDatos.gSubconsultas != null)
+    {
+      @foreach (CSubconsultaExt SubC in Contenedores.CContenedorDatos.gSubconsultas)
+      {
+        <DropdownItem Value="SubC.Codigo" Clicked="@(e => @AbrirSubconsulta(SubC.Codigo))"
+                      Style="font-size: 12px; font-weight: bold;">@SubC.Nombre</DropdownItem>
+      }
+    }
+  </DropdownMenu>
+</Dropdown>
+
+
+
+@code {
+  public void FncLoad22() { }
+  //public async void FncLoad22()
+  //{
+  //  try
+  //  {
+  //    object[] Args = new object[2];
+  //    Args[0] = 99;
+  //    Args[1] = 98;
+  //    await JSRuntime.InvokeAsync<string>("FuncionesJS.FncResizeqq", Args);
+  //  }
+  //  catch (Exception ex)
+  //  {
+  //    if (ex == null)
+  //    {
+  //      return;
+  //    }
+  //  }
+  //}
+
+  //[JSInvokable]
+  //public static Task<string> ImponerDimensionesqqAsync()
+  //{
+  //  string Aa = "AA";
+  //  return Task.FromResult(Aa);
+  //}
+
+}
+
+
+
+@*@code{
+    public void OpcionMenuSalas(Int32 Codigo)
+    {
+      if (Codigo<0)
+      {
+        return;
+      }
+    }
+
+  }*@
+@code {
+}
+

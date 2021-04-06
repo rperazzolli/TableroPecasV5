@@ -1,0 +1,28 @@
+﻿@inherits Logicas.CLogicaMapaGradiente
+
+
+<div style="position: absolute; width: 100%; height: 100%;">
+  <div style="width: 100%; height: 28px; position: absolute;">
+
+  </div>
+  <div id="@Direccion" style="@EstiloMapaComponente">
+    @if (!DatosCompletos)
+    {
+      <a>Por favor aguarde unos segundos</a>
+    }
+    else
+    {
+      @if (SinDatos)
+      {
+        <a>No hay datos disponibles</a>
+      }
+      else
+      {
+        <div id="@NombreReferencias" style="@EstiloReferencias">
+          <Blazor.Extensions.Canvas.BECanvas @ref="@CanvasReferencia" Height="@AltoReferencia" Width="@AnchoReferencia"/>
+        </div>
+      }
+    }
+  </div>
+</div>
+

@@ -1,0 +1,271 @@
+﻿@using TableroPecasV5.Shared
+@using TableroPecasV5.Client.Plantillas
+@inherits Plantillas.CContenedorBlocks
+
+<div id="@NOMBRE_ELEMENTO" style="width: 100%; height: 100%; position: absolute;"
+     ondragover="event.preventDefault();" @ondrop="RecibirDrop">
+  <CascadingValue Value="this">
+    @if (LinksEnBlock != null)
+    {
+      @foreach (CLinkBase Lnk in LinksEnBlock)
+      {
+        <CAguardar Abscisa="@Lnk.Abscisa" Ordenada="@Lnk.Ordenada"
+                   Ancho="@Lnk.Ancho" Alto="@Lnk.Alto" />
+      }
+    }
+
+    @foreach (CLinkReloj Reloj in Relojes)
+    {
+      @if (Reloj.Visible)
+      {
+        <div class="Centrada" style="@EstiloRelojLink(@Reloj)">
+          @if (Contenedores.CContenedorDatos.SiempreTendencia)
+          {
+            <TableroPecasV5.Client.Componentes.CTendRed @ref="@Reloj.ComponenteTendRed" Indicador="@Reloj.Indicador" />
+          }
+          else
+          {
+            <TableroPecasV5.Client.Componentes.CRelojCompleto Abscisa="@Reloj.Abscisa" Ordenada="@Reloj.Ordenada"
+                                                              Indicador="@Reloj.Indicador" @ref="@Reloj.ComponentePropio"
+                                                              CodigoElementoDimension="@Reloj.CodigoElemento" CodigoUnico="@Reloj.CodigoUnico"
+                                                              NivelFlotante="@Reloj.NivelFlotante" />
+          }
+        </div>
+      }
+    }
+
+    @foreach (CLinkFicha Ficha in Fichas)
+    {
+      <div style="@EstiloTarjetaLink(@Ficha)" @onclick="@((e) => { MoverseAFicha(Ficha.Pregunta.Codigo); })">
+        <TableroPecasV5.Client.Componentes.CTarjeta Pregunta="@Ficha.Pregunta" @ref="@Ficha.ComponentePropio" />
+      </div>
+    }
+
+    @foreach (CLinkTendencia Tendencia in Tendencias)
+    {
+      <div style="@EstiloLinkBase(@Tendencia)">
+        <TableroPecasV5.Client.Componentes.CComponenteTendencias @ref="@Tendencia.ComponentePropio" NivelFlotante="@Tendencia.NivelFlotante"
+                                                                 Ancho="@Tendencia.Ancho" Alto="@Tendencia.Alto"
+                                                                 CodigoElementoDimension="@Tendencia.CodigoElementoDimension"
+                                                                 PosicionPuntoSeleccionado="@Tendencia.PosicionPuntoSeleccionado"
+                                                                 Abscisa="@Tendencia.Abscisa" Ordenada="@Tendencia.Ordenada"
+                                                                 Ampliado="@Tendencia.Ampliado"
+                                                                 Indicador="@Tendencia.Indicador" CodigoUnico="@Tendencia.CodigoUnico"
+                                                                 Alarmas="@Tendencia.Reloj.Alarmas" />
+      </div>
+    }
+
+    @foreach (CLinkOtro Grilla in Grillas)
+    {
+      <div style="@EstiloGrilla(@Grilla)" class="ui-widget-content">
+        <TableroPecasV5.Client.Componentes.CGrillaDatos @ref="@Grilla.ComponenteGrilla" NivelFlotante="@Grilla.NivelFlotante"
+                                                        Ancho="@Grilla.Ancho" Alto="@Grilla.Alto"
+                                                        Abscisa="@Grilla.Abscisa" Ordenada="@Grilla.Ordenada"
+                                                        Ampliado="@Grilla.Ampliado"
+                                                        Indicador="@Grilla.Indicador" CodigoUnico="@Grilla.CodigoUnico" />
+      </div>
+    }
+
+    @foreach (CLinkGraficoCnt Grafico in Graficos)
+    {
+      <div id="@IdGrafico(Grafico.Datos.Codigo)" class="ui-widget-content"
+           style="@EstiloGrafico(Grafico)">
+        <div style="@EstiloGraficoSuperior(Grafico)">
+          <p><b>@Grafico.Datos.Nombre</b></p>
+        </div>
+        <div style="@EstiloContenedorGrafico(Grafico)">
+          @if (Grafico.Datos.Clase == ClaseGrafico.BarrasH)
+          {
+            <TableroPecasV5.Client.Componentes.CGrafico @ref="@Grafico.ComponentePropio"
+                                                        @key="@Grafico.CodigoUnico"
+                                                        Abscisa="@Grafico.Abscisa"
+                                                        Ordenada="@Grafico.Ordenada"
+                                                        Ancho="@Grafico.Ancho" Alto="@Grafico.Alto"
+                                                        CodigoUnico="@Grafico.CodigoUnico"
+                                                        Clase="@Grafico.Clase"
+                                                        ColumnaAbscisas="@Grafico.ColumnaAbscisas"
+                                                        ColumnaOrdenadas="@Grafico.ColumnaOrdenadas"
+                                                        ColumnaSexo="@Grafico.ColumnaSexo"
+                                                        ValoresSeleccionados="@Grafico.ValoresSeleccionados"
+                                                        GraficosDependientes="@Grafico.GraficosDependientes"
+                                                        AgrupamientoDependiente="@Grafico.AgrupamientoDependiente"
+                                                        AgrupamientoIndependiente="@Grafico.AgrupamientoIndependiente"
+                                                        Detallado="@Grafico.Detallado"
+                                                        PuedeCrearGraficoDependiente="false"
+                                                        NivelFlotante="@Grafico.NivelFlotante" />
+          }
+          else
+          {
+            <TableroPecasV5.Client.Componentes.CGrafico @ref="@Grafico.ComponentePropio"
+                                                        @key="@Grafico.CodigoUnico"
+                                                        Abscisa="@Grafico.Abscisa"
+                                                        Ordenada="@Grafico.Ordenada"
+                                                        Ancho="@Grafico.Ancho" Alto="@Grafico.Alto"
+                                                        CodigoUnico="@Grafico.CodigoUnico"
+                                                        Clase="@Grafico.Clase"
+                                                        ColumnaAbscisas="@Grafico.ColumnaAbscisas"
+                                                        ColumnaOrdenadas="@Grafico.ColumnaOrdenadas"
+                                                        ValoresSeleccionados="@Grafico.ValoresSeleccionados"
+                                                        GraficosDependientes="@Grafico.GraficosDependientes"
+                                                        AgrupamientoDependiente="@Grafico.AgrupamientoDependiente"
+                                                        AgrupamientoIndependiente="@Grafico.AgrupamientoIndependiente"
+                                                        Detallado="@Grafico.Detallado"
+                                                        PuedeCrearGraficoDependiente="false"
+                                                        NivelFlotante="@Grafico.NivelFlotante" />
+          }
+        </div>
+      </div>
+    }
+
+    @foreach (CLinkMapa Mapa in Mapas)
+    {
+      <div class="ui-widget-content"
+           style="@EstiloMapa(Mapa)">
+        <div style="@EstiloMapaSuperior(Mapa)">
+          <p><b>@Mapa.Datos.Nombre</b></p>
+          <div style="@EstiloDivBotonMapa(Mapa)">
+            @if (Mapa.Minimizado)
+            {
+              <a class="far fa-square EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+                 @onclick="@((e) => { MaximizarMapa(Mapa); })"></a>
+            }
+            else
+            {
+              <a class="far fa-clone EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+                 @onclick="@((e) => { ReducirMapa(Mapa); })"></a>
+            }
+          </div>
+        </div>
+        <div id="@Mapa.Direccion" style="@EstiloContenedorMapa(Mapa)">
+          @switch (Mapa.Datos.ClaseElemento)
+          {
+            case CGrafV2DatosContenedorBlock.ClaseBlock.MapaControl:
+              @*<TableroPecasV5.Client.Pages.CPaginaBingMaps Codigo="@Mapa.CodigoUnico" Abscisa="@Mapa.Abscisa"
+              Ordenada="@Mapa.Ordenada" Ancho="@Mapa.Ancho"
+              Alto="@Mapa.Alto"/>*@
+              <TableroPecasV5.Client.Componentes.CMapaBing @ref="@Mapa.ComponenteMapa"
+                                                           @key="@Mapa.CodigoUnico"
+                                                           Direccion="@Mapa.Direccion"
+                                                           Abscisa="@Mapa.Datos.Posicion.X"
+                                                           Ordenada="@Mapa.Datos.Posicion.Y"
+                                                           Ancho="@Mapa.Datos.Ancho" Alto="@Mapa.Datos.AltoNeto"
+                                                           Codigo="@Mapa.Datos.CodigoPropio"
+                                                           NivelFlotante="@Mapa.NivelFlotante" />
+              break;
+            case CGrafV2DatosContenedorBlock.ClaseBlock.MapaGradientes:
+              <TableroPecasV5.Client.Componentes.CMapaGradiente @ref="@Mapa.ComponenteGradiente"
+                                                                @key="@Mapa.CodigoUnico"
+                                                                Mapa="@Mapa"
+                                                                Direccion="@Mapa.Direccion"
+                                                                CodigoCapa="@Mapa.Datos.CodigoPropio"
+                                                                Indicador="@Contenedores.CContenedorDatos.IndicadorDesdeCodigo(Mapa.Datos.CodigoIndicador)"
+                                                                CodigoElementoDimension="@Mapa.Datos.CodigoElementoDimension"
+                                                                Abscisa="@Mapa.Datos.Posicion.X"
+                                                                Ordenada="@Mapa.Datos.Posicion.Y"
+                                                                Ancho="@Mapa.Datos.Ancho"
+                                                                Alto="@Mapa.Datos.Alto"
+                                                                NivelFlotante="@Mapa.NivelFlotante" />
+              break;
+            case CGrafV2DatosContenedorBlock.ClaseBlock.Pines:
+            case CGrafV2DatosContenedorBlock.ClaseBlock.MapaCalor:
+              <TableroPecasV5.Client.Componentes.CMapaCalor @ref="@Mapa.ComponenteCalor"
+                                                            @key="@Mapa.CodigoUnico"
+                                                            Direccion="@Mapa.Direccion"
+                                                            Clase="@Mapa.Datos.ClaseElemento"
+                                                            CodigoCapa="@Mapa.Datos.CodigoPropio"
+                                                            ClaseOrigen="@Mapa.Datos.ClaseOrigen"
+                                                            Datos="@Mapa"
+                                                            Filtros="@Mapa.Filtros"
+                                                            Indicador="@Contenedores.CContenedorDatos.IndicadorDesdeCodigo(Mapa.Datos.CodigoIndicador)"
+                                                            CodigoElementoDimension="@Mapa.Datos.CodigoElementoDimension"
+                                                            Abscisa="@Mapa.Datos.Posicion.X"
+                                                            Ordenada="@Mapa.Datos.Posicion.Y"
+                                                            ColumnaLat="@Mapa.Datos.ColumnaLat"
+                                                            ColumnaLng="@Mapa.Datos.ColumnaLng"
+                                                            ColumnaValor="@Mapa.Datos.ColumnaDatos"
+                                                            Ancho="@Mapa.Datos.Ancho"
+                                                            Alto="@Mapa.Datos.Alto"
+                                                            NivelFlotante="@Mapa.NivelFlotante" />
+              break;
+          }
+        </div>
+      </div>
+    }
+
+    @foreach (CLinkOtro Otro in Otros)
+    {
+      <div class="ui-widget-content"
+           style="@EstiloOtro(Otro)">
+        <div style="@EstiloOtroSuperior(Otro)">
+          <p><b>@Otro.Datos.Nombre</b></p>
+          <div style="@EstiloDivBotonOtro(Otro)">
+            @if (Otro.Minimizado)
+            {
+              <a class="far fa-square EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+                 @onclick="@((e) => {MaximizarOtro(Otro);})"></a>
+            }
+            else
+            {
+              <a class="far fa-clone EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+                 @onclick="@((e) => {ReducirOtro(Otro);})"></a>
+            }
+          </div>
+        </div>
+        <div id="@Otro.Direccion" style="@EstiloContenedorOtro(Otro)">
+          @switch (Otro.Datos.Clase)
+          {
+            case CGrafV2DatosContenedorBlock.ClaseBlock.Mimico:
+              <TableroPecasV5.Client.Componentes.CMimico @ref="@Otro.ComponenteMimico"
+                                                         @key="@Otro.CodigoUnico"
+                                                         CodigoUnico="@Otro.Datos.CodigoPropio"
+                                                         Abscisa="@Otro.Datos.Posicion.AbscisaI"
+                                                         Ordenada="@Otro.Datos.Posicion.OrdenadaI"
+                                                         AnchoImpuesto="@Otro.Datos.Ancho"
+                                                         AltoImpuesto="@Otro.Datos.Alto"
+                                                         Filtros="@Otro.Filtros"
+                                                         DefasajeVertical="25" />
+              break;
+            case CGrafV2DatosContenedorBlock.ClaseBlock.Subconsulta:
+              <TableroPecasV5.Client.Componentes.CContenedorFiltros @ref="@Otro.ComponenteFiltros"
+                                                                    @key="Otro.CodigoUnico"
+                                                                    Abscisa="@Otro.Datos.Posicion.AbscisaI"
+                                                                    Ordenada="@Otro.Datos.Posicion.OrdenadaI"
+                                                                    Ancho="@Otro.Datos.Ancho"
+                                                                    Alto="@Otro.Datos.Alto"
+                                                                    Proveedor="@Otro.Proveedor" />
+              break;
+          }
+        </div>
+      </div>
+    }
+
+    @foreach (CLinkOtro Otro in Otros)
+    {
+      if (Otro.Datos.Clase == CGrafV2DatosContenedorBlock.ClaseBlock.Subconsulta)
+      {
+        @if (Otro.ComponenteFiltros != null)
+        {
+          foreach (Logicas.CLinkFiltros Link in Otro.ComponenteFiltros.Links)
+          {
+            if (Link.PosicionEnPantalla >= 0)
+            {
+              <div id="@IdFiltro(Link)" class="ui-widget-content"
+                         style="@EstiloFiltro(Link, Otro.ComponenteFiltros)" draggable="true"
+                         @ondragstart="@(() => IniciarDragFiltro(Link))">
+                <TableroPecasV5.Client.Componentes.FiltroTextos @ref="Link.Componente"
+                                                                NivelFlotante="@Otro.NivelFlotante"
+                                                                Ancho="@Link.Ancho"
+                                                                Alto="@Logicas.CDetalleIndicador.AltoFiltro"
+                                                                Abscisa="@Link.Abscisa"
+                                                                Ordenada="@Link.Ordenada"
+                                                                CodigoUnico="@Link.PosicionUnica" />
+              </div>
+            }
+          }
+        }
+      }
+    }
+
+  </CascadingValue>
+
+</div>

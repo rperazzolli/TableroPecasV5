@@ -1,0 +1,13 @@
+﻿@page "/test"
+
+<Alert @ref="WhateverPropertyNameYouLike" />
+
+@code
+{
+  private Alert WhateverPropertyNameYouLike { get; set; }
+
+  protected override void OnInitialized()
+  {
+    WhateverPropertyNameYouLike.Show();
+  }
+}

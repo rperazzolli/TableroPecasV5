@@ -1,0 +1,20 @@
+﻿@using TableroPecasV5.Client.Clases; 
+@inherits Logicas.CLogicaDefinirRectangulos
+
+<div style="width: 100%; height: 100%; background: rgba(192,192,192,0.75); position: absolute; z-index: 11;">
+  <svg width="100%" height="100%" style="position: absolute; z-index: 2;"
+       @onpointerdown=PointerDown @onpointerdown:preventDefault
+       @onpointerup=PointerUp @onpointerup:preventDefault
+       @onpointermove=PointerMove @onpointermove:preventDefault>
+    @*@foreach (CRect Rect0 in Rectangulos)
+    {
+      <rect x="@Rect0.Abscisa" y="@Rect0.Ordenada" width="@Rect0.Ancho" height="@Rect0.Alto"
+            style="fill:gray;" />
+    }*@
+    @if (MouseAbajo && Ancho > 0 && Alto > 0)
+    {
+      <rect x="@Abscisa" y="@Ordenada" width="@Ancho" height="@Alto"
+            style="fill:transparent;stroke-width:1;stroke:rgb(237, 255, 0)" />
+    }
+  </svg>
+</div>

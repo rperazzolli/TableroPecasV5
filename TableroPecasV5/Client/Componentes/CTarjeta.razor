@@ -1,0 +1,17 @@
+﻿@using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Logicas;
+@inherits TableroPecasV5.Client.Logicas.CLogicaTarjeta
+
+<div style="@Estilo" @onclick="@AbrirTarjeta">
+  <Blazor.Extensions.Canvas.BECanvas Width="@CLogicaTarjeta.ANCHO_TARJETA" Height="@CLogicaTarjeta.ALTO_TARJETA" @ref="@CanvasGrafico" />
+  <div style="@EstiloTextos">
+    @if (IndicadoresCriticos != null)
+    {
+      @foreach (CDatoIndicador Indicador in IndicadoresCriticos)
+      {
+        <p style=@EstiloIndicador(Indicador)>@Indicador.Descripcion</p>
+      }
+    }
+  </div>
+</div>
+

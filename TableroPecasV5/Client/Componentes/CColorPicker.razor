@@ -1,0 +1,17 @@
+﻿@using TableroPecasV5.Shared;
+@inherits Logicas.CLogicaColorPicker
+
+<div style="@EstiloGlobal">
+  <div style="position: absolute; margin-left: 5px; margin-top: 5px; height: 20px; width: 47px;">
+    <div style="@EstiloZonaColor"/>
+    <div style="width: 20px; height: 20px; position: absolute; margin-left: 32px; margin-top: 5px;">
+      <img src="~/Imagenes/Bing.png" width="20" height="20" @onclick="@CambiarAbierto"/>
+    </div>
+  </div>
+  @if (Abierto)
+  {
+    <div style="width: 320px; height: 240px; position: absolute; margin-left: 15px; margin-top: 30px;">
+    <BECanvas @ref="@CanvasColores" Width="320" Height="240"/>
+    </div>          
+  }
+</div>

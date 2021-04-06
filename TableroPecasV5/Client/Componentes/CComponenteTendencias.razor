@@ -1,0 +1,149 @@
+﻿@using Microsoft.JSInterop
+@using Blazorise 
+@using TableroPecasV5.Shared; 
+@inherits Logicas.CLogicaTendencias
+
+<div class="dropdown" style="width: 100%; height: 100%; text-align: left; display: block; overflow-y: auto; position: absolute; margin: 0px; z-index: 4;"
+     @onload="@AlCompletar" @onmousedown="@EventoMouseAbajo">
+  <Dropdown Style="font-size: 9px; padding: 2px 4px; cursor: pointer;" >
+    <DropdownToggle Color="Color.Primary">
+      Menu
+    </DropdownToggle>
+    <DropdownMenu>
+      <DropdownItem Style="font-size: 9px; padding: 2px 4px; cursor: pointer;" Clicked="@AbrirVentanaAgregarIndicador">Comparar con otro indicador</DropdownItem>
+      <DropdownDivider />
+      <DropdownItem Clicked="@AbrirVentanaRangoFechas">Cambiar rango de fechas</DropdownItem>
+      <DropdownDivider />
+      <DropdownItem Clicked="@CambiarReferencias">Agregar/eliminar referencias</DropdownItem>
+      <DropdownItem Clicked="@CambiarEtiquetas">Agregar/eliminar etiquetas</DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+
+  @if (IndicadoresAdicionales.Count > 0)
+  {
+    <Dropdown Style="font-size: 9px; padding: 2px 4px; cursor: pointer; float: left;">
+      <DropdownToggle Color="Color.Primary">
+        Ver como
+      </DropdownToggle>
+      <DropdownMenu>
+        <DropdownItem Clicked="@(e => @OpcionBarras(-1))">Tendencia</DropdownItem>
+        <DropdownItem>
+          Barras
+          <DropdownItem>
+            <DropdownItem Clicked="@(e => @OpcionBarras(1))">Mensual</DropdownItem>
+            <DropdownItem Clicked="@(e => @OpcionBarras(2))">Bimestral</DropdownItem>
+            <DropdownItem Clicked="@(e => @OpcionBarras(3))">Trimestral</DropdownItem>
+            <DropdownItem Clicked="@(e => @OpcionBarras(4))">Cuatrimestral</DropdownItem>
+            <DropdownItem Clicked="@(e => @OpcionBarras(6))">Semestral</DropdownItem>
+            <DropdownItem Clicked="@(e => @OpcionBarras(12))">Anual</DropdownItem>
+          </DropdownItem>
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  }
+
+    <div class="ContenedorComandosFiltro" style="margin-top: 0px;">
+      <div class="BarraComandosFiltro" style="font-size: 16px; padding: 0px;">
+        @if (Ampliado)
+        {
+          <a class="far fa-clone EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+             @onclick="@Reducir"></a>
+        }
+        else
+        {
+          <a class="far fa-square EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+             @onclick="@Maximizar"></a>
+        }
+      </div>
+    </div>
+
+    <div id="ContenedorTend" style=@EstiloContenedor
+         @onclick="@ClickSobreTendencias">
+      @if (Ampliado)
+      {
+        <Blazor.Extensions.Canvas.BECanvas Width="@AnchoGrafico" Height="@AltoGraficoTotal" @ref="@CanvasGrafico" />
+      }
+      else
+      {
+        <Blazor.Extensions.Canvas.BECanvas Width="@AnchoGrafico" Height="@AltoGraficoTotal" @ref="@CanvasGrafico" />
+      }
+    </div>
+
+</div>
+
+
+<div style="@EstiloAguarda">
+</div>
+
+<Modal @ref="ModalIndicadorAdicional" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar indicador comparativo</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Indicador</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@CodigoIndicadorAdicional">
+          <SelectItem Value="-1">No corresponde</SelectItem>
+          @foreach (CDatoIndicador Indi in Contenedores.CContenedorDatos.ListaIndicadores)
+          {
+            if (Indi != Indicador)
+            {
+              <SelectItem Value="@Indi.Codigo">@Indi.Descripcion</SelectItem>
+            }
+          }
+        </Select>
+      </Field>
+      <Field>
+        <FieldLabel>Escala derecha</FieldLabel>
+        <Check TValue="bool" @bind-Checked="@EscalaDerecha"/>
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block;">
+      <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarVentanaAgregarIndicador">Cerrar</Button>
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@CerrarVentanaEliminarIndicador">Eliminar</Button>
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@AjustarIndicadorAdicionalAsync">Agregar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+<Modal @ref="ModalRangoFechas" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Rango de fechas</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>Fecha desde</FieldLabel>
+        <DateEdit @bind-Date="@FechaInicialImpuesta"/>
+      </Field>
+      <Field>
+        <FieldLabel>Fecha hasta</FieldLabel>
+        <DateEdit @bind-Date="@FechaHastaImpuesta" />
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block;">
+      <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarVentanaRangoFechas">Cerrar</Button>
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@ImponerRangoFechasAsync">Imponer</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+<Modal @ref="ModalMsg" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>@MensajeBase</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <FieldLabel>@DetalleMensaje</FieldLabel>
+      </Field>
+    </ModalBody>
+    <ModalFooter>
+      <Button style="width: 50px;" Color="Color.Warning" Clicked="@CerrarVentanaMsg">OK</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>

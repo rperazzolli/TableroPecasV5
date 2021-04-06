@@ -1,0 +1,247 @@
+﻿/* Main */
+#menuH {
+  width: 100%;
+  margin: 0;
+  float: left;
+  padding: 10px 0 0 0;
+  list-style: none;
+  background-color: #40568d;
+  /*background-image: linear-gradient(#1e2b46, #444);*/
+  background-image: linear-gradient(#04173d, #020b1e);
+  box-shadow: 0 2px 1px #9c9c9c;
+}
+
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+#menuH li {
+    float: left;
+    padding: 0 0 10px 0;
+    position: relative;
+  }
+
+  #menuH a {
+    float: left;
+    height: 25px;
+    padding: 0 10px;
+    color: #999;
+    text-transform: uppercase;
+    font: bold 12px/25px Arial, Helvetica;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #000;
+  }
+
+  #menuH :hover > a {
+    color: #fafafa;
+  }
+
+  #menuH li:hover > a {
+    color: #fafafa;
+  }
+
+  *html #menuH li a:hover { /* IE6 */
+    color: #fafafa;
+  }
+
+  #menuH li:hover > ul {
+    display: block;
+  }
+
+  /* Sub-menu */
+  #menuH ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: none;
+    position: absolute;
+    top: 35px;
+    left: 0;
+    z-index: 99999;
+    background-color: #444;
+    background-image: linear-gradient(#444, #111);
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+  }
+
+    #menuH ul li {
+      float: none;
+      margin: 0;
+      padding: 0;
+      display: block;
+      box-shadow: 0 1px 0 #111111, 0 2px 0 #777777;
+    }
+
+      #menuH ul li:last-child {
+        box-shadow: none;
+      }
+
+    #menuH ul a {
+      padding: 10px;
+      height: auto;
+      line-height: 1;
+      display: block;
+      white-space: nowrap;
+      float: none;
+      text-transform: none;
+    }
+
+    *html #menuH ul a { /* IE6 */
+      height: 10px;
+      width: 150px;
+    }
+
+    *:first-child + html #menuH ul a { /* IE7 */
+      height: 10px;
+      width: 150px;
+    }
+
+      #menuH ul a:hover {
+        background-color: #0186ba;
+        background-image: linear-gradient(#04acec, #0186ba);
+      }
+
+    #menuH ul li:first-child a {
+      border-radius: 5px 5px 0 0;
+    }
+
+      #menuH ul li:first-child a:after {
+        content: '';
+        position: absolute;
+        left: 30px;
+        top: -8px;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 8px solid #444;
+      }
+
+      #menuH ul li:first-child a:hover:after {
+        border-bottom-color: #04acec;
+      }
+
+    #menuH ul li:last-child a {
+      border-radius: 0 0 5px 5px;
+    }
+
+  /* Clear floated elements */
+  #menuH:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+
+* html #menuH {
+  zoom: 1;
+}
+/* IE6 */
+*:first-child + html #menuH {
+  zoom: 1;
+}
+/* IE7 */
+
+.HHorizontal {
+  margin-left: 0px;
+  width: 100%;
+  height: auto;
+  margin-top: 0px;
+  padding: 2px;
+  background-color: #fafafa;
+  position: relative;
+}
+
+.Flotante {
+  position: absolute;
+}
+
+.dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 5px;
+  font-size: 11px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  text-align: left;
+  display: inline-block;
+  float: left;
+  margin: 2px;
+}
+
+.dropdown a {
+  color: black;
+  padding: 6px 4px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown2 {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  text-align: left;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content2 {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  cursor: pointer;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content2 a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+  .dropdown-content a:hover {
+    background-color: #f1f1f1
+  }
+
+.dropdown-content2 a:hover {
+  background-color: #f1f1f1
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown2:hover .dropdown-content2 {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
+}

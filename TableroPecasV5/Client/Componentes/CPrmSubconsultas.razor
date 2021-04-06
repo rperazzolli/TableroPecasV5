@@ -1,0 +1,68 @@
+﻿@using TableroPecasV5.Client.Logicas
+@using TableroPecasV5.Client.Listas;
+@inherits TableroPecasV5.Client.Logicas.CLogicaPedirSubconsultas
+@inject IJSRuntime JSRuntime
+
+<Modal @ref="Dialogo" Closing="@Cerrando">
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>@Nombre</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      @if (Parametros != null)
+      {
+        @foreach (DatosPrmSubconsulta Dato in Parametros)
+        {
+          <FieldLabel>@Dato.Parametro.Nombre</FieldLabel>
+          @if (Dato.Parametro.TieneQuery)
+          {
+            if (Dato.Lista != null)
+            {
+              @if (Dato.Lista != null)
+              {
+                <Select TValue="string" @bind-SelectedValue="@Dato.ValorLista">
+                  @foreach (CListaDoble Elemento in Dato.Lista)
+                  {
+                    <SelectItem TValue="string" Value="@Elemento.Descripcion">@Elemento.Detalle</SelectItem>
+                  }
+                </Select>
+              }
+            }
+          }
+          else
+          {
+            @if (Dato.EsEntero)
+            {
+              <NumericEdit Disabled="@Aguardando" TValue="int" @bind-Value="@Dato.ValorEntero" />
+            }
+            else
+            {
+              @if (Dato.EsReal)
+              {
+                <NumericEdit Disabled="@Aguardando" TValue="double" @bind-Value="@Dato.ValorReal" />
+              }
+              else
+              {
+                @if (Dato.EsFecha)
+                {
+                  <DateEdit Disabled="@Aguardando" TValue="DateTime?" Date="@Dato.ValorFecha" />
+                }
+                else
+                {
+                  <TextEdit Disabled="@Aguardando" TValue="string" @bind-Text="@Dato.ValorTexto" />
+                }
+              }
+            }
+          }
+          <p />
+        }
+      }
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@Abrir">Abrir</Button>
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@Ignorar">Salir</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+

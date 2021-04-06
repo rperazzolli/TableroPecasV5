@@ -1,0 +1,20 @@
+﻿@using TableroPecasV5.Client.Componentes
+@using Microsoft.AspNetCore.Components
+@inherits Logicas.CLogicaRelojCompleto
+
+
+<div class="ui-widget-content"
+     style=@EstiloReloj>
+  <b>@NombreIndicador</b>
+  <br />
+  @Unidades
+  <p />
+  <div class="Centrada" style="width: 110px; height: 60px;">
+    <CReloj @ref="ComponenteReloj" Indicador="@Indicador"
+            Alarmas="@Alarmas" @key="@Indicador.Codigo"
+            CodigoElementoDimension="@CodigoElementoDimension"
+            CodigoUnico="@CodigoUnico"/>
+  </div>
+  <p>@ValorIndicador</p>
+</div>
+

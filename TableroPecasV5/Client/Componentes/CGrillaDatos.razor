@@ -1,0 +1,84 @@
+﻿@using TableroPecasV5.Shared;
+@inherits  Logicas.CLogicaGrilla
+
+<div style="@EstiloPagina" @onmousedown="@EventoMouseAbajo">
+  <div class="ContenedorComandosFiltro" style="margin-top: 0px;">
+    <div class="BarraComandosFiltro" style="font-size: 16px; padding: 0px;">
+      @if (Ampliado)
+      {
+        <a class="far fa-clone EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+           @onclick="@Reducir"></a>
+      }
+      else
+      {
+        <a class="far fa-square EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+           @onclick="@Maximizar"></a>
+      }
+      <a class="far fa-window-close EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+         @onclick="@Cerrar"></a>
+    </div>
+  </div>
+  <div style="@EstiloDatos">
+    @if (Proveedor != null)
+    {
+      <table>
+        <tr>
+          @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+          {
+            <th>@Columna.Nombre</th>
+          }
+        </tr>
+        @foreach (Datos.CLineaComprimida Linea in LineasPagina)
+        {
+          <tr>
+            @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+            {
+              <td>@Columna.TextoIndice(Linea.Codigos[Columna.Orden])</td>
+            }
+          </tr>
+        }
+      </table>
+    }
+  </div>
+  <div class="Centrada" style="background: white; display: inline; float: none; text-align: center; height: 25px; overflow-x:auto; overflow-y: hidden; ">
+    @if (HayPaginasAtras)
+    {
+      <a class="fa fa-angle-double-left EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+         @onclick="@IrAlInicio"></a>
+      <a class="fa fa-angle-left EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 5px;"
+         @onclick="@Retroceder"></a>
+    }
+    @if (HayBoton1)
+    {
+      <a class="EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block;  margin: 0px 0px 0px 5px;"
+         @onclick="@((e) => {Moverse(1);})">@TextoBoton1</a>
+      }
+    @if (HayBoton2)
+    {
+      <a class="EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block;  margin: 0px 0px 0px 5px;"
+         @onclick="@((e) => {Moverse(2);})">@TextoBoton2</a>
+      }
+    @if (HayBoton3)
+    {
+      <a class="EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block;  margin: 0px 0px 0px 5px;"
+         @onclick="@((e) => {Moverse(3);})">@TextoBoton3</a>
+      }
+    @if (HayBoton4)
+    {
+      <a class="EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block;  margin: 0px 0px 0px 5px;"
+         @onclick="@((e) => {Moverse(4);})">@TextoBoton4</a>
+      }
+    @if (HayBoton5)
+    {
+      <a class="EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block;  margin: 0px 0px 0px 5px;"
+         @onclick="@((e) => {Moverse(5);})">@TextoBoton5</a>
+      }
+    @if (HayPaginaAdelante)
+    {
+      <a class="fa fa-angle-right EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 5px;"
+         @onclick="@((e) => {Moverse(1);})"></a>
+      <a class="fa fa-angle-double-right EstiloBoton EstiloBotonAwesome" style="font-size: 16px; display: inline-block; margin: 0px 0px 0px 0px;"
+         @onclick="@IrAlCierre"></a>
+    }
+  </div>
+</div>
