@@ -15,6 +15,12 @@ namespace TableroPecasV5.Client.Logicas
 {
   public class CLogicaBingMaps : ComponentBase, IDisposable
   {
+    public delegate void FncEventoViewChange(Int32 Posicion);
+    public delegate void FncEventoClick(double Lat, double Lng);
+
+    public static FncEventoViewChange gAlHacerViewChange { get; set; }
+    public static FncEventoClick gAlHacerClick { get; set; }
+
     [Inject]
     IJSRuntime JSRuntime { get; set; }
 
@@ -465,6 +471,57 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+    [JSInvokable]
+    public static Task<string> RefrescarZoomAsync(string Referencia)
+    {
+      try
+      {
+        Int32 Posicion = Int32.Parse(Referencia);
+        return Task.FromResult("");
+      }
+      catch (Exception)
+      {
+        return Task.FromResult("No funcionó");
+      }
+    }
+
+    private void FncProcesarViewChange(Int32 Posicion)
+    {
+      if (Posicion != mPosicionBingMap)
+      {
+        return;
+      }
+    }
+
+    [JSInvokable]
+    public static Task<string> ClickEnMapaAsync(string Referencia)
+    {
+      try
+      {
+        if (gAlHacerClick != null)
+				{
+          string[] Coordenadas = Referencia.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+          if (Coordenadas.Length == 2)
+					{
+            gAlHacerClick(CRutinas.StrVFloat(Coordenadas[0]), CRutinas.StrVFloat(Coordenadas[1]));
+					}
+				}
+        return Task.FromResult("");
+      }
+      catch (Exception)
+      {
+        return Task.FromResult("No funcionó");
+      }
+    }
+
+    private void FncProcesarClick(double Lat, double Lng)
+		{
+      if (Lat != Lng)
+			{
+        return;
+			}
+		}
+
     private Int32 mCodigoLeido = -1;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -488,21 +545,29 @@ namespace TableroPecasV5.Client.Logicas
           }
         }
 
-        object[] Args = new object[5];
-        Args[0] = mPosicionBingMap;
-        Args[1] = '#' + Direccion; // mProyecto.LatCentro;
-        Args[2] = mProyecto.LatCentro;
-        Args[3] = mProyecto.LngCentro;
-        Args[4] = mProyecto.NivelZoom;
-        try                                                                           
+        if (mPosicionBingMap < 0)
         {
-          string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
-          mPosicionBingMap = Int32.Parse(PosLocal);
-          await mProyecto.DibujarAsync(JSRuntime, mPosicionBingMap);
-        }
-        catch (Exception ex)
-        {
-          CRutinas.DesplegarMsg(ex);
+
+          object[] Args = new object[7];
+          Args[0] = mPosicionBingMap;
+          Args[1] = '#' + Direccion; // mProyecto.LatCentro;
+          Args[2] = mProyecto.LatCentro;
+          Args[3] = mProyecto.LngCentro;
+          Args[4] = mProyecto.NivelZoom;
+          Args[5] = true;
+          Args[6] = true;
+          try
+          {
+            string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
+            gAlHacerViewChange = FncProcesarViewChange;
+            gAlHacerClick = FncProcesarClick;
+            mPosicionBingMap = Int32.Parse(PosLocal);
+            await mProyecto.DibujarAsync(JSRuntime, mPosicionBingMap);
+          }
+          catch (Exception ex)
+          {
+            CRutinas.DesplegarMsg(ex);
+          }
         }
 				//foreach (CPuntoTextoColor Punto in mPuntos)
 				//{

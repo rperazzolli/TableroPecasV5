@@ -9,7 +9,7 @@ namespace TableroPecasV5.Shared
 	public class RespuestaEnteros	: Respuesta
 	{
 		//[JsonProperty("Codigos")]
-		public List<Int32> Codigos { get; set; }
+		public List<Int32> Codigos { get; set; } = new List<int>();
 
 		public RespuestaEnteros()
 		{

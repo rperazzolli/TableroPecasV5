@@ -196,6 +196,33 @@ namespace TableroPecasV5.Server.Controllers
 			};
 		}
 
+		public static WCFBPI.CVinculoIndicadorCompletoCN CopiarVinculoCompletoBPI(CVinculoIndicadorCompletoCN Vinculo)
+		{
+			return new WCFBPI.CVinculoIndicadorCompletoCN()
+			{
+				Detalles = (from D in Vinculo.Detalles
+										select new WCFBPI.CVinculoDetalleCN()
+										{
+											Codigo = D.Codigo,
+											Posicion = D.Posicion,
+											ValorAsociado = D.ValorAsociado
+										}).ToList(),
+				Vinculo = new WCFBPI.CVinculoIndicadorCN()
+				{
+					ClaseIndicador = (WCFBPI.ClaseElemento)((Int32)Vinculo.Vinculo.ClaseIndicador),
+					ClaseVinculada = (WCFBPI.ClaseVinculo)((Int32)Vinculo.Vinculo.ClaseVinculada),
+					Codigo = Vinculo.Vinculo.Codigo,
+					CodigoIndicador = Vinculo.Vinculo.CodigoIndicador,
+					CodigoVinculado = Vinculo.Vinculo.CodigoVinculado,
+					ColumnaLat = Vinculo.Vinculo.ColumnaLat,
+					ColumnaLng = Vinculo.Vinculo.ColumnaLng,
+					NombreColumna = Vinculo.Vinculo.NombreColumna,
+					Rango = Vinculo.Vinculo.Rango,
+					TipoColumna = (WCFBPI.ClaseVariable)((Int32)Vinculo.Vinculo.TipoColumna)
+				}
+			};
+		}
+
 		[HttpGet("LeerVinculoDeUnIndicadorCodigo")]
 		// GET: IndicadoresController
 		public RespuestaDetalleVinculo LeerVinculoDeUnIndicadorCodigo(string URL, string Ticket, Int32 Vinculo)

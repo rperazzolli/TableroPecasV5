@@ -63,6 +63,12 @@
         //DotNet.invokeMethod("BrowserResize", 'OnBrowserResize');
         DotNet.invokeMethodAsync("BrowserResize", 'OnBrowserResize');
     },
+    ReposicionarMapa: function (Posicion) {
+        DotNet.invokeMethodAsync('TableroPecasV5.Client', 'RefrescarZoomAsync', Posicion.toString());
+    },
+    ClickEnMapa: function (Lat, Lng) {
+        DotNet.invokeMethodAsync('TableroPecasV5.Client', 'ClickEnMapaAsync', Lat + ";" + Lng);
+    },
     AbrirMenuBingMaps: function (Referencia) {
         DotNet.invokeMethodAsync('TableroPecasV5.Client', 'AbrirMenuBingMapsAsync', Referencia);
     },

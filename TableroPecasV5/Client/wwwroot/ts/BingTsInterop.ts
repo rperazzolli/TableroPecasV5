@@ -2,7 +2,8 @@
 /// <reference path="types/MicrosoftMaps/Microsoft.Maps.All.d.ts" />
 
 let bingMap: BingMap[] = [null, null, null, null, null, null, null, null, null, null];
-
+let EventoViewChanged: boolean[] = [false, false, false, false, false, false, false, false, false, false];
+let EventoMouseUp: boolean[] = [false, false, false, false, false, false, false, false, false, false];
 
 
 class BingMap {
@@ -68,22 +69,38 @@ function LiberarMap(Posicion: number) {
 //    }
 //}
 
-function loadMapRetPos(Posicion: number, Direccion: string, LatCentro: number, LngCentro: number, NivelZoom: number): string {
+function loadMapRetPos(Posicion: number, Direccion: string, LatCentro: number, LngCentro: number, NivelZoom: number,
+    EventoViewChange: boolean, EventoMouseUp: boolean): string {
 
     try {
+        let Eventos: boolean = false;
         if (Posicion < 0) {
             Posicion = UbicarPosicionLibre();
+            Eventos = true;
+            bingMap[Posicion] = new BingMap(Direccion);
         }
-        bingMap[Posicion] = new BingMap(Direccion);
+//        bingMap[Posicion] = new BingMap(Direccion);
         if (bingMap[Posicion] != null) {
             bingMap[Posicion].map.setView({
                 center: new Microsoft.Maps.Location(LatCentro, LngCentro),
                 zoom: NivelZoom
             });
             Microsoft.Maps.registerModule('RutinasJS', 'RutinasJS.js');
-            Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchangeend', function () {
-                window['FuncionesJS'].RefrescarMapa(Direccion);
-            });
+            //Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchangeend', function () {
+            //    window['FuncionesJS'].RefrescarMapa(Direccion)
+            //       });
+            if (Eventos) {
+            if (EventoViewChange) {
+                Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchange', function () {
+                    window['FuncionesJS'].ReposicionarMapa(Posicion)
+                });
+            }
+                if (EventoMouseUp) {
+                    Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'click', function (e: Microsoft.Maps.IMouseEventArgs) {
+                        window['FuncionesJS'].ClickEnMapa(e.location.latitude.toString(), e.location.longitude.toString())
+                    });
+                }
+            }
         }
     }
     catch (exc) {
@@ -154,6 +171,28 @@ function AgregarPushpin(Posicion: number, Abscisa: number, Ordenada: number, Col
         bingMap[Posicion].map.entities.push(pushpinLocal);
     }
 
+}
+
+function EliminarPushpin(Posicion: number, Referencia: string) : string {
+    let Eliminar: Microsoft.Maps.Pushpin = null;
+    for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
+
+        if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Pushpin) {
+            let EnCiclo: Microsoft.Maps.Pushpin = <Microsoft.Maps.Pushpin>bingMap[Posicion].map.entities.get(i);
+            if (Referencia.length > 0 && EnCiclo.metadata == Referencia) 
+            {
+                Eliminar = EnCiclo;
+                break;
+            }
+        }
+    }
+    if (Eliminar != null) {
+        bingMap[Posicion].map.entities.remove(Eliminar);
+        return "";
+    }
+    else {
+        return "No";
+    }
 }
 
 function pushpinClicked(e) {

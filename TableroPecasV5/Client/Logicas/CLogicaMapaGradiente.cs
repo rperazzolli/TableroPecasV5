@@ -881,12 +881,14 @@ namespace TableroPecasV5.Client.Logicas
                 Abscisa < -998 ? (Contenedores.CContenedorDatos.AltoPantalla - 45) : (Alto - 45));
             ReubicarCentro = false;
           }
-          object[] Args = new object[5];
+          object[] Args = new object[7];
           Args[0] = mPosicionMapBing;
           Args[1] = '#' + Direccion;
           Args[2] = mProyectoBing.LatCentro;
           Args[3] = mProyectoBing.LngCentro;
           Args[4] = mProyectoBing.NivelZoom;
+          Args[5] = false;
+          Args[6] = false;
           try
           {
             if (mPosicionMapBing < 0)

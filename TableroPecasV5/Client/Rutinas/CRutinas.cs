@@ -80,6 +80,21 @@ namespace TableroPecasV5.Client.Rutinas
       Anios = 4
     }
 
+    public static void ExtraerCoordenadasPosicion(string Posicion, out double Lng, out double Lat)
+    {
+      try
+      {
+        string[] Coord = Posicion.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        Lng = StrVFloat(Coord[0]);
+        Lat = StrVFloat(Coord[1]);
+      }
+      catch (Exception)
+      {
+        Lng = -1000;
+        Lat = -1000;
+      }
+    }
+
     public static string ColorAlarma(CInformacionAlarmaCN Datos)
 		{
       if (Datos == null)

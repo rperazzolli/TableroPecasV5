@@ -628,12 +628,14 @@ namespace TableroPecasV5.Client.Logicas
                 mLatMin, mLatMax, mLngMin, mLngMax, out mLatCentro, out mLngCentro, out mNivelZoom);
             ReubicarCentro = false;
           }
-          object[] Args = new object[5];
+          object[] Args = new object[7];
           Args[0] = mPosicionMapaCalor;
           Args[1] = '#' + Direccion;
           Args[2] = (mLatMax + mLatMin) / 2;
           Args[3] = (mLngMax + mLngMin) / 2;
           Args[4] = mNivelZoom;
+          Args[5] = false;
+          Args[6] = false;
           try
           {
             if (mPosicionMapaCalor < 0)
