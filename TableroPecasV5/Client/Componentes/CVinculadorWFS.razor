@@ -1,0 +1,46 @@
+﻿@using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Listas;
+@inherits Logicas.CLogicaVinculadorWFS
+
+<div style="width: 80%; left: 10%; top: 10%; height: 50%; overflow: hidden; background-color: white; position: absolute;">
+  @if (ListaCapas == null)
+  {
+    <CAguardar/>
+  }
+  else
+  {
+    <div class="row" style="width: 100%; height: 100%; position: relative; margin: 0px; overflow-x: hidden; overflow-y: auto; display: inline-block;">
+      <div style="width: 100%; height: 25px; display: inline-block;">
+        <label style="margin-left: 15px;">Capa seleccionada</label>
+        <select style="margin-left: 5px; width: 200px;" @onselectionchange="@SeleccionoCapa">
+          @foreach (CListaTexto Elemento in ListaCapas)
+          {
+            <option value="@Elemento.Codigo" typeof="int">@Elemento.Descripcion</option>
+          }
+        </select>
+      </div>
+      <div style="width: 50%; height: calc(100% - 65px);">
+        @foreach (CListaTexto Elemento in ListaElementos)
+        {
+          <div style="width: 100%; height: 25px;">
+            <label>@Elemento.Descripcion</label>
+          </div>
+        }
+      </div>
+      <div style="width: 50%; height: calc(100% - 65px);">
+          @foreach (CListaTexto Elemento in ListaElementos)
+          {
+            <select style="margin-left: 5%; width: 90%;" @onselectionchange="((e) => { AsociarCapaElemento(Elemento.Codigo); })">
+            @foreach (CListaDoble ElementoCapa in ListaElementosCapa)
+            {
+              <option value="@ElementoCapa.Codigo" typeof="int">@Elemento.Descripcion</option>
+            }
+            </select>
+          }
+      </div>
+      <div style="width: 100%; height: 40px; text-align: right;">
+        <button style="width: 80px; height: 25px;" @onclick="@Registrar">Registrar</button>
+      </div>
+    </div>
+  }
+</div>

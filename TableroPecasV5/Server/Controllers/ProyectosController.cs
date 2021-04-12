@@ -364,6 +364,19 @@ namespace TableroPecasV5.Server.Controllers
 			};
 		}
 
+		public static CPreguntaPreguntaWISCN CopiarPreguntaWISCN(WCFBPI.CPreguntaPreguntaWISCN Pregunta)
+		{
+			return new CPreguntaPreguntaWISCN()
+			{
+				Clase = (ClaseDetalle)((Int32)Pregunta.Clase),
+				Codigo = Pregunta.Codigo,
+				CodigoDimension = Pregunta.CodigoDimension,
+				CodigoElemento = Pregunta.CodigoElemento,
+				CodigoElementoDimension = Pregunta.CodigoElementoDimension,
+				CodigoPregunta = Pregunta.CodigoPregunta
+			};
+		}
+
 		public static List<CElementoPreguntasWISCN> ConvertirPreguntas(List<WCFBPI.CElementoPreguntasWISCN> PreguntasWCF)
 		{
 			return (from P in PreguntasWCF
@@ -375,15 +388,7 @@ namespace TableroPecasV5.Server.Controllers
 								CodigoArea = P.CodigoArea,
 								CodigoWIS = P.CodigoWIS,
 								Contenidos = (from C in P.Contenidos
-															select new CPreguntaPreguntaWISCN()
-															{
-																Clase = (ClaseDetalle)((Int32)C.Clase),
-																Codigo = C.Codigo,
-																CodigoDimension = C.CodigoDimension,
-																CodigoElemento = C.CodigoElemento,
-																CodigoElementoDimension = C.CodigoElementoDimension,
-																CodigoPregunta = C.CodigoPregunta
-															}).ToList(),
+															select CopiarPreguntaWISCN(C)).ToList(),
 								Dimension = P.Dimension,
 								ElementoDimension = P.ElementoDimension,
 								Nombre = P.Nombre,

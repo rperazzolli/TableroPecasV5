@@ -67,9 +67,19 @@ namespace TableroPecasV5.Client.Logicas
     public Int32 NivelFlotante { get; set; }
 
     [Parameter]
-    public string Direccion { get; set; } = "ContenedorMapa";
+    public string Direccion { get; set; } = "";
 
-    public async void Dispose()
+    private static Int32 gCodigoMapa = 0;
+    private Int32 mCodigoMapa;
+
+		protected override Task OnInitializedAsync()
+		{
+      mCodigo = gCodigoMapa++;
+      Direccion = "ContenedorMapa" + mCodigoMapa.ToString();
+			return base.OnInitializedAsync();
+		}
+
+		public async void Dispose()
     {
       try
       {
@@ -136,11 +146,11 @@ namespace TableroPecasV5.Client.Logicas
     private async Task AgregarPushPinAsync(CPuntoTextoColor Punto)
     {
       object[] Args = new object[7];
-      Args[0] = Punto.Abscisa;
-      Args[1] = Punto.Ordenada;
-      Args[2] = Punto.Color;
-      Args[3] = Punto.Texto;
-      Args[4] = "";
+      Args[0] = mPosicionBingMap;
+      Args[1] = Punto.Abscisa;
+      Args[2] = Punto.Ordenada;
+      Args[3] = Punto.Color;
+      Args[4] = Punto.Texto;
       Args[5] = "";
       Args[6] = "";
       try

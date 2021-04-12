@@ -184,6 +184,32 @@ namespace TableroPecasV5.Client.Contenedores
       }
     }
 
+    public async static Task<RespuestaCapasGIS> LeerCapasWFSAsync(HttpClient Http, bool UnicamenteWFS,
+        bool SinDetalle)
+    {
+      try
+      {
+
+        RespuestaCapasGIS Respuesta = await Http.GetFromJsonAsync<RespuestaCapasGIS>(
+            "api/Capas/ListarTodasLasCapas?URL=" + Contenedores.CContenedorDatos.UrlBPI +
+            "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
+            "&WFS=" + CRutinas.BoolToStr(UnicamenteWFS) +
+            "&SinDetalle=" + CRutinas.BoolToStr(SinDetalle));
+        if (!Respuesta.RespuestaOK)
+        {
+          throw new Exception(Respuesta.MsgErr);
+        }
+
+        return Respuesta;
+
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return null;
+      }
+    }
+
     public async static Task<RespuestaDatasetBin> LeerDetalleSubconsultaAsync(HttpClient Http,
           Int32 Subconsulta, List<CParametroExt> Parametros)
 		{

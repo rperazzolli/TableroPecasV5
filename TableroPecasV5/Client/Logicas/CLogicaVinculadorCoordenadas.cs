@@ -31,11 +31,18 @@ namespace TableroPecasV5.Client.Logicas
 
 		private CListaPosicion mElementoSeleccionado = null;
 
-		public string EstiloLinea(CListaPosicion Elemento)
+		public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
 		{
-			return "width: 100%; height: 25px; background: " +
-					(mElementoSeleccionado == Elemento ? "yellow" : "white") + "; color: " +
-					(Elemento.Lat > -999 ? "blue;" : "red;");
+			// Obtener location abajo.
+
+		}
+
+		public string EstiloLinea
+		{
+			get
+			{
+				return "width: 100%; height: 25px;";
+			}
 		}
 
 		private Int32 mPosicionBingMap = -1;

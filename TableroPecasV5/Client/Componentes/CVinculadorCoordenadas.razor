@@ -13,12 +13,12 @@
   <div style="width: 50%; height: calc(100% - 40px);">
     @foreach (CListaPosicion Elemento in ListaElementos)
     {
-      <div style="@EstiloLinea(Elemento)" @onclick="((e) => { SeleccionarVinculo(Elemento); })">
+      <div style="@EstiloLinea" @onclick="((e) => { SeleccionarVinculo(Elemento); })">
         <label>@Elemento.Descripcion</label>
       </div>
     }
   </div>
-  <div id="@Direccion" style="width: 50%; height: 100%;">
+  <div id="@Direccion" style="width: 50%; height: 100%;" ondragover="event.preventDefault();" @ondrop="RecibirDrop">
   </div>
   <div style="width: 100%; height: 40px; text-align: right;">
     <button style="width: 80px; height: 25px;" @onclick="@Registrar">Registrar</button>

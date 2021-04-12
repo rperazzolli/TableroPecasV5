@@ -39,6 +39,18 @@ function UbicarPosicionLibre() {
     return bingMap.length - 1;
 }
 
+function LiberarPushpins(Posicion: number) {
+    if (Posicion >= 0 && Posicion < bingMap.length) {
+        if (bingMap[Posicion] != null) {
+            if (bingMap[Posicion].map != null) {
+                if (bingMap[Posicion].map.entities != null) {
+                    bingMap[Posicion].map.entities.clear();
+                }
+            }
+        }
+    }
+}
+
 function LiberarMap(Posicion: number) {
     if (Posicion >= 0 && Posicion < bingMap.length) {
         var i: number;
@@ -48,6 +60,7 @@ function LiberarMap(Posicion: number) {
         }
         bingMap[Posicion].map.entities.clear();
         bingMap[Posicion].map.layers.clear();
+        bingMap[Posicion].map.dispose();
         bingMap[Posicion] = null;
     }
 }
@@ -148,7 +161,7 @@ function AgregarPushpin(Posicion: number, Abscisa: number, Ordenada: number, Col
 
                 subTitle: Texto2,
 
-                anchor: new Microsoft.Maps.Point(12 - 5, 40.5)
+                anchor: new Microsoft.Maps.Point(12.5, 40.5)
 
             });
         }
@@ -157,7 +170,47 @@ function AgregarPushpin(Posicion: number, Abscisa: number, Ordenada: number, Col
 
                 icon: this.CrearIcono(Color, Texto),
 
-                anchor: new Microsoft.Maps.Point(12 - 5, 40.5)
+                anchor: new Microsoft.Maps.Point(12.5, 40.5)
+
+            });
+        }
+
+        pushpinLocal.metadata = Referencia;
+
+        if (Referencia.length > 0) {
+            Microsoft.Maps.Events.addHandler(pushpinLocal, 'click', pushpinClicked);
+        }
+
+        bingMap[Posicion].map.entities.push(pushpinLocal);
+    }
+
+}
+
+function AgregarPushpinGrande(Posicion: number, Abscisa: number, Ordenada: number, Color: string, Texto: string, Texto2: string, Referencia: string): void {
+
+    if (bingMap != null) {
+
+        var Factor: number = 1.25;
+
+        if (Texto != null && Texto.length > 0) {
+            var pushpinLocal = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(Ordenada, Abscisa), {
+
+                icon: this.CrearIconoFactor(Color, Texto, Factor),
+
+                title: Texto,
+
+                subTitle: Texto2,
+
+                anchor: new Microsoft.Maps.Point(12.5 * Factor, 40.5 * Factor)
+
+            });
+        }
+        else {
+            var pushpinLocal = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(Ordenada, Abscisa), {
+
+                icon: this.CrearIconoFactor(Color, Texto, Factor),
+
+                anchor: new Microsoft.Maps.Point(12.5 * Factor, 40.5 * Factor)
 
             });
         }
@@ -209,6 +262,7 @@ var IconoAzul = null;
 var IconoRojo = null;
 var IconoVerde = null;
 var IconoAmarillo = null;
+var IconoGrande = null;
 
 function CrearIcono(Color: string, Texto: string): string {
     switch (Color) {
@@ -237,10 +291,21 @@ function CrearIcono(Color: string, Texto: string): string {
     }
 }
 
+function CrearIconoFactor(Color: string, Texto: string, Factor: number): string {
+    if (IconoGrande == null) {
+        IconoGrande = CrearIconoColorFactor(Color, Texto, Factor);
+    }
+    return IconoGrande;
+}
+
 function CrearIconoColor(Color: string, Texto: string): string {
+    return CrearIconoColorFactor(Color, Texto, 1);
+}
+
+function CrearIconoColorFactor(Color: string, Texto: string, Factor: number): string {
     var CanvasIc = document.createElement('canvas');
-    CanvasIc.width = 25;
-    CanvasIc.height = 41;
+    CanvasIc.width = 25 * Factor;
+    CanvasIc.height = 41 * Factor;
 
     var Contexto = CanvasIc.getContext('2d');
 
@@ -252,10 +317,10 @@ function CrearIconoColor(Color: string, Texto: string): string {
     Contexto.fillStyle = "lightgray";
     Contexto.strokeStyle = "gray";
     Contexto.lineWidth = 1;
-    Contexto.moveTo(1.657905, 17.642857);
-    Contexto.arc(12.5, 12.5, 12, 2.698682, 0.442911, true);
-    Contexto.lineTo(12.5, 40.5);
-    Contexto.lineTo(1.6157905, 17.642857);
+    Contexto.moveTo(1.657905 * Factor, 17.642857 * Factor);
+    Contexto.arc(12.5 * Factor, 12.5 * Factor, 12 * Factor, 2.698682, 0.442911, true);
+    Contexto.lineTo(12.5 * Factor, 40.5 * Factor);
+    Contexto.lineTo(1.6157905 * Factor, 17.642857 * Factor);
     Contexto.closePath();
     Contexto.fill();
     Contexto.stroke();
@@ -263,7 +328,7 @@ function CrearIconoColor(Color: string, Texto: string): string {
     Contexto.beginPath();
     Contexto.fillStyle = Color;
     Contexto.strokeStyle = "gray";
-    Contexto.arc(12.5, 12.5, 12, 0, 6.283185, false);
+    Contexto.arc(12.5 * Factor, 12.5 * Factor, 12 * Factor, 0, 6.283185, false);
     Contexto.closePath();
     Contexto.fill();
     Contexto.stroke();
@@ -279,6 +344,19 @@ function PosicionarMapa(Posicion: number, AbscCentro: number, OrdCentro: number,
             center: new Microsoft.Maps.Location(OrdCentro, AbscCentro),
             zoom: Zoom
         });
+    }
+}
+
+function ExtremosMapa(Posicion: number): string {
+    if (Posicion > 0 && Posicion < bingMap.length && bingMap[Posicion] != null) {
+        var PosicionMapa = bingMap[Posicion].map.getBounds();
+        return PosicionMapa.getWest().toString() + ";" +
+            PosicionMapa.getNorth().toString() + ";" +
+            PosicionMapa.getEast().toString() + ";" +
+            PosicionMapa.getSouth().toString();
+    }
+    else {
+        return "0;0;-1;-1";
     }
 }
 

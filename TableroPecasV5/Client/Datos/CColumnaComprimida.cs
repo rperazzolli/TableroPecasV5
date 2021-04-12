@@ -313,7 +313,7 @@ namespace TableroPecasV5.Client.Datos
       }
     }
 
-    public double ValorReal(Int32 Posicion)
+    public double ValorReal(Int32 Posicion, bool Retorna1 = false)
     {
       if (Posicion < 0 || Posicion >= mValores.Count)
       {
@@ -328,7 +328,7 @@ namespace TableroPecasV5.Client.Datos
           case ClaseVariable.Entero:
             return (Int32)mValores[Posicion];
           default:
-            return double.NaN;
+            return (Retorna1 ? 1 : double.NaN);
         }
       }
     }

@@ -732,6 +732,41 @@ namespace TableroPecasV5.Client.Rutinas
       return Respuesta;
 		}
 
+    public static Int32 UbicarNivelZoom(double Ancho, double Alto, double RangoLng, double RangoLat)
+		{
+      double Relacion1 = RangoLat * 650 / Alto;
+      double Relacion2 = RangoLng * 1280 / Ancho;
+      double Salto = Math.Max(Relacion1, Relacion2);
+      if (Salto == 0)
+      {
+        return 10;
+      }
+      else
+      {
+        Salto *= Math.Pow(2, 7);
+        for (Int32 i = 15; i > 1; i--)
+        {
+          if (Salto < 1.5)
+          {
+            return i;
+          }
+          Salto /= 2;
+        }
+        return 1;
+      }
+    }
+
+    public static List<double> ListaAReales(string Lista)
+    {
+      string[] Datos = Lista.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+      List<double> Valores = new List<double>();
+      foreach (string Valor in Datos)
+			{
+        Valores.Add(StrVFloat(Valor));
+			}
+      return Valores;
+    }
+
     public static CElementoPreguntasWISCN CrearElementoPreguntas(CPunto Posicion)
     {
       CElementoPreguntasWISCN Respuesta = new CElementoPreguntasWISCN();

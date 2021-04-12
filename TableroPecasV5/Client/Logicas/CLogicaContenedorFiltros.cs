@@ -45,9 +45,9 @@ namespace TableroPecasV5.Client.Logicas
         if (mBlocks != value)
         {
           if (mBlocks != null)
-					{
+          {
             AlAjustarVentanasFlotantes -= mBlocks.Refrescar;
-					}
+          }
           mBlocks = value;
           if (mBlocks != null)
           {
@@ -57,6 +57,34 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+
+    public void AbrirGISPinsLL()
+    {
+      OrdenValor = -1;
+      OrdenLat = -1;
+      OrdenLng = -1;
+      ModalPinsLL.Show();
+    }
+
+    public void AbrirTortasLL()
+    {
+      //
+    }
+
+    public void AbrirTortasManual()
+    {
+      //
+    }
+
+    public void AbrirTortasCapa()
+    {
+      //
+    }
+
+    public void AbrirGISWSS()
+    {
+      //
+    }
 
     public CLogicaContenedorFiltros()
     {
@@ -94,6 +122,8 @@ namespace TableroPecasV5.Client.Logicas
 
     public Modal ModalCrearGrafico { get; set; }
 
+    public Modal ModalPinsLL { get; set; }
+
     public List<CLinkFiltros> LinksAnteriores
     {
       get { return mLinksAnteriores; }
@@ -114,6 +144,30 @@ namespace TableroPecasV5.Client.Logicas
       {
         ModalCrearGrafico.Hide();
       }
+      if (ModalPinsLL != null)
+      {
+        ModalPinsLL.Hide();
+      }
+    }
+
+    [Inject]
+    public NavigationManager Navegador { get; set; }
+
+    public void AgregarPinsLL()
+		{
+      CLogicaPagPinsLL.gColumnaDatos = Proveedor.Columnas[OrdenValor].Nombre;
+      CLogicaPagPinsLL.gColumnaLat = Proveedor.Columnas[OrdenLat].Nombre;
+      CLogicaPagPinsLL.gColumnaLng = Proveedor.Columnas[OrdenLng].Nombre;
+      CLogicaPagPinsLL.gColumnas = Proveedor.Columnas;
+      if (mLinks != null && mLinks.Count > 0)
+      {
+        CLogicaPagPinsLL.gLineas = mLinks[0].Filtrador.DatosFiltrados;
+      }
+      else
+      {
+        CLogicaPagPinsLL.gLineas = Proveedor.Datos;
+      }
+      Navegador.NavigateTo("PagPinsLL");
     }
 
     public void Cerrando(Blazorise.ModalClosingEventArgs e)
@@ -129,41 +183,41 @@ namespace TableroPecasV5.Client.Logicas
 
     private ClaseGrafico mClaseGrafico = ClaseGrafico.Torta;
     public Int32 ClaseGraficoElegido
-		{
+    {
       get
-			{
+      {
         return (Int32)mClaseGrafico;
-			}
+      }
       set
-			{
+      {
         mClaseGrafico = (ClaseGrafico)value;
         StateHasChanged();
-			}
-		}
+      }
+    }
 
     public bool EsTortas
     {
-      get { return (mClaseGrafico==ClaseGrafico.Torta); }
+      get { return (mClaseGrafico == ClaseGrafico.Torta); }
     }
 
     public bool EsBarras
     {
-      get { return (mClaseGrafico==ClaseGrafico.Barras); }
+      get { return (mClaseGrafico == ClaseGrafico.Barras); }
     }
 
     public bool EsHistograma
     {
-      get { return (mClaseGrafico==ClaseGrafico.Histograma); }
+      get { return (mClaseGrafico == ClaseGrafico.Histograma); }
     }
 
     public bool EsBarrasApiladas
     {
-      get { return (mClaseGrafico==ClaseGrafico.BarrasH); }
+      get { return (mClaseGrafico == ClaseGrafico.BarrasH); }
     }
 
     public bool EsPuntos
     {
-      get { return (mClaseGrafico==ClaseGrafico.Puntos); }
+      get { return (mClaseGrafico == ClaseGrafico.Puntos); }
     }
 
     public Int32 OrdenColumnaValor { get; set; } = -1;
@@ -223,9 +277,9 @@ namespace TableroPecasV5.Client.Logicas
     public void AbrirGrafico()
     {
       if (FncReposicionarArriba != null)
-			{
+      {
         FncReposicionarArriba();
-			}
+      }
       if (ModalCrearGrafico != null)
       {
         ModalCrearGrafico.Show();
@@ -287,18 +341,30 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     public string GraficoSeleccionado
-		{
+    {
       get
-			{
+      {
         switch (mClaseGrafico)
-				{
+        {
           case ClaseGrafico.Torta: return "Torta";
           case ClaseGrafico.Barras: return "Barras";
           case ClaseGrafico.Histograma: return "Histograma";
           case ClaseGrafico.BarrasH: return "Barras apiladas";
           case ClaseGrafico.Puntos: return "Puntos";
           default: return "No definido";
-				}
+        }
+      }
+    }
+
+    public Int32 OrdenValor { get; set; }
+    public Int32 OrdenLat { get; set; }
+    public Int32 OrdenLng { get; set; }
+
+    public bool NoHayPinsLL
+		{
+      get
+			{
+        return (OrdenValor < 0 || OrdenLat < 0 || OrdenLng < 0);
 			}
 		}
 
@@ -528,12 +594,12 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     public CProveedorComprimido ProveedorImpuesto
-		{
+    {
       set
-			{
+      {
         Proveedor = value;
-			}
-		}
+      }
+    }
 
     [Parameter]
     public CProveedorComprimido Proveedor
@@ -565,8 +631,8 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-		public override void RefrescarSuperior()
-		{
+    public override void RefrescarSuperior()
+    {
       if (Blocks != null)
       {
         Blocks.Refrescar();
@@ -575,9 +641,9 @@ namespace TableroPecasV5.Client.Logicas
       {
         base.RefrescarSuperior();
       }
-		}
+    }
 
-		public void CrearLineas(bool BloquearRefresco = false)
+    public void CrearLineas(bool BloquearRefresco = false)
     {
       if (Lineas == null)
       {
@@ -593,10 +659,10 @@ namespace TableroPecasV5.Client.Logicas
     {
 
       List<LineaFiltro> Respuesta = null;
-      if (Otro!=null && Otro.Lineas != null)
-			{
+      if (Otro != null && Otro.Lineas != null)
+      {
         return Otro.Lineas;
-			}
+      }
 
       if (Proveedor != null && Otro != null)
       {
@@ -635,7 +701,7 @@ namespace TableroPecasV5.Client.Logicas
       Lineas = null;
       CrearLineas(true);
       StateHasChanged();
-//      AlAjustarVentanasFlotantes();
+      //      AlAjustarVentanasFlotantes();
     }
 
     public double DimensionCaracter { get; set; }
@@ -682,12 +748,12 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     public void FiltrarDataset()
-		{
-      if (mLinks!=null && mLinks.Count > 0)
-			{
+    {
+      if (mLinks != null && mLinks.Count > 0)
+      {
         mLinks[0].Filtrador.FiltrarDataset();
-			}
-		}
+      }
+    }
 
     private void FncAjustarListasValor(Datos.CFiltrador Filtro, List<Int32> Codigos)
     {
@@ -734,7 +800,7 @@ namespace TableroPecasV5.Client.Logicas
 
     private void FncCerrarFiltro(string NombreColumna, bool Eliminar)
     {
-//      ActualizarDatosDataset(mProveedor);
+      //      ActualizarDatosDataset(mProveedor);
       for (Int32 i = 0; i < mLinks.Count; i++)
       {
         CLogicaFiltroTextos Filtro = mLinks[i].Componente as CLogicaFiltroTextos;
@@ -771,12 +837,12 @@ namespace TableroPecasV5.Client.Logicas
 
       CrearLineas();
 
-			if (AlAjustarVentanasFlotantes != null)
-			{
-				AlAjustarVentanasFlotantes();
-			}
+      if (AlAjustarVentanasFlotantes != null)
+      {
+        AlAjustarVentanasFlotantes();
+      }
 
-		}
+    }
 
     private void RecrearPantallaFiltro(CLinkFiltros Link)
     {
@@ -830,7 +896,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       get
       {
-        return "padding-left: 15px; padding-top: 10px; width: 100 %; bottom: 0px; height: " + (Alto - 45).ToString() +
+        return "padding-left: 15px; padding-top: 10px; width: 100 %; bottom: 0px; height: " + (Alto - 70).ToString() +
           "px; overflow: auto; display: block; box-sizing: inherit; text-align: left; ";
       }
     }
@@ -845,13 +911,13 @@ namespace TableroPecasV5.Client.Logicas
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
       if (Lineas == null)
-			{
+      {
         CrearLineas();
         if (Lineas != null)
         {
           StateHasChanged();
         }
-			}
+      }
       await base.OnAfterRenderAsync(firstRender);
     }
 
@@ -874,11 +940,11 @@ namespace TableroPecasV5.Client.Logicas
       }
 
       if (Grilla != null)
-			{
+      {
         Grilla.Proveedor = Proveedor;
         Grilla.Componente.Proveedor = Proveedor;
         Grilla.Componente.Redibujar();
-			}
+      }
 
       StateHasChanged();
     }
@@ -961,12 +1027,12 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     public void GuardarPosicion()
-		{
+    {
       AbscisaAnterior = Abscisa;
       OrdenadaAnterior = Ordenada;
       AnchoAnterior = Ancho;
       AltoAnterior = Alto;
-		}
+    }
 
     public void RecuperarPosicion()
     {
@@ -984,16 +1050,16 @@ namespace TableroPecasV5.Client.Logicas
     private bool mbAmpliado = false;
 
     public bool Ampliado
-		{
+    {
       get
-			{
+      {
         return mbAmpliado;
-			}
+      }
       set
-			{
+      {
         mbAmpliado = value;
-			}
-		}
+      }
+    }
 
     public Int32 NivelFlotante { get; set; }
 

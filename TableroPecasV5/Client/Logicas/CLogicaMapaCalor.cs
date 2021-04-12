@@ -46,6 +46,16 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+		protected override Task OnInitializedAsync()
+		{
+      mCodigoMapa = gCodigoMapa++;
+      Direccion = "MapaCalor" + mCodigoMapa.ToString();
+			return base.OnInitializedAsync();
+		}
+
+		public static Int32 gCodigoMapa = 0;
+    private Int32 mCodigoMapa;
+
     [Parameter]
     public CDatoIndicador Indicador { get; set; }
 
@@ -56,7 +66,7 @@ namespace TableroPecasV5.Client.Logicas
     public Int32 CodigoCapa { get; set; }
 
     [Parameter]
-    public string Direccion { get; set; } = "MapaCalor";
+    public string Direccion { get; set; }
 
     [Parameter]
     public double Abscisa { get; set; } = -999;

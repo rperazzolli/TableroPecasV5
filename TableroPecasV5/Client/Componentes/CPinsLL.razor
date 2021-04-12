@@ -1,0 +1,16 @@
+﻿@inherits Logicas.CLogicaPinsLL
+
+
+<div id="@Direccion" style="width: 100%; height: 100%;">
+  @if (!DatosCompletos)
+  {
+    <CAguardar />
+  }
+  else
+  {
+    @if (SinDatos)
+    {
+      <a>No hay datos disponibles</a>
+    }
+  }
+</div>
