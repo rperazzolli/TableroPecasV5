@@ -63,6 +63,7 @@ namespace TableroPecasV5.Client.Logicas
       OrdenValor = -1;
       OrdenLat = -1;
       OrdenLng = -1;
+      Agrupados = true;
       ModalPinsLL.Show();
     }
 
@@ -159,6 +160,7 @@ namespace TableroPecasV5.Client.Logicas
       CLogicaPagPinsLL.gColumnaLat = Proveedor.Columnas[OrdenLat].Nombre;
       CLogicaPagPinsLL.gColumnaLng = Proveedor.Columnas[OrdenLng].Nombre;
       CLogicaPagPinsLL.gColumnas = Proveedor.Columnas;
+      CLogicaPagPinsLL.gAgrupados = Agrupados;
       if (mLinks != null && mLinks.Count > 0)
       {
         CLogicaPagPinsLL.gLineas = mLinks[0].Filtrador.DatosFiltrados;
@@ -359,6 +361,7 @@ namespace TableroPecasV5.Client.Logicas
     public Int32 OrdenValor { get; set; }
     public Int32 OrdenLat { get; set; }
     public Int32 OrdenLng { get; set; }
+    public bool Agrupados { get; set; } = true;
 
     public bool NoHayPinsLL
 		{

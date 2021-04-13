@@ -82,7 +82,7 @@ function loadMapRetPos(Posicion, Direccion, LatCentro, LngCentro, NivelZoom, Eve
             if (Eventos) {
                 if (EventoViewChange) {
                     Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchange', function () {
-                        window['FuncionesJS'].ReposicionarMapa(Posicion);
+                        window['FuncionesJS'].ReposicionarMapa(Posicion, bingMap[Posicion].map.getZoom());
                     });
                 }
                 if (EventoMouseUp) {
@@ -169,6 +169,25 @@ function EliminarPushpin(Posicion, Referencia) {
     var Eliminar = null;
     for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
         if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Pushpin) {
+            var EnCiclo = bingMap[Posicion].map.entities.get(i);
+            if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
+                Eliminar = EnCiclo;
+                break;
+            }
+        }
+    }
+    if (Eliminar != null) {
+        bingMap[Posicion].map.entities.remove(Eliminar);
+        return "";
+    }
+    else {
+        return "No";
+    }
+}
+function EliminarPoligono(Posicion, Referencia) {
+    var Eliminar = null;
+    for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
+        if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Polygon) {
             var EnCiclo = bingMap[Posicion].map.entities.get(i);
             if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
                 Eliminar = EnCiclo;

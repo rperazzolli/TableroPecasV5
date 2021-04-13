@@ -15,7 +15,7 @@ namespace TableroPecasV5.Client.Logicas
 {
   public class CLogicaBingMaps : ComponentBase, IDisposable
   {
-    public delegate void FncEventoViewChange(Int32 Posicion);
+    public delegate void FncEventoViewChange(Int32 Posicion, double Zoom);
     public delegate void FncEventoClick(double Lat, double Lng);
 
     public static FncEventoViewChange gAlHacerViewChange { get; set; }
@@ -399,11 +399,23 @@ namespace TableroPecasV5.Client.Logicas
 
     private Int32 mPosicionBingMap = -1;
 
+    public delegate void FncEventoPoligono(string Referencia);
+    public static event FncEventoPoligono AlRecibirEventoPoligono;
+
+    private static void ProcesarMensajeClick(string Referencia)
+		{
+      AlRecibirEventoPoligono?.Invoke(Referencia);
+		}
+
     [JSInvokable]
     public static Task<string> AbrirMenuBingMapsAsync(string Referencia)
     {
       try
       {
+        if (Referencia.StartsWith("$$"))
+				{
+          ProcesarMensajeClick(Referencia);
+				}
         string[] Elementos = Referencia.Split(';');
         if (Elementos.Length >= 1)
         {
@@ -486,20 +498,18 @@ namespace TableroPecasV5.Client.Logicas
     {
       try
       {
-        Int32 Posicion = Int32.Parse(Referencia);
+        Int32 Pos = Referencia.IndexOf(";");
+        Int32 Posicion = Int32.Parse(Referencia.Substring(0,Pos));
+        double Zoom = CRutinas.StrVFloat(Referencia.Substring(Pos + 1));
+        if (gAlHacerViewChange != null)
+				{
+          gAlHacerViewChange(Posicion, Zoom);
+				}
         return Task.FromResult("");
       }
       catch (Exception)
       {
         return Task.FromResult("No funcionó");
-      }
-    }
-
-    private void FncProcesarViewChange(Int32 Posicion)
-    {
-      if (Posicion != mPosicionBingMap)
-      {
-        return;
       }
     }
 
@@ -564,13 +574,13 @@ namespace TableroPecasV5.Client.Logicas
           Args[2] = mProyecto.LatCentro;
           Args[3] = mProyecto.LngCentro;
           Args[4] = mProyecto.NivelZoom;
-          Args[5] = true;
-          Args[6] = true;
+          Args[5] = false;
+          Args[6] = false;
           try
           {
             string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
-            gAlHacerViewChange = FncProcesarViewChange;
-            gAlHacerClick = FncProcesarClick;
+            //gAlHacerViewChange = FncProcesarViewChange;
+            //gAlHacerClick = FncProcesarClick;
             mPosicionBingMap = Int32.Parse(PosLocal);
             await mProyecto.DibujarAsync(JSRuntime, mPosicionBingMap);
           }

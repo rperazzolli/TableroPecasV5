@@ -1,7 +1,7 @@
 ﻿@inherits Logicas.CLogicaPinsLL
 
 
-<div id="@Direccion" style="width: 100%; height: 100%;">
+<div id="@Direccion" style="width: 100%; height: 100%; position: absolute;">
   @if (!DatosCompletos)
   {
     <CAguardar />
@@ -13,4 +13,10 @@
       <a>No hay datos disponibles</a>
     }
   }
+  @if (Graficando)
+			{
+        <div style="width: 100%; height: 100%; margin: 0px; background: rgba(128,128,128,0.3);">
+          <CTextoAguarda/>
+        </div>
+			}
 </div>

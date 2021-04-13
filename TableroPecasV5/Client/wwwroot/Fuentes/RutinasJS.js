@@ -63,8 +63,8 @@
         //DotNet.invokeMethod("BrowserResize", 'OnBrowserResize');
         DotNet.invokeMethodAsync("BrowserResize", 'OnBrowserResize');
     },
-    ReposicionarMapa: function (Posicion) {
-        DotNet.invokeMethodAsync('TableroPecasV5.Client', 'RefrescarZoomAsync', Posicion.toString());
+    ReposicionarMapa: function (Posicion, Zoom) {
+        DotNet.invokeMethodAsync('TableroPecasV5.Client', 'RefrescarZoomAsync', Posicion.toString() + ";" + Zoom.toString());
     },
     ClickEnMapa: function (Lat, Lng) {
         DotNet.invokeMethodAsync('TableroPecasV5.Client', 'ClickEnMapaAsync', Lat + ";" + Lng);

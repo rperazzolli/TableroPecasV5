@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -45,12 +46,12 @@ namespace TableroPecasV5.Client.Logicas
     private double mOrdenada = -1000;
     private double mAbscisaCentro = -1000;
     private double mOrdenadaCentro = -1000;
-    private double mAncho = -1000;
-    private double mAlto = -1000;
+    public double Ancho = -1000;
+    public double Alto = -1000;
     private double mNivelZoom = 0;
     private bool mbRedimensionar = true;
-    private Int32 mPosicionMapa = -1;
-    private List<IconoPush> mIconos = null;
+    public Int32 PosicionMapa = -1;
+    public List<IconoPush> Iconos = null;
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
@@ -61,8 +62,8 @@ namespace TableroPecasV5.Client.Logicas
       List<double> Valores = CRutinas.ListaAReales(Posicion);
       mAbscisa = Valores[0];
       mOrdenada = Valores[1];
-      mAncho = Valores[2];
-      mAlto = Valores[3];
+      Ancho = Valores[2];
+      Alto = Valores[3];
     }
 
     private CColumnaBase ColumnaNombre(string Nombre)
@@ -113,14 +114,14 @@ namespace TableroPecasV5.Client.Logicas
 			}
       mAbscisaCentro = (AbscMin + AbscMax) / 2;
       mOrdenadaCentro = (OrdMin + OrdMax) / 2;
-      mNivelZoom = CRutinas.UbicarNivelZoom(mAncho, mAlto, AbscMax - AbscMin, OrdMax - OrdMin);
+      mNivelZoom = CRutinas.UbicarNivelZoom(Ancho, Alto, AbscMax - AbscMin, OrdMax - OrdMin);
 		}
 
     private void AjustarAgrupacionesIconos(IconoPush Icono, Int32 Posicion, double RangoLat, double RangoLng)
 		{
       for (Int32 i = Posicion-1; i >= 0; i--)
       {
-        IconoPush Referencia = mIconos[i];
+        IconoPush Referencia = Iconos[i];
         if (Math.Abs(Referencia.Lng - Icono.Lng) > RangoLng)
 				{
           break;
@@ -138,7 +139,7 @@ namespace TableroPecasV5.Client.Logicas
       }
       for (Int32 i = 0; i < Posicion; i++)
       {
-        IconoPush Referencia = mIconos[i];
+        IconoPush Referencia = Iconos[i];
         if (Referencia.LineaContenedor < 0)
         {
           if (Math.Abs(Referencia.Lat-Icono.Lat)<RangoLat &&
@@ -161,7 +162,7 @@ namespace TableroPecasV5.Client.Logicas
     private async Task AgregarPushPinAsync(IconoPush Punto)
     {
       object[] Args = new object[7];
-      Args[0] = mPosicionMapa;
+      Args[0] = PosicionMapa;
       Args[1] = Punto.Lng;
       Args[2] = Punto.Lat;
       Args[3] = (Punto.Agrupado ? "lightblue" : "lightgray");
@@ -181,10 +182,10 @@ namespace TableroPecasV5.Client.Logicas
     private async Task DibujarPushpinsAsync()
     {
       object[] Args = new object[1];
-      Args[0] = mPosicionMapa;
+      Args[0] = PosicionMapa;
       await JSRuntime.InvokeVoidAsync("LiberarPushpins", Args);
 
-      foreach (IconoPush Punto in mIconos)
+      foreach (IconoPush Punto in Iconos)
 			{
         if (Punto.LineaContenedor < 0)
 				{
@@ -204,15 +205,32 @@ namespace TableroPecasV5.Client.Logicas
       get { return (Lineas == null || Lineas.Count == 0); }
 		}
 
+    private Int32 CompararPuntos(IconoPush I1, IconoPush I2)
+		{
+      if (I1.Lng == I2.Lng)
+			{
+        return I1.Lat.CompareTo(I2.Lat);
+			}
+      else
+			{
+        return I1.Lng.CompareTo(I2.Lng);
+			}
+		}
+
+    private bool CoordenadasIguales(IconoPush I1, IconoPush I2)
+		{
+      return I1.Lat == I2.Lat && I1.Lng == I2.Lng;
+		}
+
     private void CargarValores()
     {
       CColumnaBase ColDatos = ColumnaNombre(ColumnaDatos);
       CColumnaBase ColLat = ColumnaNombre(ColumnaLat);
       CColumnaBase ColLng = ColumnaNombre(ColumnaLng);
 
-      if (mIconos == null)
+      if (Iconos == null)
       {
-        mIconos = new List<IconoPush>();
+        Iconos = new List<IconoPush>();
         Int32 i = 0;
         foreach (CLineaComprimida Linea in Lineas)
         {
@@ -226,64 +244,126 @@ namespace TableroPecasV5.Client.Logicas
           {
             Icono.LineaDatos = i++;
             Icono.ValorGrafico = Icono.Valor;
-            mIconos.Add(Icono);
+            Iconos.Add(Icono);
           }
         }
 
-        mIconos.Sort(delegate (IconoPush I1, IconoPush I2)
-        {
-          return I1.Lng.CompareTo(I2.Lng);
-        });
+        Iconos.Sort(CompararPuntos);
+
+        for (i = Iconos.Count - 1; i > 0; i--)
+				{
+          if (CoordenadasIguales(Iconos[i], Iconos[i - 1]))
+					{
+            Iconos[i - 1].Valor += Iconos[i].Valor;
+            Iconos.RemoveAt(i);
+					}
+				}
 
       }
     }
 
-    private async void FncProcesarViewChange(Int32 Posicion)
-    {
-      if (mPosicionMapa >= 0)
-      {
-      }
+    public bool ProcesandoViewChange { get; set; } = false;
+    public double ZoomAnterior = -1;
+    public double ZoomPendiente = -1;
 
-      object[] Args = new object[1];
-      Args[0] = mPosicionMapa;
+    private System.Timers.Timer mTimer = null;
+
+    private void FncProcesarViewChange(Int32 Posicion, double Zoom)
+    {
+      if (PosicionMapa == Posicion && Agrupar)
+      {
+        if (mTimer != null)
+				{
+          mTimer.Stop();
+          mTimer.Dispose();
+          mTimer = null;
+				}
+
+        if (ZoomAnterior != Zoom)
+				{
+          ZoomPendiente = Zoom;
+          mTimer = new System.Timers.Timer();
+          mTimer.Interval = 2000;
+					mTimer.Elapsed += MTimer_Elapsed;
+          mTimer.Start();
+				}
+      }
+    }
+
+    public bool Graficando { get; set; } = false;
+
+    private void MTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+      if (!ProcesandoViewChange)
+      {
+        try
+        {
+          Graficando = true;
+          StateHasChanged();
+          ProcesandoViewChange = true;
+          //Thread workerThread = new Thread(TareaEnThread);
+          //workerThread.Start(this);
+          _ = TareaEnThreadAsync(this);
+        }
+        catch (Exception ex)
+				{
+          CRutinas.DesplegarMsg(ex);
+				}
+      }
+    }
+
+    private static async Task TareaEnThreadAsync(object Prm)
+    {
+      CLogicaPinsLL Logica = (CLogicaPinsLL)Prm;
       try
       {
-        string PosLocal = await JSRuntime.InvokeAsync<string>("ExtremosMapa", Args);
-        List<double> Valores = CRutinas.ListaAReales(PosLocal);
-        double RangoLng = Valores[2] - Valores[0];
-        double RangoLat = Valores[3] - Valores[1];
-        if (RangoLat <= 0 || RangoLng <= 0)
+        Logica.ZoomAnterior = Logica.ZoomPendiente;
+        if (Logica.Agrupar)
         {
-          double LatMin = double.MaxValue;
-          double LatMax = double.MinValue;
-          double LngMin = double.MaxValue;
-          double LngMax = double.MinValue;
-          foreach (IconoPush Icono in mIconos)
+          object[] Args = new object[1];
+          Args[0] = Logica.PosicionMapa;
+          string PosLocal = await Logica.JSRuntime.InvokeAsync<string>("ExtremosMapa", Args);
+          List<double> Valores = CRutinas.ListaAReales(PosLocal);
+          double RangoLng = Valores[2] - Valores[0];
+          double RangoLat = Valores[3] - Valores[1];
+          if (RangoLat <= 0 || RangoLng <= 0)
           {
-            LatMin = Math.Min(LatMin, Icono.Lat);
-            LatMax = Math.Max(LatMax, Icono.Lat);
-            LngMin = Math.Min(LngMin, Icono.Lng);
-            LngMax = Math.Max(LngMax, Icono.Lng);
+            double LatMin = double.MaxValue;
+            double LatMax = double.MinValue;
+            double LngMin = double.MaxValue;
+            double LngMax = double.MinValue;
+            foreach (IconoPush Icono in Logica.Iconos)
+            {
+              LatMin = Math.Min(LatMin, Icono.Lat);
+              LatMax = Math.Max(LatMax, Icono.Lat);
+              LngMin = Math.Min(LngMin, Icono.Lng);
+              LngMax = Math.Max(LngMax, Icono.Lng);
+            }
+            RangoLat = LatMax - LatMin;
+            RangoLng = LngMax - LngMin;
           }
-          RangoLat = LatMax - LatMin;
-          RangoLng = LngMax - LngMin;
-        }
-        double DeltaLat = 40 * RangoLat / mAlto;
-        double DeltaLng = 25 * RangoLng / mAncho;
+          double DeltaLat = 40 * RangoLat / Logica.Alto;
+          double DeltaLng = 25 * RangoLng / Logica.Ancho;
 
-        for (Int32 i = 0; i < mIconos.Count; i++)
-        {
-          AjustarAgrupacionesIconos(mIconos[i], i, DeltaLat, DeltaLng);
+          for (Int32 i = 0; i < Logica.Iconos.Count; i++)
+          {
+            Logica.AjustarAgrupacionesIconos(Logica.Iconos[i], i, DeltaLat, DeltaLng);
+          }
         }
 
-        await DibujarPushpinsAsync();
+        await Logica.DibujarPushpinsAsync();
 
-        StateHasChanged();
 
       }
       catch (Exception ex)
       {
         CRutinas.DesplegarMsg(ex);
+      }
+      finally
+      {
+        Logica.ProcesandoViewChange = false;
+        Logica.Graficando = false;
+        Logica.StateHasChanged();
       }
     }
 
@@ -298,7 +378,7 @@ namespace TableroPecasV5.Client.Logicas
         }
         else
         {
-          if (mPosicionMapa < 0)
+          if (PosicionMapa < 0)
           {
 
             CargarValores();
@@ -306,7 +386,7 @@ namespace TableroPecasV5.Client.Logicas
             UbicarCentro();
 
             object[] Args = new object[7];
-            Args[0] = mPosicionMapa;
+            Args[0] = PosicionMapa;
             Args[1] = '#' + Direccion; // mProyecto.LatCentro;
             Args[2] = mOrdenadaCentro;
             Args[3] = mAbscisaCentro;
@@ -316,9 +396,10 @@ namespace TableroPecasV5.Client.Logicas
             try
             {
               string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
-              mPosicionMapa = Int32.Parse(PosLocal);
+              PosicionMapa = Int32.Parse(PosLocal);
               CLogicaBingMaps.gAlHacerViewChange = FncProcesarViewChange;
-              FncProcesarViewChange(mPosicionMapa);
+              ProcesandoViewChange = true;
+              await TareaEnThreadAsync(this);
             }
             catch (Exception ex)
             {

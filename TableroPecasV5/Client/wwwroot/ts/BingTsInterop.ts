@@ -105,7 +105,7 @@ function loadMapRetPos(Posicion: number, Direccion: string, LatCentro: number, L
             if (Eventos) {
             if (EventoViewChange) {
                 Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchange', function () {
-                    window['FuncionesJS'].ReposicionarMapa(Posicion)
+                    window['FuncionesJS'].ReposicionarMapa(Posicion, bingMap[Posicion].map.getZoom());
                 });
             }
                 if (EventoMouseUp) {
@@ -234,6 +234,27 @@ function EliminarPushpin(Posicion: number, Referencia: string) : string {
             let EnCiclo: Microsoft.Maps.Pushpin = <Microsoft.Maps.Pushpin>bingMap[Posicion].map.entities.get(i);
             if (Referencia.length > 0 && EnCiclo.metadata == Referencia) 
             {
+                Eliminar = EnCiclo;
+                break;
+            }
+        }
+    }
+    if (Eliminar != null) {
+        bingMap[Posicion].map.entities.remove(Eliminar);
+        return "";
+    }
+    else {
+        return "No";
+    }
+}
+
+function EliminarPoligono(Posicion: number, Referencia: string): string {
+    let Eliminar: Microsoft.Maps.Polygon = null;
+    for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
+
+        if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Polygon) {
+            let EnCiclo: Microsoft.Maps.Polygon = <Microsoft.Maps.Polygon>bingMap[Posicion].map.entities.get(i);
+            if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
                 Eliminar = EnCiclo;
                 break;
             }
@@ -412,8 +433,10 @@ function CrearIconoCentroArea(): string {
     return CanvasIc.toDataURL();
 }
 
-function DibujarPoligono(Posicion: number, Abscisas: number[], Ordenadas: number[], AbscCentro: number, OrdCentro: number,
-    Color: string, Texto1: string, Texto2: string, Referencia: string, AnchoBorde: number): void {
+function DibujarPoligono(Posicion: number, Abscisas: number[], Ordenadas: number[],
+    AbscCentro: number, OrdCentro: number,
+    Color: string, Texto1: string, Texto2: string,
+    Referencia: string, AnchoBorde: number): void {
 
     if (bingMap[Posicion] != null) {
         var Capa: Microsoft.Maps.Layer;
