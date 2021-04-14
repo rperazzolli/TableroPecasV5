@@ -67,7 +67,7 @@ namespace TableroPecasV5.Client.Componentes
 		{
 			object[] Args = new object[2];
 			Args[0] = Posicion;
-			Args[1] = "$$" + Posicion.ToString() + "$$" + CodigoTorta + "$$" + Referencia
+			Args[1] = "$$" + Posicion.ToString() + "$$" + CodigoTorta + "$$" + Referencia;
 			await JSRuntime.InvokeAsync<Task>("EliminarPoligono", Args);
 		}
 
@@ -110,7 +110,7 @@ namespace TableroPecasV5.Client.Componentes
 			Args[4] = OrdCentro;
 			Args[5] = Gajo.Color;
 			Args[6] = Gajo.Texto;
-			Args[7] = Gajo.Valor
+			Args[7] = Gajo.Valor;
 			Args[8] = "$$" + Posicion.ToString() + "$$" + CodigoTorta + "$$" + Gajo.Texto;
 			Args[9] = 1;
 			await JSRuntime.InvokeAsync<Task>("DibujarPoligono", Args);
@@ -123,7 +123,7 @@ namespace TableroPecasV5.Client.Componentes
 				AjustarAngulos();
 				foreach (CGajoTorta Gajo in Gajos)
 				{
-					await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa)
+					await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa);
 				}
 			}
 		}

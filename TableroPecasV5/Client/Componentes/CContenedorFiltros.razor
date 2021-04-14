@@ -129,37 +129,56 @@
             }
           </Select>
         </Field>
-        <Field>
-          <FieldLabel>Columna con latitud</FieldLabel>
-          <Select TValue="int" @bind-SelectedValue="@OrdenLat">
-            <SelectItem Value="-1">No corresponde</SelectItem>
-            @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
-            {
-              if (Columna.Clase == ClaseVariable.Real)
+        @if (!CapaPins)
+        {
+          <Field>
+            <FieldLabel>Columna agrupadora</FieldLabel>
+            <Select TValue="int" @bind-SelectedValue="@OrdenAgrupador">
+              <SelectItem Value="-1">No corresponde</SelectItem>
+              @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
               {
-                <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+                if (Columna.Clase != ClaseVariable.Real)
+                {
+                  <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+                }
               }
-            }
-          </Select>
-        </Field>
-        <Field>
-          <FieldLabel>Columna con longitud</FieldLabel>
-          <Select TValue="int" @bind-SelectedValue="@OrdenLng">
-            <SelectItem Value="-1">No corresponde</SelectItem>
-            @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+            </Select>
+          </Field>
+        }
+      <Field>
+        <FieldLabel>Columna con latitud</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@OrdenLat">
+          <SelectItem Value="-1">No corresponde</SelectItem>
+          @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+          {
+            if (Columna.Clase == ClaseVariable.Real)
             {
-              if (Columna.Clase == ClaseVariable.Real)
-              {
-                <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
-              }
+              <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
             }
-          </Select>
-        </Field>
+          }
+        </Select>
+      </Field>
+      <Field>
+        <FieldLabel>Columna con longitud</FieldLabel>
+        <Select TValue="int" @bind-SelectedValue="@OrdenLng">
+          <SelectItem Value="-1">No corresponde</SelectItem>
+          @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+          {
+            if (Columna.Clase == ClaseVariable.Real)
+            {
+              <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+            }
+          }
+        </Select>
+      </Field>
+      @if (CapaPins)
+      {
         <Field>
           <FieldLabel>Agrupa pines cercanos</FieldLabel>
           <Check TValue="bool" @bind-Checked="@Agrupados" />
         </Field>
       }
+    }
     </ModalBody>
     <ModalFooter Style="display: inline-block;">
       <Button Color="Color.Secondary" Clicked="@CerrarVentanaGrafico" Style="width: 50px;">Cerrar</Button>
@@ -170,3 +189,64 @@
     </ModalFooter>
   </ModalContent>
 </Modal>
+
+<Modal @ref="ModalTortasGIS" Closing="@Cerrando">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Agregar tortas sobre GIS</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      @if (Proveedor != null && Proveedor.Columnas != null)
+      {
+        <Field>
+          <FieldLabel>Columna posicionadora</FieldLabel>
+          <Select TValue="int" @bind-SelectedValue="@OrdenPosicionador">
+            <SelectItem Value="-1">No corresponde</SelectItem>
+            @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+            {
+              if (Columna.Clase != ClaseVariable.Real)
+              {
+              <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+              }
+            }
+          </Select>
+        </Field>
+        <Field>
+          <FieldLabel>Columna de valores</FieldLabel>
+          <Select TValue="int" @bind-SelectedValue="@OrdenValor">
+            <SelectItem Value="-1">No corresponde</SelectItem>
+            @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+            {
+              if (Columna.Clase == ClaseVariable.Real || Columna.Clase==ClaseVariable.Entero)
+              {
+                <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+              }
+            }
+          </Select>
+        </Field>
+        <Field>
+          <FieldLabel>Columna agrupadora</FieldLabel>
+          <Select TValue="int" @bind-SelectedValue="@OrdenAgrupador">
+            <SelectItem Value="-1">No corresponde</SelectItem>
+            @foreach (Datos.CColumnaBase Columna in Proveedor.Columnas)
+            {
+              if (Columna.Clase != ClaseVariable.Real)
+              {
+                <SelectItem Value="@Columna.Orden">@Columna.Nombre</SelectItem>
+              }
+            }
+          </Select>
+        </Field>
+      }
+    </ModalBody>
+    <ModalFooter Style="display: inline-block;">
+      <Button Color="Color.Secondary" Clicked="@CerrarVentanaGrafico" Style="width: 50px;">Cerrar</Button>
+      @if (Proveedor != null && Proveedor.Columnas != null)
+      {
+        <Button Color="Color.Primary" Style="width: 75px;" Disabled="@NoHayTortasGIS" Clicked="@AgregarTortasGIS">Graficar</Button>
+      }
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+

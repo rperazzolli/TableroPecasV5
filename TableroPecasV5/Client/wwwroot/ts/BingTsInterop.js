@@ -32,18 +32,28 @@ function LiberarPushpins(Posicion) {
             }
         }
     }
+    return "OK";
 }
 function LiberarMap(Posicion) {
-    if (Posicion >= 0 && Posicion < bingMap.length) {
-        var i;
-        for (i = 0; i < bingMap[Posicion].map.layers.length; i++) {
-            var Capa = bingMap[Posicion].map.layers[i];
-            Capa.clear();
+    try {
+        if (bingMap != null && Posicion >= 0 && Posicion < bingMap.length && bingMap[Posicion] != null) {
+            var i;
+            for (i = 0; i < bingMap[Posicion].map.layers.length; i++) {
+                var Capa = bingMap[Posicion].map.layers[i];
+                Capa.clear();
+            }
+            bingMap[Posicion].map.entities.clear();
+            bingMap[Posicion].map.layers.clear();
+            bingMap[Posicion].map.dispose();
+            bingMap[Posicion] = null;
+            return "";
         }
-        bingMap[Posicion].map.entities.clear();
-        bingMap[Posicion].map.layers.clear();
-        bingMap[Posicion].map.dispose();
-        bingMap[Posicion] = null;
+        else {
+            return "";
+        }
+    }
+    catch (exc) {
+        return exc.message;
     }
 }
 //function loadMap(Direccion: string, LatCentro: number, LngCentro: number, NivelZoom: number): void {
@@ -62,6 +72,9 @@ function LiberarMap(Posicion) {
 //    }
 //}
 function loadMapRetPos(Posicion, Direccion, LatCentro, LngCentro, NivelZoom, EventoViewChange, EventoMouseUp) {
+    if (bingMap == null) {
+        return 'bingMap es nulo';
+    }
     try {
         var Eventos = false;
         if (Posicion < 0) {
@@ -69,13 +82,16 @@ function loadMapRetPos(Posicion, Direccion, LatCentro, LngCentro, NivelZoom, Eve
             Eventos = true;
             bingMap[Posicion] = new BingMap(Direccion);
         }
+        if (Posicion < 0) {
+            return "-1";
+        }
         //        bingMap[Posicion] = new BingMap(Direccion);
         if (bingMap[Posicion] != null) {
             bingMap[Posicion].map.setView({
                 center: new Microsoft.Maps.Location(LatCentro, LngCentro),
                 zoom: NivelZoom
             });
-            Microsoft.Maps.registerModule('RutinasJS', 'RutinasJS.js');
+            //           Microsoft.Maps.registerModule('RutinasJS', 'RutinasJS.js');
             //Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchangeend', function () {
             //    window['FuncionesJS'].RefrescarMapa(Direccion)
             //       });
@@ -95,7 +111,9 @@ function loadMapRetPos(Posicion, Direccion, LatCentro, LngCentro, NivelZoom, Eve
     }
     catch (exc) {
         alert(exc.message);
-        bingMap = null;
+        if (Posicion > 0) {
+            bingMap[Posicion] = null;
+        }
     }
     return Posicion.toString();
 }
@@ -167,40 +185,50 @@ function AgregarPushpinGrande(Posicion, Abscisa, Ordenada, Color, Texto, Texto2,
 }
 function EliminarPushpin(Posicion, Referencia) {
     var Eliminar = null;
-    for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
-        if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Pushpin) {
-            var EnCiclo = bingMap[Posicion].map.entities.get(i);
-            if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
-                Eliminar = EnCiclo;
-                break;
+    try {
+        for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
+            if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Pushpin) {
+                var EnCiclo = bingMap[Posicion].map.entities.get(i);
+                if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
+                    Eliminar = EnCiclo;
+                    break;
+                }
             }
         }
+        if (Eliminar != null) {
+            bingMap[Posicion].map.entities.remove(Eliminar);
+            return "";
+        }
+        else {
+            return "";
+        }
     }
-    if (Eliminar != null) {
-        bingMap[Posicion].map.entities.remove(Eliminar);
-        return "";
-    }
-    else {
-        return "No";
+    catch (exc) {
+        return exc.message;
     }
 }
 function EliminarPoligono(Posicion, Referencia) {
-    var Eliminar = null;
-    for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
-        if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Polygon) {
-            var EnCiclo = bingMap[Posicion].map.entities.get(i);
-            if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
-                Eliminar = EnCiclo;
-                break;
+    try {
+        var Eliminar = null;
+        for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
+            if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Polygon) {
+                var EnCiclo = bingMap[Posicion].map.entities.get(i);
+                if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
+                    Eliminar = EnCiclo;
+                    break;
+                }
             }
         }
+        if (Eliminar != null) {
+            bingMap[Posicion].map.entities.remove(Eliminar);
+            return "";
+        }
+        else {
+            return "";
+        }
     }
-    if (Eliminar != null) {
-        bingMap[Posicion].map.entities.remove(Eliminar);
-        return "";
-    }
-    else {
-        return "No";
+    catch (exc) {
+        return exc.message;
     }
 }
 function pushpinClicked(e) {

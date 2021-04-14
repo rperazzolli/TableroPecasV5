@@ -7,7 +7,7 @@ namespace TableroPecasV5.Client.Listas
 {
 	public class CListaPosicion : CListaTexto
 	{
-		public string Color { get; set; } = "red";
+		public string Color { get; set; } = "white";
 		public double Lat { get; set; } = -1000;
 		public double Lng { get; set; } = -1000;
 		public string Referencia { get; set; } = "";

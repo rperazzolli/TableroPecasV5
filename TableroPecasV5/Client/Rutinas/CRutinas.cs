@@ -80,6 +80,39 @@ namespace TableroPecasV5.Client.Rutinas
       Anios = 4
     }
 
+    public async static Task LiberarMapaAsync(Microsoft.JSInterop.IJSRuntime JSRuntime, Int32 Posicion)
+    {
+      object[] Args = new object[1];
+      Args[0] = Posicion;
+      try
+      {
+        string Retorno = await JSRuntime.InvokeAsync<string>("LiberarMap", Args);
+        if (Retorno.Length > 0)
+        {
+          throw new Exception(Retorno);
+        }
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+      }
+
+    }
+
+    public static async Task<CPosicionWFSCN> ObtenerDimensionesPantallaAsync(
+        Microsoft.JSInterop.IJSRuntime JSRuntime, string Direccion)
+    {
+      object[] Args = new object[1];
+      Args[0] = Direccion;
+      string Posicion = await JSRuntime.InvokeAsync<string>("FuncionesJS.getRectangulo", Args);
+      List<double> Valores = ListaAReales(Posicion);
+      return new CPosicionWFSCN()
+      {
+        X = Valores[2],
+        Y = Valores[3]
+      };
+    }
+
     public static void ExtraerCoordenadasPosicion(string Posicion, out double Lng, out double Lat)
     {
       try

@@ -49,7 +49,7 @@ namespace TableroPecasV5.Server.Controllers
 
 		[HttpGet("ListarVinculos")]
 		public RespuestaVinculos ListarVinculos(string URL, string Ticket, Int32 ClaseIndicador,
-					Int32 Codigo, string Columna)
+					Int32 Codigo)
 		{
 			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
 			RespuestaVinculos Retorno = new RespuestaVinculos();

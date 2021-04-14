@@ -10,7 +10,7 @@ using TableroPecasV5.Client.Rutinas;
 
 namespace TableroPecasV5.Client.Logicas
 {
-	public class CLogicaPinsLL : ComponentBase
+	public class CLogicaPinsLL : ComponentBase, IDisposable
 	{
 		[Parameter]
 		public List<CLineaComprimida> Lineas { get; set; }
@@ -32,6 +32,14 @@ namespace TableroPecasV5.Client.Logicas
 
 		[Parameter]
 		public string Direccion { get; set; } = "";
+
+    public async void Dispose()
+		{
+      if (PosicionMapa >= 0)
+			{
+        await CRutinas.LiberarMapaAsync(JSRuntime, PosicionMapa);
+			}
+		}
 
 		protected override Task OnInitializedAsync()
 		{

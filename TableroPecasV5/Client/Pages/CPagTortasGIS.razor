@@ -1,0 +1,16 @@
+﻿@page "/PagTortasGIS"
+@using TableroPecasV5.Client.Componentes
+@inherits Logicas.CLogicaPagTortasGIS
+
+<div style="width: 100%; height: 100%;">
+  <CTortasGIS ColumnaDatos="@ColumnaDatos"
+              ColumnaAgrupadora="@ColumnaAgrupadora"
+              ColumnaPosicion="@ColumnaPosicion"
+              ColumnaLat="@ColumnaLat"
+              ColumnaLng="@ColumnaLng"
+              ClaseIndicador="@ClaseIndicador"
+              CodigoIndicador="@Indicador"
+              Solicitud="@Solicitados"
+              Lineas="@Lineas"/>
+</div>
+

@@ -64,22 +64,36 @@ namespace TableroPecasV5.Client.Logicas
       OrdenLat = -1;
       OrdenLng = -1;
       Agrupados = true;
+      CapaPins = true;
       ModalPinsLL.Show();
     }
 
     public void AbrirTortasLL()
     {
-      //
+      OrdenValor = -1;
+      OrdenLat = -1;
+      OrdenLng = -1;
+      OrdenAgrupador = -1;
+      CapaPins = false;
+      ModalPinsLL.Show();
     }
 
     public void AbrirTortasManual()
     {
-      //
+      OrdenValor = -1;
+      OrdenAgrupador = -1;
+      OrdenPosicionador = -1;
+      mSolicitud = DatosSolicitados.TortasManual;
+      ModalTortasGIS.Show();
     }
 
     public void AbrirTortasCapa()
     {
-      //
+      OrdenValor = -1;
+      OrdenAgrupador = -1;
+      OrdenPosicionador = -1;
+      mSolicitud = DatosSolicitados.TortasGIS;
+      ModalTortasGIS.Show();
     }
 
     public void AbrirGISWSS()
@@ -124,6 +138,7 @@ namespace TableroPecasV5.Client.Logicas
     public Modal ModalCrearGrafico { get; set; }
 
     public Modal ModalPinsLL { get; set; }
+    public Modal ModalTortasGIS { get; set; }
 
     public List<CLinkFiltros> LinksAnteriores
     {
@@ -156,21 +171,62 @@ namespace TableroPecasV5.Client.Logicas
 
     public void AgregarPinsLL()
 		{
-      CLogicaPagPinsLL.gColumnaDatos = Proveedor.Columnas[OrdenValor].Nombre;
-      CLogicaPagPinsLL.gColumnaLat = Proveedor.Columnas[OrdenLat].Nombre;
-      CLogicaPagPinsLL.gColumnaLng = Proveedor.Columnas[OrdenLng].Nombre;
-      CLogicaPagPinsLL.gColumnas = Proveedor.Columnas;
-      CLogicaPagPinsLL.gAgrupados = Agrupados;
-      if (mLinks != null && mLinks.Count > 0)
+      if (CapaPins)
       {
-        CLogicaPagPinsLL.gLineas = mLinks[0].Filtrador.DatosFiltrados;
+        CLogicaPagPinsLL.gColumnaDatos = Proveedor.Columnas[OrdenValor].Nombre;
+        CLogicaPagPinsLL.gColumnaLat = Proveedor.Columnas[OrdenLat].Nombre;
+        CLogicaPagPinsLL.gColumnaLng = Proveedor.Columnas[OrdenLng].Nombre;
+        CLogicaPagPinsLL.gColumnas = Proveedor.Columnas;
+        CLogicaPagPinsLL.gAgrupados = Agrupados;
+        if (mLinks != null && mLinks.Count > 0)
+        {
+          CLogicaPagPinsLL.gLineas = mLinks[0].Filtrador.DatosFiltrados;
+        }
+        else
+        {
+          CLogicaPagPinsLL.gLineas = Proveedor.Datos;
+        }
+        Navegador.NavigateTo("PagPinsLL");
       }
       else
-      {
-        CLogicaPagPinsLL.gLineas = Proveedor.Datos;
+			{
+        CLogicaPagTortasGIS.gColumnaDatos = Proveedor.Columnas[OrdenValor];
+        CLogicaPagTortasGIS.gColumnaAgrupadora = Proveedor.Columnas[OrdenAgrupador];
+        CLogicaPagTortasGIS.gColumnaLat = Proveedor.Columnas[OrdenLat];
+        CLogicaPagTortasGIS.gColumnaLng = Proveedor.Columnas[OrdenLng];
+        CLogicaPagTortasGIS.gClaseIndicador = Proveedor.ClaseOrigen;
+        CLogicaPagTortasGIS.gIndicador = Proveedor.CodigoOrigen;
+        CLogicaPagTortasGIS.gSolicitados = DatosSolicitados.TortasLL;
+        if (mLinks != null && mLinks.Count > 0)
+        {
+          CLogicaPagTortasGIS.gLineas = mLinks[0].Filtrador.DatosFiltrados;
+        }
+        else
+        {
+          CLogicaPagTortasGIS.gLineas = Proveedor.Datos;
+        }
+        Navegador.NavigateTo("PagTortasGIS");
       }
-      Navegador.NavigateTo("PagPinsLL");
     }
+
+    public void AgregarTortasGIS()
+    {
+      CLogicaPagTortasGIS.gColumnaDatos = Proveedor.Columnas[OrdenValor];
+      CLogicaPagTortasGIS.gColumnaAgrupadora = Proveedor.Columnas[OrdenAgrupador];
+      CLogicaPagTortasGIS.gColumnaPosicion = Proveedor.Columnas[OrdenPosicionador];
+      CLogicaPagTortasGIS.gClaseIndicador = Proveedor.ClaseOrigen;
+      CLogicaPagTortasGIS.gIndicador = Proveedor.CodigoOrigen;
+      CLogicaPagTortasGIS.gSolicitados = mSolicitud;
+      if (mLinks != null && mLinks.Count > 0)
+        {
+          CLogicaPagTortasGIS.gLineas = mLinks[0].Filtrador.DatosFiltrados;
+        }
+        else
+        {
+          CLogicaPagTortasGIS.gLineas = Proveedor.Datos;
+        }
+        Navegador.NavigateTo("PagTortasGIS");
+      }
 
     public void Cerrando(Blazorise.ModalClosingEventArgs e)
     {
@@ -358,18 +414,30 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+    public DatosSolicitados mSolicitud;
+    public Int32 OrdenPosicionador { get; set; }
+    public Int32 OrdenAgrupador { get; set; }
     public Int32 OrdenValor { get; set; }
     public Int32 OrdenLat { get; set; }
     public Int32 OrdenLng { get; set; }
     public bool Agrupados { get; set; } = true;
+    public bool CapaPins { get; set; } = true;
 
     public bool NoHayPinsLL
 		{
       get
 			{
-        return (OrdenValor < 0 || OrdenLat < 0 || OrdenLng < 0);
+        return (OrdenValor < 0 || OrdenLat < 0 || OrdenLng < 0 || (!CapaPins && OrdenAgrupador < 0));
 			}
 		}
+
+    public bool NoHayTortasGIS
+    {
+      get
+      {
+        return (OrdenValor < 0 || OrdenAgrupador < 0 || OrdenPosicionador < 0);
+      }
+    }
 
     public string EstiloBoton(Int32 Clase, Int32 Ancho = 50)
     {
@@ -1448,5 +1516,12 @@ namespace TableroPecasV5.Client.Logicas
     }
 
   }
+
+  public enum DatosSolicitados
+	{
+    TortasLL,
+    TortasManual,
+    TortasGIS
+	}
 
 }

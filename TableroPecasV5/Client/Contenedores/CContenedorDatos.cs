@@ -95,7 +95,7 @@ namespace TableroPecasV5.Client.Contenedores
       }
     }
 
-    public async static Task<CVinculoIndicadorCompletoCN> LeerVinculosIndicadorAsync(HttpClient Http,
+    public async static Task<CVinculoIndicadorCompletoCN> LeerVinculoAsync(HttpClient Http,
           ClaseElemento Clase, Int32 Indicador, string Columna)
     {
       try

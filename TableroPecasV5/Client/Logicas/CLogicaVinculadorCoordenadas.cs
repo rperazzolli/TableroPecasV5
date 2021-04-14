@@ -12,8 +12,13 @@ using TableroPecasV5.Client.Rutinas;
 
 namespace TableroPecasV5.Client.Logicas
 {
-	public class CLogicaVinculadorCoordenadas	: ComponentBase
+	public class CLogicaVinculadorCoordenadas	: ComponentBase, IDisposable
 	{
+
+		public delegate void FncRespondeVinculo(CVinculoIndicadorCompletoCN Vinculo);
+
+		[Parameter]
+		public FncRespondeVinculo AlResponder { get; set; } = null;
 
 		[Parameter]
 		public Int32 Indicador { get; set; }
@@ -24,12 +29,25 @@ namespace TableroPecasV5.Client.Logicas
 		[Parameter]
 		public ClaseElemento ClaseIndicador { get; set; } = ClaseElemento.Indicador;
 
-		public string Direccion { get { return "Cont_Vinc_Coord;"; } }
+		public string Direccion { get { return "ContVincCoord"; } }
 
 		public CVinculoIndicadorCompletoCN Vinculador { get; set; } = null;
 		public List<CListaPosicion> ListaElementos { get; set; } = null;
 
 		private CListaPosicion mElementoSeleccionado = null;
+
+		public void Cerrar()
+		{
+			if (AlResponder != null)
+			{
+				AlResponder(null);
+			}
+		}
+
+		public async void Dispose()
+		{
+			LiberarMapa();
+		}
 
 		public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
 		{
@@ -37,12 +55,10 @@ namespace TableroPecasV5.Client.Logicas
 
 		}
 
-		public string EstiloLinea
+		public string EstiloLinea(CListaPosicion Elemento)
 		{
-			get
-			{
-				return "width: 100%; height: 25px;";
-			}
+			return "width: 100%; height: 25px; background: " +
+				(Elemento == mElementoSeleccionado ? "red" : Elemento.Color) + ";";
 		}
 
 		private Int32 mPosicionBingMap = -1;
@@ -84,23 +100,39 @@ namespace TableroPecasV5.Client.Logicas
 
 		private async Task AjustarColoresPushpinsAsync(bool PonerEnRojo)
 		{
-			if (mPosicionBingMap >= 0 && mElementoSeleccionado != null)
+			if (mPosicionBingMap >= 0 && mElementoSeleccionado != null && mElementoSeleccionado.Lat > -999)
 			{
 				if (await EliminarPushpinAsync(mElementoSeleccionado))
 				{
 					{
 						// borró, entonces agrega con color correspondiente.
-						mElementoSeleccionado.Color = (PonerEnRojo ? COLOR_SELECCIONADO : COLOR_NO);
 						await AgregarPushpinAsync(mElementoSeleccionado);
 					}
 				}
 			}
 		}
 
+		private void AjustarColorElemento(CListaPosicion Elemento, bool Seleccionado)
+		{
+			if (Elemento != null)
+			{
+				Elemento.Color = (Seleccionado ? COLOR_SELECCIONADO :
+					(Elemento.Lat > -999 ? "white" : COLOR_NO));
+			}
+		}
+
 		public async void SeleccionarVinculo(CListaPosicion Elemento)
 		{
-			await AjustarColoresPushpinsAsync(false);
-			Elemento.Color = COLOR_SELECCIONADO;
+			if (mElementoSeleccionado != null)
+			{
+				AjustarColorElemento(mElementoSeleccionado, false);
+			}
+			AjustarColorElemento(Elemento, true);
+
+			if (mElementoSeleccionado != null)
+			{
+				await AjustarColoresPushpinsAsync(false);
+			}
 			mElementoSeleccionado = Elemento;
 			await AjustarColoresPushpinsAsync(true);
 			StateHasChanged();
@@ -111,6 +143,8 @@ namespace TableroPecasV5.Client.Logicas
 			if (mElementoSeleccionado != null)
 			{
 				await EliminarPushpinAsync(mElementoSeleccionado);
+				mElementoSeleccionado.Lat = Lat;
+				mElementoSeleccionado.Lng = Lng;
 				mElementoSeleccionado.Color = COLOR_SELECCIONADO;
 				await AgregarPushpinAsync(mElementoSeleccionado);
 			}
@@ -127,7 +161,7 @@ namespace TableroPecasV5.Client.Logicas
 
 		private async Task LeerVinculosAsync()
 		{
-			Vinculador = await CContenedorDatos.LeerVinculosIndicadorAsync(Http,
+			Vinculador = await CContenedorDatos.LeerVinculoAsync(Http,
 				  ClaseIndicador, Indicador, ColumnaVinculo.Nombre);
 			if (Vinculador != null)
 			{
@@ -144,8 +178,9 @@ namespace TableroPecasV5.Client.Logicas
 			{
 				LatCentro = -38.92;
 				LngCentro = -68.05;
-				return 10;
+				return 7;
 			}
+
 			double LatMin = double.MaxValue;
 			double LatMax = double.MinValue;
 			double LngMin = double.MaxValue;
@@ -166,26 +201,28 @@ namespace TableroPecasV5.Client.Logicas
 			LatCentro = (LatMin + LatMax) / 2;
 			LngCentro = (LngMin + LngMax) / 2;
 
-			double Relacion1 = (LatMax - LatMin) * 650 / Alto;
-			double Relacion2 = (LngMax - LngMin) * 1280 / Ancho;
-			double Salto = Math.Max(Relacion1, Relacion2);
-			if (Salto == 0)
-			{
-				return 10;
-			}
-			else
-			{
-				Salto *= Math.Pow(2, 7);
-				for (Int32 i = 15; i > 1; i--)
-				{
-					if (Salto < 1.5)
-					{
-						return i;
-					}
-					Salto /= 2;
-				}
-				return 1;
-			}
+			return CRutinas.UbicarNivelZoom(Ancho, Alto, LngMax - LngMin, LatMax - LatMin);
+
+			//double Relacion1 = (LatMax - LatMin) * 650 / Alto;
+			//double Relacion2 = (LngMax - LngMin) * 1280 / Ancho;
+			//double Salto = Math.Max(Relacion1, Relacion2);
+			//if (Salto == 0)
+			//{
+			//	return 10;
+			//}
+			//else
+			//{
+			//	Salto *= Math.Pow(2, 7);
+			//	for (Int32 i = 15; i > 1; i--)
+			//	{
+			//		if (Salto < 1.5)
+			//		{
+			//			return i;
+			//		}
+			//		Salto /= 2;
+			//	}
+			//	return 1;
+			//}
 
 		}
 
@@ -233,9 +270,61 @@ namespace TableroPecasV5.Client.Logicas
 			StateHasChanged();
 		}
 
+		private CVinculoIndicadorCompletoCN CrearVinculador()
+		{
+			Int32 CodAgregado = -1;
+			if (Vinculador == null)
+			{
+				Vinculador = new CVinculoIndicadorCompletoCN();
+				Vinculador.Vinculo.Codigo = -1;
+			}
+			Vinculador.Vinculo.ClaseIndicador = ClaseIndicador;
+			Vinculador.Vinculo.ClaseVinculada = ClaseVinculo.Marcador;
+			Vinculador.Vinculo.CodigoIndicador = Indicador;
+			Vinculador.Vinculo.CodigoVinculado = -1;
+			Vinculador.Vinculo.ColumnaLat = "";
+			Vinculador.Vinculo.ColumnaLng = "";
+			Vinculador.Vinculo.NombreColumna = ColumnaVinculo.Nombre;
+			Vinculador.Vinculo.Rango = 0;
+			Vinculador.Vinculo.TipoColumna = ColumnaVinculo.Clase;
+			foreach (CListaPosicion Elemento in ListaElementos)
+			{
+				if (Elemento.Lat > -999)
+				{
+					CVinculoDetalleCN Vinculo = (from D in Vinculador.Detalles
+																			 where D.ValorAsociado == Elemento.Referencia
+																			 select D).FirstOrDefault();
+					if (Vinculo == null)
+					{
+						Vinculo = new CVinculoDetalleCN()
+						{
+							Codigo = CodAgregado--,
+							ValorAsociado = Elemento.Referencia
+						};
+						Vinculador.Detalles.Add(Vinculo);
+					}
+					Vinculo.Posicion = CRutinas.FloatVStr(Elemento.Lng) + " " + CRutinas.FloatVStr(Elemento.Lat);
+				}
+			}
+			return Vinculador;
+		}
+
+		public async void LiberarMapa()
+		{
+			if (mPosicionBingMap >= 0)
+			{
+				Int32 Posicion = mPosicionBingMap;
+				mPosicionBingMap = -1;
+				await CRutinas.LiberarMapaAsync(JSRuntime, Posicion);
+			}
+		}
+
 		public void Registrar()
 		{
-			//
+			if (AlResponder != null)
+			{
+				AlResponder(CrearVinculador());
+			}
 		}
 
 		protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -253,36 +342,38 @@ namespace TableroPecasV5.Client.Logicas
 						mNivelZoom = UbicarCentro(0.8 * Contenedores.CContenedorDatos.AnchoPantalla,
 							0.5 * Contenedores.CContenedorDatos.AltoPantalla, out mLatCentro, out mLngCentro);
 						mbReubicar = false;
+						StateHasChanged();
+						return;
 					}
-				}
 
-				if (mPosicionBingMap < 0)
-				{
-					object[] Args = new object[7];
-					Args[0] = mPosicionBingMap;
-					Args[1] = '#' + Direccion; // mProyecto.LatCentro;
-					Args[2] = mLatCentro;
-					Args[3] = mLngCentro;
-					Args[4] = mNivelZoom;
-					Args[5] = false;
-					Args[6] = true;
-					try
+					if (mPosicionBingMap < 0)
 					{
-						string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
-						mPosicionBingMap = Int32.Parse(PosLocal);
-						CrearListaElementos();
-						_ = DibujarPushpinsAsync();
-						//					await mProyecto.DibujarAsync(JSRuntime, mPosicionBingMap);
+						object[] Args = new object[7];
+						Args[0] = mPosicionBingMap;
+						Args[1] = '#' + Direccion; // mProyecto.LatCentro;
+						Args[2] = mLatCentro;
+						Args[3] = mLngCentro;
+						Args[4] = mNivelZoom;
+						Args[5] = false;
+						Args[6] = true;
+						try
+						{
+							string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
+							mPosicionBingMap = Int32.Parse(PosLocal);
+							CrearListaElementos();
+							_ = DibujarPushpinsAsync();
+							//					await mProyecto.DibujarAsync(JSRuntime, mPosicionBingMap);
+						}
+						catch (Exception ex)
+						{
+							CRutinas.DesplegarMsg(ex);
+						}
 					}
-					catch (Exception ex)
-					{
-						CRutinas.DesplegarMsg(ex);
-					}
+					//foreach (CPuntoTextoColor Punto in mPuntos)
+					//{
+					//	await AgregarPushPinAsync(Punto);
+					//}
 				}
-				//foreach (CPuntoTextoColor Punto in mPuntos)
-				//{
-				//	await AgregarPushPinAsync(Punto);
-				//}
 			}
 			catch (Exception ex)
 			{

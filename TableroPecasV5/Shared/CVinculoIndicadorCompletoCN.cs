@@ -23,12 +23,18 @@ namespace TableroPecasV5.Shared
     //[JsonProperty("ClaseIndicador")]
     public ClaseElemento ClaseIndicador{ get; set; }
 
+    /// <summary>
+    /// Clase de vínculo
+    /// </summary>
     //[JsonProperty("ClaseVinculada")]
     public ClaseVinculo ClaseVinculada{ get; set; }
 
     //[JsonProperty("CodigoIndicador")]
     public int CodigoIndicador{ get; set; }
 
+    /// <summary>
+    /// Cuando hay una capa asociada, es el código de la capa.
+    /// </summary>
     //[JsonProperty("CodigoVinculado")]
     public int CodigoVinculado{ get; set; }
 

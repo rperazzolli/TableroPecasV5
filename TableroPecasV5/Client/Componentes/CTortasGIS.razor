@@ -1,0 +1,15 @@
+﻿@using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Logicas;
+@inherits CLogicaTortasGIS
+
+<div id="@Direccion" style="width: 100%; height: 100%; position: absolute;">
+  @if (MostrarVinculadorManual)
+			{
+				<CVinculadorCoordenadas ClaseIndicador="@ClaseIndicador"
+																Indicador="@CodigoIndicador"
+																ColumnaVinculo="@ColumnaPosicion"
+																AlResponder="@RecibirVinculos"
+																@ref="VinculadorCoordenadas"/>
+			}
+</div>
+

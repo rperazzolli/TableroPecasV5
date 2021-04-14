@@ -39,7 +39,7 @@ function UbicarPosicionLibre() {
     return bingMap.length - 1;
 }
 
-function LiberarPushpins(Posicion: number) {
+function LiberarPushpins(Posicion: number) : string {
     if (Posicion >= 0 && Posicion < bingMap.length) {
         if (bingMap[Posicion] != null) {
             if (bingMap[Posicion].map != null) {
@@ -49,19 +49,29 @@ function LiberarPushpins(Posicion: number) {
             }
         }
     }
+    return "OK";
 }
 
-function LiberarMap(Posicion: number) {
-    if (Posicion >= 0 && Posicion < bingMap.length) {
-        var i: number;
-        for (i = 0; i < bingMap[Posicion].map.layers.length; i++) {
-            var Capa: Microsoft.Maps.Layer = bingMap[Posicion].map.layers[i];
-            Capa.clear();
+function LiberarMap(Posicion: number): string {
+    try {
+        if (bingMap != null && Posicion >= 0 && Posicion < bingMap.length && bingMap[Posicion] != null) {
+            var i: number;
+            for (i = 0; i < bingMap[Posicion].map.layers.length; i++) {
+                var Capa: Microsoft.Maps.Layer = bingMap[Posicion].map.layers[i];
+                Capa.clear();
+            }
+            bingMap[Posicion].map.entities.clear();
+            bingMap[Posicion].map.layers.clear();
+            bingMap[Posicion].map.dispose();
+            bingMap[Posicion] = null;
+            return "";
         }
-        bingMap[Posicion].map.entities.clear();
-        bingMap[Posicion].map.layers.clear();
-        bingMap[Posicion].map.dispose();
-        bingMap[Posicion] = null;
+        else {
+            return "";
+        }
+    }
+    catch (exc) {
+        return exc.message;
     }
 }
 
@@ -85,6 +95,10 @@ function LiberarMap(Posicion: number) {
 function loadMapRetPos(Posicion: number, Direccion: string, LatCentro: number, LngCentro: number, NivelZoom: number,
     EventoViewChange: boolean, EventoMouseUp: boolean): string {
 
+    if (bingMap == null) {
+        return 'bingMap es nulo';
+    }
+
     try {
         let Eventos: boolean = false;
         if (Posicion < 0) {
@@ -92,22 +106,25 @@ function loadMapRetPos(Posicion: number, Direccion: string, LatCentro: number, L
             Eventos = true;
             bingMap[Posicion] = new BingMap(Direccion);
         }
-//        bingMap[Posicion] = new BingMap(Direccion);
+        if (Posicion < 0) {
+            return "-1";
+        }
+        //        bingMap[Posicion] = new BingMap(Direccion);
         if (bingMap[Posicion] != null) {
             bingMap[Posicion].map.setView({
                 center: new Microsoft.Maps.Location(LatCentro, LngCentro),
                 zoom: NivelZoom
             });
-            Microsoft.Maps.registerModule('RutinasJS', 'RutinasJS.js');
+            //           Microsoft.Maps.registerModule('RutinasJS', 'RutinasJS.js');
             //Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchangeend', function () {
             //    window['FuncionesJS'].RefrescarMapa(Direccion)
             //       });
             if (Eventos) {
-            if (EventoViewChange) {
-                Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchange', function () {
-                    window['FuncionesJS'].ReposicionarMapa(Posicion, bingMap[Posicion].map.getZoom());
-                });
-            }
+                if (EventoViewChange) {
+                    Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchange', function () {
+                        window['FuncionesJS'].ReposicionarMapa(Posicion, bingMap[Posicion].map.getZoom());
+                    });
+                }
                 if (EventoMouseUp) {
                     Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'click', function (e: Microsoft.Maps.IMouseEventArgs) {
                         window['FuncionesJS'].ClickEnMapa(e.location.latitude.toString(), e.location.longitude.toString())
@@ -118,7 +135,9 @@ function loadMapRetPos(Posicion: number, Direccion: string, LatCentro: number, L
     }
     catch (exc) {
         alert(exc.message);
-        bingMap = null;
+        if (Posicion > 0) {
+            bingMap[Posicion] = null;
+        }
     }
     return Posicion.toString();
 }
@@ -228,44 +247,53 @@ function AgregarPushpinGrande(Posicion: number, Abscisa: number, Ordenada: numbe
 
 function EliminarPushpin(Posicion: number, Referencia: string) : string {
     let Eliminar: Microsoft.Maps.Pushpin = null;
-    for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
+    try {
+        for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
 
-        if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Pushpin) {
-            let EnCiclo: Microsoft.Maps.Pushpin = <Microsoft.Maps.Pushpin>bingMap[Posicion].map.entities.get(i);
-            if (Referencia.length > 0 && EnCiclo.metadata == Referencia) 
-            {
-                Eliminar = EnCiclo;
-                break;
+            if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Pushpin) {
+                let EnCiclo: Microsoft.Maps.Pushpin = <Microsoft.Maps.Pushpin>bingMap[Posicion].map.entities.get(i);
+                if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
+                    Eliminar = EnCiclo;
+                    break;
+                }
             }
         }
+        if (Eliminar != null) {
+            bingMap[Posicion].map.entities.remove(Eliminar);
+            return "";
+        }
+        else {
+            return "";
+        }
     }
-    if (Eliminar != null) {
-        bingMap[Posicion].map.entities.remove(Eliminar);
-        return "";
-    }
-    else {
-        return "No";
+    catch (exc) {
+        return exc.message;
     }
 }
 
 function EliminarPoligono(Posicion: number, Referencia: string): string {
-    let Eliminar: Microsoft.Maps.Polygon = null;
-    for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
+    try {
+        let Eliminar: Microsoft.Maps.Polygon = null;
+        for (var i = 0; i < bingMap[Posicion].map.entities.getLength(); i++) {
 
-        if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Polygon) {
-            let EnCiclo: Microsoft.Maps.Polygon = <Microsoft.Maps.Polygon>bingMap[Posicion].map.entities.get(i);
-            if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
-                Eliminar = EnCiclo;
-                break;
+            if (bingMap[Posicion].map.entities.get(i) instanceof Microsoft.Maps.Polygon) {
+                let EnCiclo: Microsoft.Maps.Polygon = <Microsoft.Maps.Polygon>bingMap[Posicion].map.entities.get(i);
+                if (Referencia.length > 0 && EnCiclo.metadata == Referencia) {
+                    Eliminar = EnCiclo;
+                    break;
+                }
             }
         }
+        if (Eliminar != null) {
+            bingMap[Posicion].map.entities.remove(Eliminar);
+            return "";
+        }
+        else {
+            return "";
+        }
     }
-    if (Eliminar != null) {
-        bingMap[Posicion].map.entities.remove(Eliminar);
-        return "";
-    }
-    else {
-        return "No";
+    catch (exc) {
+        return exc.message;
     }
 }
 

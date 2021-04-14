@@ -125,6 +125,8 @@ namespace TableroPecasV5.Client.Logicas
           Indicador = (from I in Contenedores.CContenedorDatos.ListaIndicadores
                        where I.Codigo == mCodigo
                        select I).FirstOrDefault();
+          ClaseOrigen = ClaseElemento.Indicador;
+          CodigoOrigen = Codigo;
           StateHasChanged();
         }
       }
@@ -797,7 +799,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       if (ComponenteFiltros != null)
       {
-        ComponenteFiltros.Proveedor = ProvAhora;
+        ComponenteFiltros.ProveedorImpuesto = ProvAhora;
       }
     }
 
@@ -874,7 +876,7 @@ namespace TableroPecasV5.Client.Logicas
             mProveedor = Block.Proveedor;
             if (ComponenteFiltros != null)
 						{
-              ComponenteFiltros.Proveedor = mProveedor;
+              ComponenteFiltros.ProveedorImpuesto = mProveedor;
 						}
           }
 
