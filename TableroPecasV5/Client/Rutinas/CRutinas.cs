@@ -99,6 +99,45 @@ namespace TableroPecasV5.Client.Rutinas
 
     }
 
+    public async static Task<Logicas.Rectangulo> ObtenerExtremosMapaAsync(Microsoft.JSInterop.IJSRuntime JSRuntime, Int32 Posicion)
+    {
+      object[] Args = new object[1];
+      Args[0] = Posicion;
+      try
+      {
+        string Retorno = await JSRuntime.InvokeAsync<string>("ExtremosMapa", Args);
+        Logicas.Rectangulo Rect = new Logicas.Rectangulo(Retorno);
+        Rect.width = Math.Abs(Rect.width - Rect.left);
+        Rect.height = Math.Abs(Rect.height - Rect.top);
+        return Rect;
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return new Logicas.Rectangulo("0;0;1;1");
+      }
+
+    }
+
+    public async static Task LimpiarContenidoMapaAsync(Microsoft.JSInterop.IJSRuntime JSRuntime, Int32 Posicion)
+    {
+      object[] Args = new object[1];
+      Args[0] = Posicion;
+      try
+      {
+        string Retorno = await JSRuntime.InvokeAsync<string>("LiberarPushpins", Args);
+        if (Retorno.Length > 0)
+        {
+          throw new Exception(Retorno);
+        }
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+      }
+
+    }
+
     public static async Task<CPosicionWFSCN> ObtenerDimensionesPantallaAsync(
         Microsoft.JSInterop.IJSRuntime JSRuntime, string Direccion)
     {
@@ -1541,7 +1580,7 @@ namespace TableroPecasV5.Client.Rutinas
     public static List<string> ArmarListaColores(Int32 Cantidad)
     {
       List<string> Respuesta = new List<string>();
-      Random Semilla = new Random(0); //DateTime.Now.Millisecond);
+//      Random Semilla = new Random(0); //DateTime.Now.Millisecond);
       for (Int32 i = 0; i < Cantidad; i++)
       {
         Respuesta.Add(ColorSecuencia(i));

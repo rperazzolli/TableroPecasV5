@@ -95,6 +95,37 @@ namespace TableroPecasV5.Client.Contenedores
       }
     }
 
+    public async static Task<Int32> RegistrarVinculoAsync(HttpClient Http,
+          CVinculoIndicadorCompletoCN Vinculo)
+    {
+      try
+      {
+
+        var Respuesta = await Http.PostAsJsonAsync<CVinculoIndicadorCompletoCN>(
+              "api/Vinculos/RegistrarVinculo?URL=" +
+              Contenedores.CContenedorDatos.UrlBPI +
+              "&Ticket=" + Contenedores.CContenedorDatos.Ticket, Vinculo);
+        if (!Respuesta.IsSuccessStatusCode)
+        {
+          throw new Exception(Respuesta.ReasonPhrase);
+        }
+
+        RespuestaEnteros RespuestaCodigo = await Respuesta.Content.ReadFromJsonAsync<RespuestaEnteros>();
+        if (!RespuestaCodigo.RespuestaOK)
+        {
+          throw new Exception(RespuestaCodigo.MsgErr);
+        }
+
+        return RespuestaCodigo.Codigos[0];
+
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return Vinculo.Vinculo.Codigo;
+      }
+    }
+
     public async static Task<CVinculoIndicadorCompletoCN> LeerVinculoAsync(HttpClient Http,
           ClaseElemento Clase, Int32 Indicador, string Columna)
     {

@@ -58,7 +58,7 @@
     },
     registerResizeCallback: function () {
         window.addEventListener("resize", browserResize.resized);
-    },
+    },                                                                      
     resized: function () {
         //DotNet.invokeMethod("BrowserResize", 'OnBrowserResize');
         DotNet.invokeMethodAsync("BrowserResize", 'OnBrowserResize');

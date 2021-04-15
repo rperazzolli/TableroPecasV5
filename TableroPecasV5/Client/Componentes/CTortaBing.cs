@@ -15,8 +15,9 @@ namespace TableroPecasV5.Client.Componentes
 		public CPosicionWFSCN Centro { get; set; }
 		public double Lado { get; set; } = 1;
 		public List<CGajoTorta> Gajos { get; set; }
+		public double Acumulado { get; set; }
 
-		public async Task ResaltarSectorAsync(IJSRuntime JSRuntime, Int32 PosicionMapa, string Texto)
+		public async Task ResaltarSectorAsync(IJSRuntime JSRuntime, Int32 PosicionMapa, string Texto, double FactorAbsc)
 		{
 			foreach (CGajoTorta Gajo in Gajos)
 			{
@@ -26,7 +27,7 @@ namespace TableroPecasV5.Client.Componentes
 					{
 						Gajo.Resaltado = true;
 						await EliminarPoligonoAsync(JSRuntime, Gajo.Texto, PosicionMapa);
-						await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa);
+						await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc);
 					}
 				}
 				else
@@ -35,7 +36,7 @@ namespace TableroPecasV5.Client.Componentes
 					{
 						Gajo.Resaltado = false;
 						await EliminarPoligonoAsync(JSRuntime, Gajo.Texto, PosicionMapa);
-						await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa);
+						await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc);
 					}
 				}
 			}
@@ -43,16 +44,17 @@ namespace TableroPecasV5.Client.Componentes
 
 		private const double SALTO_ANGULO = Math.PI / 90;
 
-		private void AgregarPunto(double Distancia, double Angulo, List<double> Abscisas, List<double> Ordenadas)
+		private void AgregarPunto(double Distancia, double Angulo, List<double> Abscisas, List<double> Ordenadas,
+				double FactAbsc)
 		{
-			Abscisas.Add(Centro.X + Distancia * Math.Cos(Angulo));
+			Abscisas.Add(Centro.X + Distancia * Math.Cos(Angulo) * FactAbsc);
 			Ordenadas.Add(Centro.Y + Distancia * Math.Sin(Angulo));
 		}
 
-		private void DesplazarPorResaltado(double Angulo, List<double> Abscisas, List<double> Ordenadas,
+		private void DesplazarPorResaltado(double Angulo, double FactAbsc, List<double> Abscisas, List<double> Ordenadas,
 			  ref double AbscCentro, ref double OrdCentro)
 		{
-			double DespAbsc = Lado * Math.Cos(Angulo) / 4;
+			double DespAbsc = FactAbsc * Lado * Math.Cos(Angulo) / 4;
 			double DespOrd = Lado * Math.Sin(Angulo) / 4;
 			AbscCentro += DespAbsc;
 			OrdCentro += DespOrd;
@@ -71,7 +73,7 @@ namespace TableroPecasV5.Client.Componentes
 			await JSRuntime.InvokeAsync<Task>("EliminarPoligono", Args);
 		}
 
-		private async Task DibujarGajoAsync(IJSRuntime JSRuntime, CGajoTorta Gajo, Int32 Posicion)
+		private async Task DibujarGajoAsync(IJSRuntime JSRuntime, CGajoTorta Gajo, Int32 Posicion, double FactAbsc)
 		{
 			double DeltaAngulo = 2 * Math.PI * (mbValorUnitario ? 1 : Math.Abs(Gajo.Valor)) / Acumulado;
 			List<double> Abscisas = new List<double>();
@@ -79,27 +81,27 @@ namespace TableroPecasV5.Client.Componentes
 			double AnguloMedio = Gajo.Angulo + DeltaAngulo / 2;
 			double Saltos = Math.Max(2, DeltaAngulo / SALTO_ANGULO);
 
-			AgregarPunto(Lado / 2, Gajo.Angulo, Abscisas, Ordenadas);
-			AgregarPunto(Lado, Gajo.Angulo, Abscisas, Ordenadas);
+			AgregarPunto(Lado / 2, Gajo.Angulo, Abscisas, Ordenadas, FactAbsc);
+			AgregarPunto(Lado, Gajo.Angulo, Abscisas, Ordenadas, FactAbsc);
 
 			for (double i = 0; i <= Saltos; i++)
 			{
-				AgregarPunto(Lado, Gajo.Angulo + i * DeltaAngulo / Saltos, Abscisas, Ordenadas);
+				AgregarPunto(Lado, Gajo.Angulo + i * DeltaAngulo / Saltos, Abscisas, Ordenadas, FactAbsc);
 			}
 
-			AgregarPunto(Lado, Gajo.Angulo + DeltaAngulo, Abscisas, Ordenadas);
+			AgregarPunto(Lado, Gajo.Angulo + DeltaAngulo, Abscisas, Ordenadas, FactAbsc);
 
 			for (double i = Saltos; i >= 0; i--)
 			{
-				AgregarPunto(Lado / 2, Gajo.Angulo + i * DeltaAngulo / Saltos, Abscisas, Ordenadas);
+				AgregarPunto(Lado / 2, Gajo.Angulo + i * DeltaAngulo / Saltos, Abscisas, Ordenadas, FactAbsc);
 			}
 
-			double AbscCentro = Centro.X + Lado * 0.75 * Math.Cos(Gajo.Angulo + DeltaAngulo / 2);
+			double AbscCentro = Centro.X + FactAbsc* Lado * 0.75 * Math.Cos(Gajo.Angulo + DeltaAngulo / 2);
 			double OrdCentro = Centro.Y + Lado * 0.75 * Math.Sin(Gajo.Angulo + DeltaAngulo / 2);
 
 			if (Gajo.Resaltado)
 			{
-				DesplazarPorResaltado(Gajo.Angulo + DeltaAngulo / 2, Abscisas, Ordenadas, ref AbscCentro, ref OrdCentro);
+				DesplazarPorResaltado(Gajo.Angulo + DeltaAngulo / 2, FactAbsc, Abscisas, Ordenadas, ref AbscCentro, ref OrdCentro);
 			}
 
 			object[] Args = new object[10];
@@ -116,19 +118,18 @@ namespace TableroPecasV5.Client.Componentes
 			await JSRuntime.InvokeAsync<Task>("DibujarPoligono", Args);
 		}
 
-		public async Task GraficarSobreMapaAsync(IJSRuntime JSRuntime, Int32 PosicionMapa)
+		public async Task GraficarSobreMapaAsync(IJSRuntime JSRuntime, Int32 PosicionMapa, double FactorAbsc)
 		{
 			if (Gajos != null && Gajos.Count > 0)
 			{
 				AjustarAngulos();
 				foreach (CGajoTorta Gajo in Gajos)
 				{
-					await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa);
+					await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc);
 				}
 			}
 		}
 
-		private double Acumulado;
 		private bool mbValorUnitario = false;
 
 		private void AjustarAngulos()
@@ -166,6 +167,7 @@ namespace TableroPecasV5.Client.Componentes
 		public double Angulo { get; set; }
 		public double Valor { get; set; }
 		public string Texto { get; set; }
+		public string Referencia { get; set; }
 		public string Color { get; set; }
 		public bool Resaltado { get; set; } = false;
 

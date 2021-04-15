@@ -317,7 +317,7 @@ function PosicionarMapa(Posicion, AbscCentro, OrdCentro, Zoom) {
     }
 }
 function ExtremosMapa(Posicion) {
-    if (Posicion > 0 && Posicion < bingMap.length && bingMap[Posicion] != null) {
+    if (Posicion >= 0 && Posicion < bingMap.length && bingMap[Posicion] != null) {
         var PosicionMapa = bingMap[Posicion].map.getBounds();
         return PosicionMapa.getWest().toString() + ";" +
             PosicionMapa.getNorth().toString() + ";" +
