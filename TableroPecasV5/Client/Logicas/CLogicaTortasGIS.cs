@@ -268,8 +268,43 @@ namespace TableroPecasV5.Client.Logicas
 
 		}
 
+		private const string NO_REFERENCIA = "%%%%%%%%";
+		private string mszReferenciaAnterior = NO_REFERENCIA;
+		private double mFactorEscala = 1;
+
+		public void ModificarFactor(double Factor)
+		{
+			mFactorEscala *= Factor;
+			mbDibujarTortas = true;
+			StateHasChanged();
+		}
+
+		public void SeleccionarGajo(string Referencia)
+		{
+			if (mTortas != null)
+			{
+				if (Referencia == mszReferenciaAnterior)
+				{
+					Referencia = NO_REFERENCIA;
+				}
+				mszReferenciaAnterior = Referencia;
+				foreach (CTortaBing Torta in mTortas)
+				{
+					Torta.SeleccionarGajo(Referencia);
+				}
+				mbDibujarTortas = true;
+				StateHasChanged();
+			}
+		}
+
 		private bool mbDibujarTortas = false;
-		private List<CLineaValorColor> mListaColores;
+		public List<CLineaValorColor> ListaColores = null;
+
+		//public List<CLineaValorColor> ListaColores
+		//{
+		//	get { return mListaColores; }
+		//	set { mListaColores = value; }
+		//}
 
 		private const string REFERENCIA_OTROS = "$$%%";
 
@@ -277,7 +312,7 @@ namespace TableroPecasV5.Client.Logicas
 		{
 			if (Gajo.Referencia != REFERENCIA_OTROS)
 			{
-				CLineaValorColor Linea = (from L in mListaColores
+				CLineaValorColor Linea = (from L in ListaColores
 																	where L.Referencia == Gajo.Referencia
 																	select L).FirstOrDefault();
 				if (Linea == null)
@@ -288,7 +323,7 @@ namespace TableroPecasV5.Client.Logicas
 						Texto = Gajo.Texto,
 						Referencia = Gajo.Referencia
 					};
-					mListaColores.Add(Linea);
+					ListaColores.Add(Linea);
 				}
 
 				Linea.Valor += Math.Abs(Gajo.Valor);
@@ -296,17 +331,89 @@ namespace TableroPecasV5.Client.Logicas
 			}
 		}
 
-		private void ImponerColor(CGajoTorta Gajo)
+		private CLogicaReferencias mReferenciaDrag = null;
+
+		public void IniciarDragReferencias()
+		{
+			mReferenciaDrag = Referencias;
+		}
+
+		public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
+		{
+			if (mReferenciaDrag != null)
+			{
+					Int32 Diferencia = (int)e.ClientX - Referencias.AbscisaAbajo;
+					mAbscisaReferencias += Diferencia;
+					Diferencia = (int)e.ClientY - Referencias.OrdenadaAbajo;
+					mOrdenadaReferencias += Diferencia;
+					StateHasChanged();
+				}
+			}
+
+			private void ImponerColor(CGajoTorta Gajo)
 		{
 			if (Gajo.Referencia != REFERENCIA_OTROS)
 			{
-				CLineaValorColor Linea = (from L in mListaColores
+				CLineaValorColor Linea = (from L in ListaColores
 																	where L.Referencia == Gajo.Referencia
 																	select L).FirstOrDefault();
 				if (Linea != null)
 				{
 					Gajo.Color = Linea.Color;
 				}
+			}
+		}
+
+		private double DeterminarLadoMaximo(out double Maximo)
+		{
+			Maximo = (from T in mTortas
+											 select T.Acumulado).Max();
+			return Math.Sqrt((double)(CRutinas.AnchoPantalla - 40) * (double)(CRutinas.AltoPantalla - 40) /
+					(1.5 * mTortas.Count));
+
+		}
+
+		private void AjustarColoresGajos()
+		{
+			ListaColores = new List<CLineaValorColor>();
+			foreach (CTortaBing Torta in mTortas)
+			{
+				foreach (CGajoTorta Gajo in Torta.Gajos)
+				{
+					AgregarValoresGajoTorta(Gajo);
+				}
+			}
+
+			ListaColores.Sort(delegate (CLineaValorColor L1, CLineaValorColor L2)
+			{
+				return L2.Valor.CompareTo(L1.Valor);
+			});
+
+			ListaColores = (from L in ListaColores
+											where L.Valor > 0
+											select L).ToList();
+
+			Int32 Pos = 0;
+			foreach (CLineaValorColor Linea in ListaColores)
+			{
+				Linea.Color = CRutinas.ColorSecuencia(Pos++);
+			}
+
+			foreach (CTortaBing Torta in mTortas)
+			{
+				foreach (CGajoTorta Gajo in Torta.Gajos)
+				{
+					ImponerColor(Gajo);
+				}
+			}
+
+		}
+
+		public bool HayColores
+		{
+			get
+			{
+				return ListaColores != null && ListaColores.Count > 0;
 			}
 		}
 
@@ -330,7 +437,7 @@ namespace TableroPecasV5.Client.Logicas
 						Centro = ExtraerCentro(Detalle.Posicion),
 						Gajos = Gajos,
 						Lado = 0,
-						Acumulado = Acumulado
+						Acumulado = AcumTorta
 					});
 				}
 
@@ -342,14 +449,12 @@ namespace TableroPecasV5.Client.Logicas
 				{
 					double Maximo = (from T in mTortas
 													 select T.Acumulado).Max();
-					double LadoMaximo = Math.Sqrt((double)(CRutinas.AnchoPantalla - 40) * (double)(CRutinas.AltoPantalla - 40) /
-							(1.5 * mTortas.Count));
 					DeterminarRangoCoordenadas(out double LngMin, out double LngMax,
 							out double LatMin, out double LatMax, out double LadoMax);
 
 					foreach (CTortaBing Torta in mTortas)
 					{
-						Torta.Lado = Torta.Acumulado * LadoMax / Maximo;
+						Torta.Lado = Torta.Acumulado * Math.Sqrt(LadoMax / Maximo);
 					}
 
 					mAbscisaCentro = (LngMax + LngMin) / 2;
@@ -360,35 +465,9 @@ namespace TableroPecasV5.Client.Logicas
 				}
 			}
 
+			AjustarColoresGajos();
+
 			// Imponer colores.
-			mListaColores = new List<CLineaValorColor>();
-			foreach (CTortaBing Torta in mTortas)
-			{
-				foreach (CGajoTorta Gajo in Torta.Gajos)
-				{
-					AgregarValoresGajoTorta(Gajo);
-				}
-			}
-
-			mListaColores.Sort(delegate (CLineaValorColor L1, CLineaValorColor L2)
-			{
-				return L2.Valor.CompareTo(L1.Valor);
-			});
-
-			Int32 Pos = 0;
-			foreach (CLineaValorColor Linea in mListaColores)
-			{
-				Linea.Color = CRutinas.ColorSecuencia(Pos++);
-			}
-
-			foreach (CTortaBing Torta in mTortas)
-			{
-				foreach (CGajoTorta Gajo in Torta.Gajos)
-				{
-					ImponerColor(Gajo);
-				}
-			}
-
 			StateHasChanged();
 
 		}
@@ -435,6 +514,138 @@ namespace TableroPecasV5.Client.Logicas
 			}
 		}
 
+		private CTortaBing TortaEnPosicion(double Lat, double Lng, double Rango2)
+		{
+			double Distancia = double.MaxValue;
+			CTortaBing TortaRefe = null;
+			foreach (CTortaBing Torta in mTortas)
+			{
+				double Dist = (Torta.Centro.X - Lng) * (Torta.Centro.X - Lng) +
+						(Torta.Centro.Y - Lat) * (Torta.Centro.Y - Lat);
+				if (Dist < Distancia)
+				{
+					Distancia = Dist;
+					TortaRefe = Torta;
+				}
+			}
+			if (TortaRefe!=null && Distancia < Rango2)
+			{
+				return TortaRefe;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		private void ArmarTortasDesdeCoordenadas()
+		{
+			// determinar el rango de coordenadas.
+			if (Lineas.Count == 0)
+			{
+				Navegador.NavigateTo("Indicadores");
+			}
+			else
+			{
+				try
+				{
+					double LatMin = double.MaxValue;
+					double LatMax = double.MinValue;
+					double LngMin = double.MaxValue;
+					double LngMax = double.MinValue;
+					double Acumulado = 0;
+					foreach (CLineaComprimida Linea in Lineas)
+					{
+						double Lat = ColumnaLat.ValorReal(Linea.Codigos[ColumnaLat.Orden]);
+						double Lng = ColumnaLng.ValorReal(Linea.Codigos[ColumnaLng.Orden]);
+						if (Math.Abs(Lat) <= 180 && Math.Abs(Lng) <= 180)
+						{
+							LatMin = Math.Min(LatMin, Lat);
+							LatMax = Math.Max(LatMax, Lat);
+
+							LngMin = Math.Min(LngMin, Lng);
+							LngMax = Math.Max(LngMax, Lng);
+							Acumulado += Math.Abs(ColumnaDatos.ValorReal(Linea.Codigos[ColumnaDatos.Orden]));
+						}
+					}
+
+					bool TodosCeros = (Acumulado == 0);
+
+					double Rango;
+					if (LatMin == LatMax && LngMin == LngMax)
+					{
+						Rango = 0.1;
+					}
+					else
+					{
+						Rango = Math.Max(LatMax - LatMin, LngMax - LngMin) / 90;
+					}
+
+					// determina los grupos de datos.
+					mTortas = new List<CTortaBing>();
+					double Rango2 = Rango * Rango;
+					foreach (CLineaComprimida Linea in Lineas)
+					{
+						double Lat = ColumnaLat.ValorReal(Linea.Codigos[ColumnaLat.Orden]);
+						double Lng = ColumnaLng.ValorReal(Linea.Codigos[ColumnaLng.Orden]);
+						CTortaBing Torta = TortaEnPosicion(Lat, Lng, Rango2);
+						if (Torta == null)
+						{
+							Torta = new CTortaBing()
+							{
+								Gajos = new List<CGajoTorta>(),
+								Centro = new CPosicionWFSCN()
+								{
+									X = Lng,
+									Y = Lat
+								}
+							};
+						  mTortas.Add(Torta);
+						}
+						Torta.SumarValor(ColumnaAgrupadora.ListaValores[Linea.Codigos[ColumnaAgrupadora.Orden]],
+									ColumnaAgrupadora.Valores[Linea.Codigos[ColumnaAgrupadora.Orden]].ToString(),
+									(TodosCeros ? 1 : ColumnaDatos.ValorReal(Linea.Codigos[ColumnaDatos.Orden])));
+					}
+
+					foreach (CTortaBing Torta in mTortas)
+					{
+						Torta.DeterminarAcumulado();
+					}
+
+					mTortas = (from T in mTortas
+										 where T.Acumulado > 0
+										 select T).ToList();
+
+					DeterminarRangoCoordenadas(out LngMin, out LngMax,
+							out LatMin, out LatMax, out double LadoMax);
+
+					mAbscisaCentro = (LngMax + LngMin) / 2;
+					mOrdenadaCentro = (LatMax + LatMin) / 2;
+					mNivelZoom = CRutinas.UbicarNivelZoom(CRutinas.AnchoPantalla - 40, CRutinas.AltoPantalla - 40,
+							LngMax - LngMin, LatMax - LatMin);
+
+
+					double MaximoTorta = (from T in mTortas
+													 select T.Acumulado).Max();
+
+					foreach (CTortaBing Torta in mTortas)
+					{
+						Torta.Lado = LadoMax * Math.Sqrt(Torta.Acumulado / MaximoTorta);
+					}
+
+					AjustarColoresGajos();
+
+					StateHasChanged();
+				}
+				catch (Exception ex)
+				{
+					CRutinas.DesplegarMsg(ex);
+				}
+
+			}
+			//
+		}
+
 		private CVinculoIndicadorCompletoCN mVinculador = null;
 
 		private async Task PedirDatosVinculadorAsync()
@@ -475,6 +686,20 @@ namespace TableroPecasV5.Client.Logicas
 			}
 
 		}
+
+		private Int32 mAbscisaReferencias = 5;
+		private Int32 mOrdenadaReferencias = 5;
+
+		public string EstiloContenedorReferencias
+		{
+			get
+			{
+				return "width: 250px; height: 250px; position: absolute; margin-left: " + mAbscisaReferencias.ToString() +
+						"px; margin-top: " + mOrdenadaReferencias.ToString() + "px; background: white; z-index: 21;";
+			}
+		}
+
+		public CLogicaReferencias Referencias { get; set; }
 
 		[Inject]
 		public IJSRuntime JSRuntime { get; set; }
@@ -520,8 +745,19 @@ namespace TableroPecasV5.Client.Logicas
 		//	}
 		//}
 
+		private bool mbRedibujando = false;
+
 		private async Task DibujarTortasAsync()
 		{
+			if (mbRedibujando)
+			{
+				await CRutinas.LimpiarContenidoMapaAsync(JSRuntime, PosicionMapa);
+			}
+			else
+			{
+				mbRedibujando = true;
+			}
+
 			if (mTortas != null)
 			{
 				Rectangulo RectPant = await CRutinas.ObtenerRectanguloElementoAsync(JSRuntime, Direccion);
@@ -530,7 +766,7 @@ namespace TableroPecasV5.Client.Logicas
 				mbDibujarTortas = false;
 				foreach (CTortaBing Torta in mTortas)
 				{
-					await Torta.GraficarSobreMapaAsync(JSRuntime, PosicionMapa, FactorAbsc);
+					await Torta.GraficarSobreMapaAsync(JSRuntime, PosicionMapa, FactorAbsc, mFactorEscala);
 				}
 			}
 		}
@@ -558,28 +794,39 @@ namespace TableroPecasV5.Client.Logicas
 			}
 			else
 			{
-				if (PosicionMapa < 0)
+				if (Solicitud == DatosSolicitados.TortasLL && mTortas == null)
 				{
-//					await UbicarCentroAsync();
-					object[] Args = new object[7];
-					Args[0] = PosicionMapa;
-					Args[1] = '#' + Direccion; // mProyecto.LatCentro;
-					Args[2] = mOrdenadaCentro;
-					Args[3] = mAbscisaCentro;
-					Args[4] = mNivelZoom;
-					Args[5] = false;
-					Args[6] = true;
-					try
+					if (mbPrimerIntento)
 					{
-						string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
-						PosicionMapa = Int32.Parse(PosLocal);
-						mbDibujarTortas = true;
-						StateHasChanged();
-						return;
+						ArmarTortasDesdeCoordenadas();
 					}
-					catch (Exception ex)
+					return;
+				}
+				else
+				{
+					if (PosicionMapa < 0)
 					{
-						CRutinas.DesplegarMsg(ex);
+						//					await UbicarCentroAsync();
+						object[] Args = new object[7];
+						Args[0] = PosicionMapa;
+						Args[1] = '#' + Direccion; // mProyecto.LatCentro;
+						Args[2] = mOrdenadaCentro;
+						Args[3] = mAbscisaCentro;
+						Args[4] = mNivelZoom;
+						Args[5] = false;
+						Args[6] = true;
+						try
+						{
+							string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
+							PosicionMapa = Int32.Parse(PosLocal);
+							mbDibujarTortas = true;
+							StateHasChanged();
+							return;
+						}
+						catch (Exception ex)
+						{
+							CRutinas.DesplegarMsg(ex);
+						}
 					}
 				}
 				if (mbDibujarTortas)

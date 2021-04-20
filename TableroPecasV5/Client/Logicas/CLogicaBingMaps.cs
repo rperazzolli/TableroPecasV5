@@ -589,15 +589,12 @@ namespace TableroPecasV5.Client.Logicas
             CRutinas.DesplegarMsg(ex);
           }
         }
-				//foreach (CPuntoTextoColor Punto in mPuntos)
-				//{
-				//	await AgregarPushPinAsync(Punto);
-				//}
 			}
       catch (Exception ex)
       {
         CRutinas.DesplegarMsg(ex);
       }
+      await base.OnAfterRenderAsync(firstRender);
     }
 
     public bool ReubicarCentro { get; set; } = false;

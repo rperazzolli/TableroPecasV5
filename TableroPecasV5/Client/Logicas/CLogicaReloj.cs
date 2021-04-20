@@ -205,6 +205,7 @@ namespace TableroPecasV5.Client.Logicas
 
       if (CanvasReloj == null || mbCerrado)
       {
+        await base.OnAfterRenderAsync(firstRender);
         return;
       }
 
@@ -288,6 +289,10 @@ namespace TableroPecasV5.Client.Logicas
       catch (Exception ex)
       {
         Rutinas.CRutinas.DesplegarMsg(ex);
+      }
+      finally
+			{
+        await base.OnAfterRenderAsync(firstRender);
       }
     }
 

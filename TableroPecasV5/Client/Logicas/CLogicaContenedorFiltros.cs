@@ -164,6 +164,10 @@ namespace TableroPecasV5.Client.Logicas
       {
         ModalPinsLL.Hide();
       }
+      if (ModalTortasGIS != null)
+      {
+        ModalTortasGIS.Hide();
+      }
     }
 
     [Inject]
@@ -199,7 +203,7 @@ namespace TableroPecasV5.Client.Logicas
         CLogicaPagTortasGIS.gSolicitados = DatosSolicitados.TortasLL;
         if (mLinks != null && mLinks.Count > 0)
         {
-          CLogicaPagTortasGIS.gLineas = mLinks[0].Filtrador.DatosFiltrados;
+          CLogicaPagTortasGIS.gLineas = Proveedor.DatosVigentes; ;
         }
         else
         {

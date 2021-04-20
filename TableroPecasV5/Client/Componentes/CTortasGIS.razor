@@ -2,14 +2,24 @@
 @using TableroPecasV5.Client.Logicas;
 @inherits CLogicaTortasGIS
 
-<div id="@Direccion" style="width: 100%; height: 100%; position: absolute;">
-  @if (MostrarVinculadorManual)
-			{
-				<CVinculadorCoordenadas ClaseIndicador="@ClaseIndicador"
-																Indicador="@CodigoIndicador"
-																ColumnaVinculo="@ColumnaPosicion"
-																AlResponder="@RecibirVinculos"
-																@ref="VinculadorCoordenadas"/>
-			}
+<div id="@Direccion" style="width: 100%; height: 100%; position: absolute;"
+		 ondragover="event.preventDefault();" @ondrop="RecibirDrop">
+  <CascadingValue Value="this">
+    @if (HayColores)
+    {
+      <div style="@EstiloContenedorReferencias" draggable="true" @ondragstart="@IniciarDragReferencias">
+        <CReferencias ListaElementos="@ListaColores"
+                      @ref="@Referencias" />
+      </div>
+    }
+    @if (MostrarVinculadorManual)
+    {
+      <CVinculadorCoordenadas ClaseIndicador="@ClaseIndicador"
+                              Indicador="@CodigoIndicador"
+                              ColumnaVinculo="@ColumnaPosicion"
+                              AlResponder="@RecibirVinculos"
+                              @ref="VinculadorCoordenadas" />
+    }
+  </CascadingValue>
 </div>
 

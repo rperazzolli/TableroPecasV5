@@ -918,6 +918,21 @@ namespace TableroPecasV5.Client.Contenedores
                       }).ToList();
     }
 
+    public async static Task<List<CProveedorWFSCN>> ListarProveedoresWFSAsync(HttpClient Http)
+    {
+
+      RespuestaProveedoresWFS RespWCF = await Http.GetFromJsonAsync<RespuestaProveedoresWFS>(
+        "api/Capas/ListarProveedoresWFS?URL=" + Contenedores.CContenedorDatos.UrlBPI +
+        "&Ticket=" + Ticket);
+      if (!RespWCF.RespuestaOK)
+      {
+        throw new Exception(RespWCF.MsgErr);
+      }
+
+      return RespWCF.Proveedores;
+
+    }
+
     public async static Task<List<CEntradaIndicador>> CodigosIndicadoresPreguntaAsync(HttpClient Http, Int32 CodigoPregunta)
     {
       List<CEntradaIndicador> Respuesta = new List<CEntradaIndicador>();

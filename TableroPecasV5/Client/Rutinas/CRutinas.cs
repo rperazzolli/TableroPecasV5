@@ -805,27 +805,38 @@ namespace TableroPecasV5.Client.Rutinas
 		}
 
     public static Int32 UbicarNivelZoom(double Ancho, double Alto, double RangoLng, double RangoLat)
-		{
-      double Relacion1 = RangoLat * 650 / Alto;
-      double Relacion2 = RangoLng * 1280 / Ancho;
-      double Salto = Math.Max(Relacion1, Relacion2);
-      if (Salto == 0)
+    {
+      //double Relacion1 = RangoLat * 650 / Alto;
+      //double Relacion2 = RangoLng * 1280 / Ancho;
+      double MtsPorPixel = 2 * Math.PI * Math.Max(RangoLat * 6357000 / Alto, RangoLng * 6378000 / Ancho) / 180;
+      double Tope = 39136;
+      Int32 Nivel = 1;
+      while (MtsPorPixel < Tope && Nivel < 15)
       {
-        return 10;
+        Nivel++;
+        Tope /= 2;
       }
-      else
-      {
-        Salto *= Math.Pow(2, 7);
-        for (Int32 i = 15; i > 1; i--)
-        {
-          if (Salto < 1.5)
-          {
-            return i;
-          }
-          Salto /= 2;
-        }
-        return 1;
-      }
+      return Nivel;
+      //double Relacion1 = RangoLat / Alto;
+      //double Relacion2 = RangoLng / Ancho;
+      //double Salto = Math.Max(Relacion1, Relacion2);
+      //if (Salto == 0)
+      //{
+      //  return 10;
+      //}
+      //else
+      //{
+      //  Salto *= Math.Pow(2, 7);
+      //  for (Int32 i = 15; i > 1; i--)
+      //  {
+      //    if (Salto < 1.5)
+      //    {
+      //      return i;
+      //    }
+      //    Salto /= 2;
+      //  }
+      //  return 1;
+      //}
     }
 
     public static List<double> ListaAReales(string Lista)

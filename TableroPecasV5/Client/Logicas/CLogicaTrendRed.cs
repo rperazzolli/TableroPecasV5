@@ -133,7 +133,7 @@ namespace TableroPecasV5.Client.Logicas
       {
         string Texto = CRutinas.ValorATexto(mMaximo + (mMinimo - mMaximo) * i / 5, Indicador.Decimales);
         TextMetrics Medida = await mContexto.MeasureTextAsync(Texto);
-        await mContexto.FillTextAsync(Texto, mAnchoEscalaV - Medida.Width + 2,
+        await mContexto.FillTextAsync(Texto, mAnchoEscalaV - Medida.Width - 2,
             mOrdenadaGrafico + mAltoGrafico * i / 5 - AltoCaracter / 2);
       }
     }
@@ -687,6 +687,7 @@ namespace TableroPecasV5.Client.Logicas
 
     private bool mbLeyo = false;
     private bool mbLeyendo = false;
+    private bool mbDibujando = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -719,7 +720,7 @@ namespace TableroPecasV5.Client.Logicas
           if (!mbLeyo)
           {
 
-            await mContexto.SetFontAsync("12px serif");
+            await mContexto.SetFontAsync("11px serif");
             string Msg = "Aguarde por favor";
             TextMetrics Medida = await mContexto.MeasureTextAsync("H");
             AltoCaracter = Medida.Width;
@@ -730,29 +731,40 @@ namespace TableroPecasV5.Client.Logicas
           }
           else
           {
-            //            await PonerNombreAsync();
-            await mContexto.SetFillStyleAsync("#000000");
-            await mContexto.SetFontAsync("9px serif");
-
-            if (Alarmas.Count > 0)
+            if (!mbDibujando)
             {
-              TextMetrics Medida = await mContexto.MeasureTextAsync("H");
-              AltoCaracter = Medida.Width;
+              mbDibujando = true;
+              try
+              {
+                //            await PonerNombreAsync();
+                await mContexto.SetFillStyleAsync("#000000");
+                await mContexto.SetFontAsync("11px serif");
 
-              mOrdenadaGrafico = AltoCaracter / 2;
+                if (Alarmas.Count > 0)
+                {
+                  TextMetrics Medida = await mContexto.MeasureTextAsync("H");
+                  AltoCaracter = Medida.Width;
 
-              await DeterminarDimensionesEscalasAsync(AltoCaracter);
+                  mOrdenadaGrafico = AltoCaracter / 2;
 
-              await DibujarZonasLlenasAsync();
+                  await DeterminarDimensionesEscalasAsync(AltoCaracter);
 
-              await DibujarGrillaAsync(mContexto);
+                  await DibujarZonasLlenasAsync();
 
-              await AgregarEscalaVerticalAsync(AltoCaracter);
+                  await DibujarGrillaAsync(mContexto);
 
-              await AgregarEscalaHorizontalAsync(AltoCaracter);
+                  await AgregarEscalaVerticalAsync(AltoCaracter);
 
-              await DibujarCurvaAsync(mContexto, AltoCaracter);
+                  await AgregarEscalaHorizontalAsync(AltoCaracter);
 
+                  await DibujarCurvaAsync(mContexto, AltoCaracter);
+
+                }
+              }
+              finally
+              {
+                mbDibujando = false;
+              }
             }
 
           }

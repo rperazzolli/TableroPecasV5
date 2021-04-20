@@ -47,11 +47,11 @@ else
     }
   </div>
 
-  <div style="width: 100%; height: 1px; background-color: white; position: relative; margin-top: -5px; padding: 0px;" />
+  <div style="width: 100%; height: 1px; background-color: white; position: absolute; margin-top: 33px; padding: 0px;" />
 
   @if (PreguntasEnSolapa != null)
   {
-    <div style="width: 100%; background-color: white; position: absolute;">
+    <div style="width: 100%; background-color: white; position: absolute; margin-top: 35px;">
       @foreach (Logicas.UnionPreguntaTab Pregunta in PreguntasEnSolapa)
       {
         <div style="@EstiloTarjeta(Pregunta)" @onclick="@((e) => { MoverseAFicha(Pregunta.Pregunta.Codigo); })">
@@ -312,5 +312,9 @@ else
       </ModalFooter>
     </ModalContent>
   </Modal>
+
+  <div>
+    <CDefinirProveedoresWFS/>
+  </div>
 
 }

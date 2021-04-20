@@ -424,6 +424,10 @@ namespace TableroPecasV5.Client.Logicas
       {
         CRutinas.DesplegarMsg(ex);
       }
+      finally
+			{
+        await base.OnAfterRenderAsync(firstRender);
+      }
     }
 
   }

@@ -1806,6 +1806,7 @@ namespace TableroPecasV5.Client.Logicas
       finally
       {
         mbGraficando = false;
+        await base.OnAfterRenderAsync(firstRender);
       }
     }
 

@@ -13,7 +13,7 @@ namespace TableroPecasV5.Shared
 
 		public RespuestaEnteros()
 		{
-			Codigos = new List<int>();
+			//
 		}
 	}
 }

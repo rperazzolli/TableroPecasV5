@@ -143,7 +143,7 @@ namespace TableroPecasV5.Client.Logicas
       {
         return "width: " + (Contenedores.CContenedorDatos.AnchoPantalla - 12).ToString()+
           "px; height: "+ Contenedores.CContenedorDatos.AltoPantalla.ToString()+
-          "px; display: block; overflow: hidden; padding: 0px;";
+          "px; display: block; overflow: hidden; padding: 0px; position: absolute;";
       }
     }
 
@@ -152,7 +152,7 @@ namespace TableroPecasV5.Client.Logicas
       get
       {
         return "width: 100%; height: "+ (Contenedores.CContenedorDatos.AltoOpcionSolapa + 5).ToString()+
-            "px; position: relative; display: inline-block; overflow: hidden; margin-top: 0px; margin-left: 5px;";
+            "px; position: absolute; display: inline-block; overflow: hidden; margin-top: 0px; margin-left: 5px;";
       }
     }
 

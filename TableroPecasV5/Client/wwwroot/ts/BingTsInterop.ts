@@ -49,7 +49,7 @@ function LiberarPushpins(Posicion: number) : string {
             }
         }
     }
-    return "OK";
+    return "";
 }
 
 function LiberarMap(Posicion: number): string {

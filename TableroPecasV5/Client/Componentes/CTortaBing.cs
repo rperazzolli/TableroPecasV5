@@ -17,29 +17,71 @@ namespace TableroPecasV5.Client.Componentes
 		public List<CGajoTorta> Gajos { get; set; }
 		public double Acumulado { get; set; }
 
-		public async Task ResaltarSectorAsync(IJSRuntime JSRuntime, Int32 PosicionMapa, string Texto, double FactorAbsc)
+		//public async Task ResaltarSectorAsync(IJSRuntime JSRuntime, Int32 PosicionMapa, string Texto, double FactorAbsc)
+		//{
+		//	foreach (CGajoTorta Gajo in Gajos)
+		//	{
+		//		if (Gajo.Texto == Texto)
+		//		{
+		//			if (!Gajo.Resaltado)
+		//			{
+		//				Gajo.Resaltado = true;
+		//				await EliminarPoligonoAsync(JSRuntime, Gajo.Texto, PosicionMapa);
+		//				await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc);
+		//			}
+		//		}
+		//		else
+		//		{
+		//			if (!Gajo.Resaltado)
+		//			{
+		//				Gajo.Resaltado = false;
+		//				await EliminarPoligonoAsync(JSRuntime, Gajo.Texto, PosicionMapa);
+		//				await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc);
+		//			}
+		//		}
+		//	}
+		//}
+
+		public void SeleccionarGajo(string Referencia)
 		{
-			foreach (CGajoTorta Gajo in Gajos)
+			if (Gajos != null)
 			{
-				if (Gajo.Texto == Texto)
+				foreach (CGajoTorta Gajo in Gajos)
 				{
-					if (!Gajo.Resaltado)
-					{
-						Gajo.Resaltado = true;
-						await EliminarPoligonoAsync(JSRuntime, Gajo.Texto, PosicionMapa);
-						await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc);
-					}
-				}
-				else
-				{
-					if (!Gajo.Resaltado)
-					{
-						Gajo.Resaltado = false;
-						await EliminarPoligonoAsync(JSRuntime, Gajo.Texto, PosicionMapa);
-						await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc);
-					}
+					Gajo.Resaltado = Gajo.Referencia == Referencia;
 				}
 			}
+		}
+
+		public void DeterminarAcumulado()
+		{
+			Acumulado = 0;
+			if (Gajos != null)
+			{
+				foreach (CGajoTorta Gajo in Gajos)
+				{
+					Acumulado += Math.Abs(Gajo.Valor);
+				}
+			}
+		}
+
+		public void SumarValor(string Texto, string Referencia, double Valor)
+		{
+			CGajoTorta Gajo = (from G in Gajos
+												 where G.Referencia == Referencia
+												 select G).FirstOrDefault();
+			if (Gajo == null)
+			{
+				Gajo = new CGajoTorta()
+				{
+					Referencia = Referencia,
+					Resaltado = false,
+					Texto = Texto,
+					Valor = 0
+				};
+				Gajos.Add(Gajo);
+			}
+			Gajo.Valor += Valor;
 		}
 
 		private const double SALTO_ANGULO = Math.PI / 90;
@@ -51,20 +93,6 @@ namespace TableroPecasV5.Client.Componentes
 			Ordenadas.Add(Centro.Y + Distancia * Math.Sin(Angulo));
 		}
 
-		private void DesplazarPorResaltado(double Angulo, double FactAbsc, List<double> Abscisas, List<double> Ordenadas,
-			  ref double AbscCentro, ref double OrdCentro)
-		{
-			double DespAbsc = FactAbsc * Lado * Math.Cos(Angulo) / 4;
-			double DespOrd = Lado * Math.Sin(Angulo) / 4;
-			AbscCentro += DespAbsc;
-			OrdCentro += DespOrd;
-			for (Int32 i = 0; i < Abscisas.Count; i++)
-			{
-				Abscisas[i] += DespAbsc;
-				Ordenadas[i] += DespOrd;
-			}
-		}
-
 		private async Task EliminarPoligonoAsync(IJSRuntime JSRuntime, string Referencia, Int32 Posicion)
 		{
 			object[] Args = new object[2];
@@ -73,36 +101,33 @@ namespace TableroPecasV5.Client.Componentes
 			await JSRuntime.InvokeAsync<Task>("EliminarPoligono", Args);
 		}
 
-		private async Task DibujarGajoAsync(IJSRuntime JSRuntime, CGajoTorta Gajo, Int32 Posicion, double FactAbsc)
+		private async Task DibujarGajoAsync(IJSRuntime JSRuntime, CGajoTorta Gajo, Int32 Posicion, double FactAbsc,
+			  double FactorEscala)
 		{
 			double DeltaAngulo = 2 * Math.PI * (mbValorUnitario ? 1 : Math.Abs(Gajo.Valor)) / Acumulado;
 			List<double> Abscisas = new List<double>();
 			List<double> Ordenadas = new List<double>();
+			double LadoLocal = FactorEscala * (Gajo.Resaltado ? 1.5 * Lado : Lado);
 			double AnguloMedio = Gajo.Angulo + DeltaAngulo / 2;
 			double Saltos = Math.Max(2, DeltaAngulo / SALTO_ANGULO);
 
-			AgregarPunto(Lado / 2, Gajo.Angulo, Abscisas, Ordenadas, FactAbsc);
-			AgregarPunto(Lado, Gajo.Angulo, Abscisas, Ordenadas, FactAbsc);
+			AgregarPunto(LadoLocal / 2, Gajo.Angulo, Abscisas, Ordenadas, FactAbsc);
+			AgregarPunto(LadoLocal, Gajo.Angulo, Abscisas, Ordenadas, FactAbsc);
 
 			for (double i = 0; i <= Saltos; i++)
 			{
-				AgregarPunto(Lado, Gajo.Angulo + i * DeltaAngulo / Saltos, Abscisas, Ordenadas, FactAbsc);
+				AgregarPunto(LadoLocal, Gajo.Angulo + i * DeltaAngulo / Saltos, Abscisas, Ordenadas, FactAbsc);
 			}
 
-			AgregarPunto(Lado, Gajo.Angulo + DeltaAngulo, Abscisas, Ordenadas, FactAbsc);
+			AgregarPunto(LadoLocal, Gajo.Angulo + DeltaAngulo, Abscisas, Ordenadas, FactAbsc);
 
 			for (double i = Saltos; i >= 0; i--)
 			{
-				AgregarPunto(Lado / 2, Gajo.Angulo + i * DeltaAngulo / Saltos, Abscisas, Ordenadas, FactAbsc);
+				AgregarPunto(LadoLocal / 2, Gajo.Angulo + i * DeltaAngulo / Saltos, Abscisas, Ordenadas, FactAbsc);
 			}
 
-			double AbscCentro = Centro.X + FactAbsc* Lado * 0.75 * Math.Cos(Gajo.Angulo + DeltaAngulo / 2);
-			double OrdCentro = Centro.Y + Lado * 0.75 * Math.Sin(Gajo.Angulo + DeltaAngulo / 2);
-
-			if (Gajo.Resaltado)
-			{
-				DesplazarPorResaltado(Gajo.Angulo + DeltaAngulo / 2, FactAbsc, Abscisas, Ordenadas, ref AbscCentro, ref OrdCentro);
-			}
+			double AbscCentro = Centro.X + FactAbsc* LadoLocal * 0.75 * Math.Cos(Gajo.Angulo + DeltaAngulo / 2);
+			double OrdCentro = Centro.Y + LadoLocal * 0.75 * Math.Sin(Gajo.Angulo + DeltaAngulo / 2);
 
 			object[] Args = new object[10];
 			Args[0] = Posicion;
@@ -118,14 +143,18 @@ namespace TableroPecasV5.Client.Componentes
 			await JSRuntime.InvokeAsync<Task>("DibujarPoligono", Args);
 		}
 
-		public async Task GraficarSobreMapaAsync(IJSRuntime JSRuntime, Int32 PosicionMapa, double FactorAbsc)
+		public async Task GraficarSobreMapaAsync(IJSRuntime JSRuntime, Int32 PosicionMapa, double FactorAbsc,
+			  double FactorEscala)
 		{
 			if (Gajos != null && Gajos.Count > 0)
 			{
+				Gajos = (from G in Gajos
+								 where G.Valor != 0
+								 select G).ToList();
 				AjustarAngulos();
 				foreach (CGajoTorta Gajo in Gajos)
 				{
-					await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc);
+					await DibujarGajoAsync(JSRuntime, Gajo, PosicionMapa, FactorAbsc, FactorEscala);
 				}
 			}
 		}

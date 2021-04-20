@@ -1287,7 +1287,7 @@ namespace TableroPecasV5.Client.Logicas
       mFiltroDrag = null;
       mLineaDrag = null;
       mGrillaDrag = Grilla;
-      mGraficoDrag = null;
+      mGraficoDrag = null;       
     }
 
     public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
@@ -1501,7 +1501,7 @@ namespace TableroPecasV5.Client.Logicas
         ComponenteFiltros.LinksAnteriores = null;
         StateHasChanged();
       }
-//      return Respuesta;
+      await base.OnAfterRenderAsync(firstRender);
     }
 
     public void FncClick(EventArgs e)

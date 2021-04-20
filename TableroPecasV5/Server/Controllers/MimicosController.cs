@@ -70,68 +70,68 @@ namespace TableroPecasV5.Server.Controllers
 				}
 				Respuesta.Mimico = CrearMimico(RespMimico.Mimico);
 				Respuesta.Proceso = CrearProceso(RespMimico.Proceso);
-				Respuesta.Proceso.Pools.Add(new CPoolGraficoCN()
-				{
-					Codigo = "Pool 1",
-					Descripcion = "Pool1",
-					Lineas = new List<CLineaGraficaCN>()
-				});
-				Respuesta.Proceso.Pools[0].Lineas.Add(new CLineaGraficaCN()
-				{
-					Abscisa = 25,
-					Alto = 1200,
-					Ancho = 800,
-					Codigo = "Linea1",
-					Descripcion = "Linea 1",
-					Ordenada = 25
-				});
-				Respuesta.Proceso.Tareas.Add(new CTareaGraficaCN()
-				{
-					Abscisa = 100,
-					Alto = 200,
-					Ancho = 400,
-					Clase = ClaseElemento.Tarea,
-					Codigo = "aaaaaaaa",
-					Descripcion = "Tarea A",
-					EsTransaccion = false,
-					Ordenada = 100,
-					TareaOrigen = ""
-				});
-				Respuesta.Proceso.Tareas.Add(new CTareaGraficaCN()
-				{
-					Abscisa = 300,
-					Alto = 200,
-					Ancho = 400,
-					Clase = ClaseElemento.Tarea,
-					Codigo = "qwqwqwqw",
-					Descripcion = "Tarea QW",
-					EsTransaccion = false,
-					Ordenada = 900,
-					TareaOrigen = ""
-				});
-				Respuesta.Proceso.Flechas.Add(new CFlechaGraficaCN()
-				{
-					Clase = ClaseFlecha.Flecha,
-					ClaseDesde = ClaseElemento.Tarea,
-					ClaseHasta = ClaseElemento.Tarea,
-					Codigo = "ffffffff",
-					CodigoDesde = "aaaaaaaa",
-					CodigoHasta = "qwqwqwqw",
-					Descripcion = "Flecha A-QW",
-					PrefijoDesde = "",
-					PrefijoHasta = "",
-					Puntos = new List<CPuntoGraficoCN>()
-				});
-				Respuesta.Proceso.Flechas[0].Puntos.Add(new CPuntoGraficoCN()
-				{
-					Abscisa = 300,
-					Ordenada = 300
-				});
-				Respuesta.Proceso.Flechas[0].Puntos.Add(new CPuntoGraficoCN()
-				{
-					Abscisa = 500,
-					Ordenada = 900
-				});
+				//Respuesta.Proceso.Pools.Add(new CPoolGraficoCN()
+				//{
+				//	Codigo = "Pool 1",
+				//	Descripcion = "Pool1",
+				//	Lineas = new List<CLineaGraficaCN>()
+				//});
+				//Respuesta.Proceso.Pools[0].Lineas.Add(new CLineaGraficaCN()
+				//{
+				//	Abscisa = 25,
+				//	Alto = 1200,
+				//	Ancho = 800,
+				//	Codigo = "Linea1",
+				//	Descripcion = "Linea 1",
+				//	Ordenada = 25
+				//});
+				//Respuesta.Proceso.Tareas.Add(new CTareaGraficaCN()
+				//{
+				//	Abscisa = 100,
+				//	Alto = 200,
+				//	Ancho = 400,
+				//	Clase = ClaseElemento.Tarea,
+				//	Codigo = "aaaaaaaa",
+				//	Descripcion = "Tarea A",
+				//	EsTransaccion = false,
+				//	Ordenada = 100,
+				//	TareaOrigen = ""
+				//});
+				//Respuesta.Proceso.Tareas.Add(new CTareaGraficaCN()
+				//{
+				//	Abscisa = 300,
+				//	Alto = 200,
+				//	Ancho = 400,
+				//	Clase = ClaseElemento.Tarea,
+				//	Codigo = "qwqwqwqw",
+				//	Descripcion = "Tarea QW",
+				//	EsTransaccion = false,
+				//	Ordenada = 900,
+				//	TareaOrigen = ""
+				//});
+				//Respuesta.Proceso.Flechas.Add(new CFlechaGraficaCN()
+				//{
+				//	Clase = ClaseFlecha.Flecha,
+				//	ClaseDesde = ClaseElemento.Tarea,
+				//	ClaseHasta = ClaseElemento.Tarea,
+				//	Codigo = "ffffffff",
+				//	CodigoDesde = "aaaaaaaa",
+				//	CodigoHasta = "qwqwqwqw",
+				//	Descripcion = "Flecha A-QW",
+				//	PrefijoDesde = "",
+				//	PrefijoHasta = "",
+				//	Puntos = new List<CPuntoGraficoCN>()
+				//});
+				//Respuesta.Proceso.Flechas[0].Puntos.Add(new CPuntoGraficoCN()
+				//{
+				//	Abscisa = 300,
+				//	Ordenada = 300
+				//});
+				//Respuesta.Proceso.Flechas[0].Puntos.Add(new CPuntoGraficoCN()
+				//{
+				//	Abscisa = 500,
+				//	Ordenada = 900
+				//});
 				Respuesta.Imagen = CrearImagen(RespMimico.Imagen, Respuesta.Proceso.Tareas.Count != 0);
 			}
 			catch (Exception ex)

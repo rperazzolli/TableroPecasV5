@@ -32,7 +32,7 @@ function LiberarPushpins(Posicion) {
             }
         }
     }
-    return "OK";
+    return "";
 }
 function LiberarMap(Posicion) {
     try {

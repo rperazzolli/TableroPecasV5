@@ -251,7 +251,7 @@ namespace TableroPecasV5.Server.Controllers
 			try
 			{
 				Task<WCFBPI.CRespuestaCapasGIS> Tarea = Cliente.ListarTodasLasCapasAsync(Ticket,
-					    WFS == "Y", SinDetalle == "Y");
+							WFS == "Y", SinDetalle == "Y");
 				Tarea.Wait();
 				WCFBPI.CRespuestaCapasGIS Respuesta = Tarea.Result;
 				if (!Respuesta.RespuestaOK)
@@ -291,7 +291,7 @@ namespace TableroPecasV5.Server.Controllers
 			try
 			{
 				Task<WCFBPI.CRespuestaCapaWFS> Tarea = Cliente.LeerCapaWFSAsync(Ticket,
-						Codigo, ForzarWeb=="Y");
+						Codigo, ForzarWeb == "Y");
 				Tarea.Wait();
 				WCFBPI.CRespuestaCapaWFS Respuesta = Tarea.Result;
 				if (!Respuesta.RespuestaOK)
@@ -316,5 +316,163 @@ namespace TableroPecasV5.Server.Controllers
 
 		}
 
+		[HttpGet("ListarCapasProveedorWFS")]
+		public RespuestaCapasWFS ListarCapasProveedorWFS(string URL, string Ticket, Int32 Codigo)
+		{
+			RespuestaCapasWFS Retorno = new RespuestaCapasWFS();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				Task<WCFBPI.CRespuestaCapasWFS> Tarea = Cliente.ListarCapasProveedorWFSAsync(Ticket, Codigo);
+				Tarea.Wait();
+				WCFBPI.CRespuestaCapasWFS Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+
+				Retorno.Capas = (from WCFBPI.CCapaWFSCN Capa in Respuesta.Capas
+												 select ProyectosController.CopiarCapaWFS(Capa)).ToList();
+
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			finally
+			{
+				Cliente.Close();
+			}
+
+			return Retorno;
+
+		}
+
+		[HttpGet("ValidarCapasProveedorWFS")]
+		public Respuesta ValidarCapasProveedorWFS(string URL, string Ticket, Int32 Codigo)
+		{
+			Respuesta Retorno = new Respuesta();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				Task<WCFBPI.CRespuestaCapasWFS> Tarea = Cliente.ListarCapasProveedorWFSAsync(Ticket, Codigo);
+				Tarea.Wait();
+				WCFBPI.CRespuestaCapasWFS Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+
+				foreach (WCFBPI.CCapaWFSCN Capa in Respuesta.Capas)
+				{
+					Task<WCFBPI.CRespuestaTexto> TareaValid = Cliente.ValidarCapaWFSAsync(Ticket, Capa);
+					TareaValid.Wait();
+					WCFBPI.CRespuestaTexto RespValid = TareaValid.Result;
+					if (!RespValid.RespuestaOK)
+					{
+						throw new Exception("Capa " + Capa.Capa + " <" + Capa.Descripcion + "> " + RespValid.MensajeError);
+					}
+					else
+					{
+						if (RespValid.Contenido.Length > 0)
+						{
+							throw new Exception("Capa " + Capa.Capa + " <" + Capa.Descripcion + "> " + RespValid.Contenido);
+						}
+					}
+				}
+
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			finally
+			{
+				Cliente.Close();
+			}
+
+			return Retorno;
+
+		}
+
+		// GET: CapasController
+		[HttpGet("ListarProveedoresWFS")]
+		public RespuestaProveedoresWFS ListarProveedoresWFS(string URL, string Ticket)
+		{
+			RespuestaProveedoresWFS Retorno = new RespuestaProveedoresWFS();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				Task<WCFBPI.CRespuestaProveedoresWFS> Tarea = Cliente.ProveedoresWFSAsync(Ticket);
+				Tarea.Wait();
+				WCFBPI.CRespuestaProveedoresWFS Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+
+				Retorno.Proveedores = (from C in Respuesta.Proveedores
+															 select new CProveedorWFSCN()
+															 {
+																 Codigo = C.Codigo,
+																 Descripcion = C.Descripcion,
+																 DireccionFA = C.DireccionFA,
+																 DireccionURL = C.DireccionURL,
+																 FechaRefresco = C.FechaRefresco
+															 }).ToList();
+
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			finally
+			{
+				Cliente.Close();
+			}
+
+			return Retorno;
+
+		}
+
+		private WCFBPI.CProveedorWFSCN ExtraerProveedorWFSBPI(CProveedorWFSCN Proveedor)
+		{
+			return new WCFBPI.CProveedorWFSCN()
+			{
+				Codigo = Proveedor.Codigo,
+				Descripcion = Proveedor.Descripcion,
+				DireccionFA = Proveedor.DireccionFA,
+				DireccionURL = Proveedor.DireccionURL,
+				FechaRefresco = Proveedor.FechaRefresco
+			};
+		}
+
+		[HttpPost("InsertarProveedorWFS")]
+		public RespuestaEnteros InsertarProveedorWFS(string URL, string Ticket, [FromBody] CProveedorWFSCN Proveedor)
+		{
+			RespuestaEnteros Retorno = new RespuestaEnteros();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				WCFBPI.CProveedorWFSCN ProveedorBPI = ExtraerProveedorWFSBPI(Proveedor);
+				Task<WCFBPI.CRespuestaCodigo> Tarea = Cliente.RegistrarProveedorWFSAsync(Ticket, ProveedorBPI);
+				Tarea.Wait();
+				WCFBPI.CRespuestaCodigo Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+				Retorno.Codigos.Add(Respuesta.Codigo);
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			return Retorno;
+		}
 	}
 }
