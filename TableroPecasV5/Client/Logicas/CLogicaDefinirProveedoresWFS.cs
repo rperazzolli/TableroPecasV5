@@ -13,6 +13,20 @@ namespace TableroPecasV5.Client.Logicas
 	public class CLogicaDefinirProveedoresWFS : ComponentBase
 	{
 
+		public Int32 CodigoProveedor
+		{
+			get
+			{
+				return (mProveedor == null ? -1 : mProveedor.Codigo);
+			}
+		}
+
+		public void CerrarCapas()
+		{
+			HayCapas = false;
+			StateHasChanged();
+		}
+
 		public bool NoRegistrado { get; set; } = true;
 
 		public bool DatosIncompletos { get; set; } = true;
@@ -40,9 +54,12 @@ namespace TableroPecasV5.Client.Logicas
 
 		public List<CProveedorWFSCN> ListaProveedores { get; set; } = null;
 
+		public bool HayCapas { get; set; } = false;
+
 		public void EditarCapas()
 		{
-			//
+			HayCapas = true;
+			StateHasChanged();
 		}
 
 		public string EstiloProveedor(CProveedorWFSCN Prov)

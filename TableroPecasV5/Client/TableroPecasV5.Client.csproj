@@ -40,6 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Componentes\CDefinirCapasWFS.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.0-preview1" />
     <PackageReference Include="Blazorise" Version="0.9.2.4" />
     <PackageReference Include="Blazorise.Bootstrap" Version="0.9.2.4" />

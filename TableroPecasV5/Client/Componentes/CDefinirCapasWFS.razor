@@ -1,0 +1,123 @@
+﻿@using TableroPecasV5.Client.Logicas
+@using TableroPecasV5.Shared;
+@inherits Logicas.CLogicaDefinicionCapasWFS
+
+<div style="width: 100%; height: 100%; position: absolute;">
+  <div style="width: 100%; height: 100%; position: absolute; background: lightgray; opacity: 0.5;"></div>
+  <div style="width: 100%; height: 100%; position: absolute; overflow: hidden; margin-left: 0px; margin-top: 0px; background: white;">
+    <div style="background: #007DFF; height: 25px; width: calc(100% - 10px); text-align: left; margin: 5px; position: absolute;">
+      <div style="width: 100%; height: 100%; position: absolute;">
+        <label style="vertical-align: central; margin-left: 5px; font-size: 15px; color: white; position: absolute;">
+          Definición de capas WFS
+        </label>
+        <div style="width: 25px; height: 25px; color: white; position: absolute; margin-left: calc(100% - 25px); margin-top: 0px; text-align: center; vertical-align: central; font-size: 15px; cursor: pointer;" @onclick="@Cerrar">X</div>
+      </div>
+    </div>
+    <div style="width: 100%; height: calc(100% - 30px); display: inline; position: absolute; margin-top: 30px;">
+      <div style="width: 50%; height: 100%; position: absolute; padding: 5px;">
+        @if (ListaCapas != null)
+        {
+          @foreach (CCapaWFSCN Capa in ListaCapas)
+          {
+            <p style=@EstiloCapa(Capa) @onclick="@((e) => { SeleccionarCapa(Capa);})">@Capa.Descripcion</p>
+          }
+        }
+      </div>
+
+      <div style="width:50%; position: absolute; margin-left: 50%; margin-top: 0px; padding: 5px; overflow-y: auto;">
+        <p />
+        <div class="grilla-superior">
+          <div>Nombre</div>
+          <div>
+            <input style="@EstiloInput" type="text" @bind-value="@NombreCapa" />
+          </div>
+        </div>
+
+        <div class="grilla-superior">
+          <div>URL</div>
+          <div>
+            <input style="@EstiloInput" type="text" @bind-value="@URLCapa" />
+          </div>
+        </div>
+
+        <div class="grilla-superior">
+          <div>Capa</div>
+          <div>
+            <input style="@EstiloInput" type="text" @bind-value="@CapaCapa" />
+          </div>
+        </div>
+
+        <div class="grilla-superior">
+          <div>Versión</div>
+          <div>
+            <input style="@EstiloInput" type="text" @bind-value="@VersionCapa" />
+          </div>
+        </div>
+
+        <div class="grilla-opciones">
+          <div>Elemento</div>
+          <div class="elemento-doble">
+            <Select id="SelElm" style="width: 180px; height: 32px; font-size: 15px; margin-top: 0px;"
+                    TValue="int" @bind-SelectedValue="@CodigoElementosCapa">
+              <SelectItem TValue="int" Value="-1">No definido</SelectItem>
+              <SelectItem TValue="int" Value="2">Puntos</SelectItem>
+              <SelectItem TValue="int" Value="1">Líneas</SelectItem>
+              <SelectItem TValue="int" Value="3">Polígonos</SelectItem>
+            </Select>
+          </div>
+
+          <div class="elemento-doble" style="text-align:right;">Máximos elementos</div>
+          <div>
+            <input type="number"
+                   style="width: 50px; font-size:15px; margin-top: 0px; height: 25px; vertical-align: middle;"
+                   @bind-value="@SegmentosCapa">
+          </div>
+
+          <div>Código</div>
+          <div>
+            <input style="@EstiloInput" type="text" @bind-value="@CodigoCapa" />
+          </div>
+          <div></div>
+          <div>Nombre</div>
+          <div>
+            <input style="@EstiloInput" type="text" @bind-value="@NombreDatosCapa" />
+          </div>
+          <div style="@EstiloInput">
+            <input type="checkbox" @bind="@GuardarCopia">
+            <label> Guardar copia</label><br>
+          </div>
+          <div>Coordenadas</div>
+          <div>
+            <input style="@EstiloInput" type="text" @bind-value="@CoordenadasCapa" />
+          </div>
+          <div></div>
+        </div>
+
+        <p />
+        <p />
+
+        <div style="height: 28px; width: 100%; margin-top: 15px; margin-left: 10px; display: inline; text-align: center;">
+          <button style="width: 90px; height: 28px;" disabled="@NoRegistrado" @onclick="@ProbarCapa">Probar</button>
+          <button style="width: 90px; height: 28px; margin-left: 2px;" disabled="@DatosIncompletos" @onclick="@Registrar">Registrar</button>
+          <button style="width: 90px; height: 28px; margin-left: 2px;" @onclick="@Nuevo">Nuevo</button>
+          <button style="width: 90px; height: 28px; margin-left: 2px;" disabled="@NoRegistrado" @onclick="@Borrar">Borrar</button>
+        </div>
+      </div>
+
+      @if (HayMensaje)
+      {
+        <div style="width: 100%; height: 100%; text-align: center; position: absolute; background: lightgray; opacity: 0.8;">
+        </div>
+        <div style="width: 100%; height: 100%; margin-top: 20%; text-align: center; position: absolute;">
+          <p />
+          <p />
+          <p style="opacity: 1;">@Mensaje</p>
+          <p />
+          <p />
+          <button style="width: 80px; height: 28px; opacity: 1;" @onclick="@LimpiarMsg">OK</button>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

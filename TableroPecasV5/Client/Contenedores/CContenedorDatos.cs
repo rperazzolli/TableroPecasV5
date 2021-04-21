@@ -95,6 +95,99 @@ namespace TableroPecasV5.Client.Contenedores
       }
     }
 
+    public async static Task<Int32> RegistrarCapaWFSAsync(HttpClient Http,
+          CCapaWFSCN Capa)
+    {
+      try
+      {
+
+        var Respuesta = await Http.PostAsJsonAsync<CCapaWFSCN>(
+              "api/Capas/InsertarCapaWFS?URL=" +
+              Contenedores.CContenedorDatos.UrlBPI +
+              "&Ticket=" + Contenedores.CContenedorDatos.Ticket, Capa);
+        if (!Respuesta.IsSuccessStatusCode)
+        {
+          throw new Exception(Respuesta.ReasonPhrase);
+        }
+
+        RespuestaEnteros RespuestaCodigo = await Respuesta.Content.ReadFromJsonAsync<RespuestaEnteros>();
+        if (!RespuestaCodigo.RespuestaOK)
+        {
+          throw new Exception(RespuestaCodigo.MsgErr);
+        }
+
+        return RespuestaCodigo.Codigos[0];
+
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return Capa.Codigo;
+      }
+    }
+
+    public async static Task<Respuesta> BorrarCapaWFSAsync(HttpClient Http,
+          Int32 Capa)
+    {
+      try
+      {
+
+        var Respuesta = await Http.DeleteAsync(
+              "api/Capas/BorrarCapaWFS?URL=" +
+              Contenedores.CContenedorDatos.UrlBPI +
+              "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
+              "&CodigoCapa=" + Capa.ToString());
+        if (!Respuesta.IsSuccessStatusCode)
+        {
+          throw new Exception(Respuesta.ReasonPhrase);
+        }
+
+        return await Respuesta.Content.ReadFromJsonAsync<Respuesta>();
+      }
+      catch (Exception ex)
+      {
+        return new Respuesta()
+        {
+          RespuestaOK = false,
+          MsgErr = CRutinas.TextoMsg(ex)
+        };
+      }
+    }
+
+    public async static Task<Respuesta> ValidarCapaWFSAsync(HttpClient Http,
+          CCapaWFSCN Capa)
+    {
+      try
+      {
+
+        var Respuesta = await Http.PostAsJsonAsync<CCapaWFSCN>(
+              "api/Capas/ValidarCapaWFS?URL=" +
+              Contenedores.CContenedorDatos.UrlBPI +
+              "&Ticket=" + Contenedores.CContenedorDatos.Ticket, Capa);
+        if (!Respuesta.IsSuccessStatusCode)
+        {
+          throw new Exception(Respuesta.ReasonPhrase);
+        }
+
+        Respuesta RespuestaCodigo = await Respuesta.Content.ReadFromJsonAsync<Respuesta>();
+        if (!RespuestaCodigo.RespuestaOK)
+        {
+          throw new Exception(RespuestaCodigo.MsgErr);
+        }
+
+        return RespuestaCodigo;
+
+      }
+      catch (Exception ex)
+      {
+        return new Respuesta()
+        {
+          RespuestaOK = false,
+          MsgErr = CRutinas.TextoMsg(ex)
+        };
+      }
+    }
+
     public async static Task<Int32> RegistrarVinculoAsync(HttpClient Http,
           CVinculoIndicadorCompletoCN Vinculo)
     {
@@ -232,6 +325,30 @@ namespace TableroPecasV5.Client.Contenedores
         }
 
         return Respuesta;
+
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return null;
+      }
+    }
+
+    public async static Task<List<CCapaWFSCN>> LeerCapasProveedorWFSAsync(HttpClient Http, Int32 Proveedor)
+    {
+      try
+      {
+
+        RespuestaCapasWFS Respuesta = await Http.GetFromJsonAsync<RespuestaCapasWFS>(
+            "api/Capas/ListarCapasProveedorWFS?URL=" + Contenedores.CContenedorDatos.UrlBPI +
+            "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
+            "&Codigo=" + Proveedor.ToString());
+        if (!Respuesta.RespuestaOK)
+        {
+          throw new Exception(Respuesta.MsgErr);
+        }
+
+        return Respuesta.Capas;
 
       }
       catch (Exception ex)

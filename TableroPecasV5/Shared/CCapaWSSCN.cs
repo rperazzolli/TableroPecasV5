@@ -100,60 +100,61 @@ namespace TableroPecasV5.Shared
     public List<CAreaWFSCN> Areas{ get; set; }
 
     //[JsonProperty("CamposInformacion")]
-    public string CamposInformacion{ get; set; }
+    public string CamposInformacion { get; set; } = "";
 
     //[JsonProperty("Capa")]
-    public string Capa{ get; set; }
+    public string Capa { get; set; } = "";
 
     //[JsonProperty("Codigo")]
-    public int Codigo{ get; set; }
+    public int Codigo { get; set; } = -1;
 
     //[JsonProperty("CodigoProveedor")]
-    public int CodigoProveedor{ get; set; }
+    public int CodigoProveedor { get; set; } = -1;
 
     //[JsonProperty("Descripcion")]
-    public string Descripcion{ get; set; }
+    public string Descripcion { get; set; } = "";
 
     //[JsonProperty("Detalle")]
-    public string Detalle{ get; set; }
+    public string Detalle { get; set; } = "";
 
     //[JsonProperty("DireccionURL")]
-    public string DireccionURL{ get; set; }
+    public string DireccionURL { get; set; } = "";
 
     //[JsonProperty("Elemento")]
-    public ElementoWFS Elemento{ get; set; }
+    public ElementoWFS Elemento { get; set; } = ElementoWFS.NoDefinido;
 
     //[JsonProperty("FechaRefresco")]
-    public System.DateTime FechaRefresco{ get; set; }
+    public System.DateTime FechaRefresco { get; set; } = DateTime.Now;
 
     //[JsonProperty("GuardaCompactada")]
-    public bool GuardaCompactada{ get; set; }
+    public bool GuardaCompactada { get; set; } = false;
 
     //[JsonProperty("Lineas")]
     public List<CLineaWFSCN> Lineas{ get; set; }
 
     //[JsonProperty("NombreCampoCodigo")]
-    public string NombreCampoCodigo{ get; set; }
+    public string NombreCampoCodigo { get; set; } = "";
 
     //[JsonProperty("NombreCampoDatos")]
-    public string NombreCampoDatos{ get; set; }
+    public string NombreCampoDatos { get; set; } = "";
 
     //[JsonProperty("NombreElemento")]
-    public string NombreElemento{ get; set; }
+    public string NombreElemento { get; set; } = "";
 
     //[JsonProperty("Puntos")]
     public List<CPuntoWFSCN> Puntos{ get; set; }
 
     //[JsonProperty("PuntosMaximosContorno")]
-    public int PuntosMaximosContorno{ get; set; }
+    public int PuntosMaximosContorno { get; set; } = 199;
 
     //[JsonProperty("Version")]
-    public string Version{ get; set; }
+    public string Version { get; set; } = "";
 
     public CCapaWFSCN()
 		{
       Lineas = new List<CLineaWFSCN>();
       Puntos = new List<CPuntoWFSCN>();
+      Areas = new List<CAreaWFSCN>();
 		}
 
   }

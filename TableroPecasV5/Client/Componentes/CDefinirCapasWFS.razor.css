@@ -1,0 +1,42 @@
+﻿.grilla-superior {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  grid-template-rows: 32px;
+  grid-gap: 1px;
+  background-color: #2196F3;
+  padding: 10px;
+}
+
+.grilla-superior > div {
+  background-color: red;
+  text-align: center;
+  padding: 1px 0;
+  font-size: 20px;
+}
+
+.grilla-opciones {
+  display: grid;
+  grid-template-columns: 25% 45% 30%;
+  grid-template-rows: 32px 32px 32px 32px; 
+  grid-gap: 1px;
+  background-color: #2196F3;
+  padding: 1px;
+}
+
+.grilla-opciones > div {
+  background-color: red;
+  text-align: center;
+  padding: 0px 0;
+  font-size: 15px;
+  vertical-align: middle;
+}
+
+.elemento-doble {
+  grid-column-start: span 2;
+  display: inline-block;
+}
+
+
+
+
+

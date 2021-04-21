@@ -85,10 +85,30 @@ namespace TableroPecasV5.Server.Controllers
 							}).ToList();
 		}
 
+		private static List<WCFBPI.CPosicionWFSCN> CopiarListaPuntosWFSBPI(List<CPosicionWFSCN> Puntos)
+		{
+			return (from P in Puntos
+							select new WCFBPI.CPosicionWFSCN()
+							{
+								X = P.X,
+								Y = P.Y
+							}).ToList();
+		}
+
 		private static List<CValorDimensionCN> CopiarDimensiones(List<WCFBPI.CValorDimensionCN> Valores)
 		{
 			return (from D in Valores
 							select new CValorDimensionCN()
+							{
+								Dimension = D.Dimension,
+								Valor = D.Valor
+							}).ToList();
+		}
+
+		private static List<WCFBPI.CValorDimensionCN> CopiarDimensionesBPI(List<CValorDimensionCN> Valores)
+		{
+			return (from D in Valores
+							select new WCFBPI.CValorDimensionCN()
 							{
 								Dimension = D.Dimension,
 								Valor = D.Valor
@@ -120,6 +140,31 @@ namespace TableroPecasV5.Server.Controllers
 			}
 		}
 
+		private static List<WCFBPI.CAreaWFSCN> CopiarAreasWFSBPI(List<CAreaWFSCN> Areas)
+		{
+			if (Areas == null)
+			{
+				return new List<WCFBPI.CAreaWFSCN>();
+			}
+			else
+			{
+				return (from A in Areas
+								select new WCFBPI.CAreaWFSCN()
+								{
+									Area = A.Area,
+									Centro = new WCFBPI.CPosicionWFSCN()
+									{
+										X = A.Centro.X,
+										Y = A.Centro.Y
+									},
+									Codigo = A.Codigo,
+									Contorno = CopiarListaPuntosWFSBPI(A.Contorno),
+									Dimensiones = CopiarDimensionesBPI(A.Dimensiones),
+									Nombre = A.Nombre
+								}).ToList();
+			}
+		}
+
 		private static List<CLineaWFSCN> CopiarLineasWFS(List<WCFBPI.CLineaWFSCN> Lineas)
 		{
 			if (Lineas == null)
@@ -138,6 +183,29 @@ namespace TableroPecasV5.Server.Controllers
 									},
 									Codigo = L.Codigo,
 									Contorno = CopiarListaPuntosWFS(L.Contorno),
+									Nombre = L.Nombre
+								}).ToList();
+			}
+		}
+
+		private static List<WCFBPI.CLineaWFSCN> CopiarLineasWFSBPI(List<CLineaWFSCN> Lineas)
+		{
+			if (Lineas == null)
+			{
+				return new List<WCFBPI.CLineaWFSCN>();
+			}
+			else
+			{
+				return (from L in Lineas
+								select new WCFBPI.CLineaWFSCN()
+								{
+									Centro = new WCFBPI.CPosicionWFSCN()
+									{
+										X = L.Centro.X,
+										Y = L.Centro.Y
+									},
+									Codigo = L.Codigo,
+									Contorno = CopiarListaPuntosWFSBPI(L.Contorno),
 									Nombre = L.Nombre
 								}).ToList();
 			}
@@ -165,6 +233,27 @@ namespace TableroPecasV5.Server.Controllers
 			}
 		}
 
+		private static List<WCFBPI.CPuntoWFSCN> CopiarPuntosWFSBPI(List<CPuntoWFSCN> Puntos)
+		{
+			if (Puntos == null)
+			{
+				return new List<WCFBPI.CPuntoWFSCN>();
+			}
+			else
+			{
+				return (from P in Puntos
+								select new WCFBPI.CPuntoWFSCN()
+								{
+									Punto = new WCFBPI.CPosicionWFSCN()
+									{
+										X = P.Punto.X,
+										Y = P.Punto.Y
+									},
+									Codigo = P.Codigo,
+									Nombre = P.Nombre
+								}).ToList();
+			}
+		}
 		private static CCapaWFSCN CopiarCapaWFS(WCFBPI.CCapaWFSCN Capa)
 		{
 			return new CCapaWFSCN()
@@ -185,6 +274,31 @@ namespace TableroPecasV5.Server.Controllers
 				NombreCampoDatos = Capa.NombreCampoDatos,
 				NombreElemento = Capa.NombreElemento,
 				Puntos = CopiarPuntosWFS(Capa.Puntos),
+				PuntosMaximosContorno = Capa.PuntosMaximosContorno,
+				Version = Capa.Version
+			};
+		}
+
+		private static WCFBPI.CCapaWFSCN CopiarCapaWFSBPI(CCapaWFSCN Capa)
+		{
+			return new WCFBPI.CCapaWFSCN()
+			{
+				Areas = CopiarAreasWFSBPI(Capa.Areas),
+				CamposInformacion = Capa.CamposInformacion,
+				Capa = Capa.Capa,
+				Codigo = Capa.Codigo,
+				CodigoProveedor = Capa.CodigoProveedor,
+				Descripcion = Capa.Descripcion,
+				Detalle = Capa.Detalle,
+				DireccionURL = Capa.DireccionURL,
+				Elemento = (WCFBPI.ElementoWFS)(Int32)Capa.Elemento,
+				FechaRefresco = Capa.FechaRefresco,
+				GuardaCompactada = Capa.GuardaCompactada,
+				Lineas = CopiarLineasWFSBPI(Capa.Lineas),
+				NombreCampoCodigo = Capa.NombreCampoCodigo,
+				NombreCampoDatos = Capa.NombreCampoDatos,
+				NombreElemento = Capa.NombreElemento,
+				Puntos = CopiarPuntosWFSBPI(Capa.Puntos),
 				PuntosMaximosContorno = Capa.PuntosMaximosContorno,
 				Version = Capa.Version
 			};
@@ -300,6 +414,72 @@ namespace TableroPecasV5.Server.Controllers
 				}
 
 				Retorno.Capa = ProyectosController.CopiarCapaWFS(Respuesta.Capa);
+
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			finally
+			{
+				Cliente.Close();
+			}
+
+			return Retorno;
+
+		}
+
+		[HttpPost("ValidarCapaWFS")]
+		public Respuesta ValidarCapaWFS(string URL, string Ticket, [FromBody] CCapaWFSCN Capa)
+		{
+			RespuestaCapaWFS Retorno = new RespuestaCapaWFS();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+
+				WCFBPI.CCapaWFSCN CapaBPI = CopiarCapaWFSBPI(Capa);
+
+				Task<WCFBPI.CRespuestaTexto> TareaVal = Cliente.ValidarCapaWFSAsync(Ticket, CapaBPI);
+				TareaVal.Wait();
+				WCFBPI.CRespuestaTexto RespuestaVal = TareaVal.Result;
+				if (!RespuestaVal.RespuestaOK)
+				{
+					throw new Exception(RespuestaVal.MensajeError);
+				}
+
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			finally
+			{
+				Cliente.Close();
+			}
+
+			return Retorno;
+
+		}
+
+		[HttpGet("ListarCapasWFS")]
+		public RespuestaCapasGIS ListarCapasWFS(string URL, string Ticket)
+		{
+			RespuestaCapasGIS Retorno = new RespuestaCapasGIS();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				Task<WCFBPI.CRespuestaCapasGIS> Tarea = Cliente.ListarTodasLasCapasAsync(Ticket, true, true);
+				Tarea.Wait();
+				WCFBPI.CRespuestaCapasGIS Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+
+				Retorno.CapasWFS = (from WCFBPI.CCapaWFSCN Capa in Respuesta.CapasWFS
+												 select ProyectosController.CopiarCapaWFS(Capa)).ToList();
 
 			}
 			catch (Exception ex)
@@ -474,5 +654,63 @@ namespace TableroPecasV5.Server.Controllers
 			}
 			return Retorno;
 		}
+
+		[HttpPost("InsertarCapaWFS")]
+		public RespuestaEnteros InsertarCapaWFS(string URL, string Ticket, [FromBody] CCapaWFSCN Capa)
+		{
+			RespuestaEnteros Retorno = new RespuestaEnteros();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				WCFBPI.CCapaWFSCN CapaBPI = CopiarCapaWFSBPI(Capa);
+				Task<WCFBPI.CRespuestaCodigo> Tarea = Cliente.RegistrarCapaWFSAsync(Ticket, CapaBPI);
+				Tarea.Wait();
+				WCFBPI.CRespuestaCodigo Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+				Retorno.Codigos.Add(Respuesta.Codigo);
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			return Retorno;
+		}
+
+		[HttpDelete("BorrarCapaWFS")]
+		public Respuesta BorrarCapaWFS(string URL, string Ticket, Int32 CodigoCapa)
+		{
+			RespuestaEnteros Retorno = new RespuestaEnteros();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				Task<WCFBPI.CRespuestaCapaWFS> TareaLect = Cliente.LeerCapaWFSAsync(Ticket, CodigoCapa, false);
+				TareaLect.Wait();
+				WCFBPI.CRespuestaCapaWFS RespuestaLect = TareaLect.Result;
+				if (!RespuestaLect.RespuestaOK)
+				{
+					throw new Exception(RespuestaLect.MensajeError);
+				}
+
+
+				Task<WCFBPI.CRespuesta> Tarea = Cliente.BorrarCapaWFSAsync(Ticket, RespuestaLect.Capa);
+				Tarea.Wait();
+				WCFBPI.CRespuesta Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			return Retorno;
+		}
+
 	}
 }

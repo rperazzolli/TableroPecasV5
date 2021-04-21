@@ -360,6 +360,39 @@ input {
   margin: 2px;
 }
 
+.grilla-superior {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  grid-template-rows: 32px;
+  grid-gap: 0px;
+  padding: 1px 0;
+}
+
+  .grilla-superior > div {
+    text-align: center;
+    padding: 1px 0;
+    font-size: 15px;
+  }
+
+.grilla-opciones {
+  display: grid;
+  grid-template-columns: 25% 45% 30%;
+  grid-template-rows: 38px 32px 32px 32px 32px;
+  grid-gap: 0px;
+  padding: 1px;
+}
+
+  .grilla-opciones > div {
+    text-align: center;
+    padding: 1px 0;
+    font-size: 15px;
+  }
+
+.elemento-doble {
+  grid-column-start: span 2;
+  display: inline-block;
+}
+
 
 
 
