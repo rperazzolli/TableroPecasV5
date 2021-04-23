@@ -87,6 +87,8 @@ namespace TableroPecasV5.Client.Logicas
 
 		public bool MostrarVinculadorManual { get; set; } = false;
 
+		public bool MostrarVinculadorWFS { get; set; } = false;
+
 		protected override Task OnInitializedAsync()
 		{
 			CodigoPropio = gCodigoUnico++;
@@ -423,27 +425,37 @@ namespace TableroPecasV5.Client.Logicas
 			{
 				await CRutinas.LimpiarContenidoMapaAsync(JSRuntime, PosicionMapa);
 			}
+			
+			mTortas = new List<CTortaBing>();
+
 			if (mVinculador != null && mVinculador.Detalles.Count > 0)
 			{
 				double Acumulado = ObtenerAcumulado(Lineas);
 				bool TodosCeros = Acumulado == 0;
-				mTortas = new List<CTortaBing>();
 				foreach (CVinculoDetalleCN Detalle in mVinculador.Detalles)
 				{
-					List<CGajoTorta> Gajos = ExtraerGajos(Detalle.ValorAsociado, TodosCeros, out double AcumTorta);
-					mTortas.Add(new CTortaBing()
+					if (Detalle.Posicion.Length > 0)
 					{
-						CodigoTorta = Detalle.ValorAsociado,
-						Centro = ExtraerCentro(Detalle.Posicion),
-						Gajos = Gajos,
-						Lado = 0,
-						Acumulado = AcumTorta
-					});
+						List<CGajoTorta> Gajos = ExtraerGajos(Detalle.ValorAsociado, TodosCeros, out double AcumTorta);
+						mTortas.Add(new CTortaBing()
+						{
+							CodigoTorta = Detalle.ValorAsociado,
+							Centro = ExtraerCentro(Detalle.Posicion),
+							Gajos = Gajos,
+							Lado = 0,
+							Acumulado = AcumTorta
+						});
+					}
 				}
 
 				mTortas = (from T in mTortas
 									 where T.Gajos.Count > 0 && T.Centro.X > -999
 									 select T).ToList();
+
+				if (!TodosCeros)
+				{
+					AjustarAcumuladosTortas();
+				}
 
 				if (mTortas.Count > 0)
 				{
@@ -455,6 +467,116 @@ namespace TableroPecasV5.Client.Logicas
 					foreach (CTortaBing Torta in mTortas)
 					{
 						Torta.Lado = Torta.Acumulado * Math.Sqrt(LadoMax / Maximo);
+					}
+
+					mAbscisaCentro = (LngMax + LngMin) / 2;
+					mOrdenadaCentro = (LatMax + LatMin) / 2;
+					mNivelZoom = CRutinas.UbicarNivelZoom(CRutinas.AnchoPantalla - 40, CRutinas.AltoPantalla - 40,
+							LngMax - LngMin, LatMax - LatMin);
+
+				}
+			}
+
+			AjustarColoresGajos();
+
+			// Imponer colores.
+			StateHasChanged();
+
+		}
+
+		private void AjustarAcumuladosTortas() {
+			double AcumLocal = (from T in mTortas
+													select T.Acumulado).Sum();
+			if (AcumLocal == 0)
+			{
+				foreach (CTortaBing Torta in mTortas)
+				{
+					Torta.Gajos = ExtraerGajos(Torta.CodigoTorta, true, out double AcumTorta);
+					Torta.Acumulado = AcumTorta;
+				}
+			}
+		}
+
+		private CPosicionWFSCN ExtraerCentroWFS(string Posicion)
+		{
+			CCapaWFSCN Capa = VinculadorWFS.Capa;
+			foreach (CPuntoWFSCN Punto in Capa.Puntos)
+			{
+				if (CLogicaVinculadorWFS.TruncarTexto(Punto.Codigo) == Posicion)
+				{
+					return Punto.Punto;
+				}
+			}
+			foreach (CLineaWFSCN Linea in Capa.Lineas)
+			{
+				if (CLogicaVinculadorWFS.TruncarTexto(Linea.Codigo) == Posicion)
+				{
+					return Linea.Centro;
+				}
+			}
+			foreach (CAreaWFSCN Area in Capa.Areas)
+			{
+				if (CLogicaVinculadorWFS.TruncarTexto(Area.Codigo) == Posicion)
+				{
+					return Area.Centro;
+				}
+			}
+			return new CPosicionWFSCN
+			{
+				X = -1000,
+				Y = -1000
+			};
+		}
+
+		private async Task DeterminarPosicionElementosWFSAsync()
+		{
+			if (mTortas != null && mTortas.Count > 0)
+			{
+				await CRutinas.LimpiarContenidoMapaAsync(JSRuntime, PosicionMapa);
+			}
+
+			mTortas = new List<CTortaBing>();
+
+			if (mVinculador != null && mVinculador.Detalles.Count > 0 &&
+				  VinculadorWFS!=null && VinculadorWFS.Capa!=null)
+			{
+				double Acumulado = ObtenerAcumulado(Lineas);
+				bool TodosCeros = Acumulado == 0;
+				foreach (CVinculoDetalleCN Detalle in mVinculador.Detalles)
+				{
+					if (Detalle.Posicion.Length > 0)
+					{
+						List<CGajoTorta> Gajos = ExtraerGajos(Detalle.ValorAsociado, TodosCeros, out double AcumTorta);
+						mTortas.Add(new CTortaBing()
+						{
+							CodigoTorta = Detalle.ValorAsociado,
+							Centro = ExtraerCentroWFS(Detalle.Posicion),
+							Gajos = Gajos,
+							Lado = 0,
+							Acumulado = AcumTorta
+						});
+					}
+				}
+
+				mTortas = (from T in mTortas
+									 where T.Gajos.Count > 0 && T.Centro.X > -999
+									 select T).ToList();
+
+				if (!TodosCeros)
+				{
+					AjustarAcumuladosTortas();
+				}
+
+				if (mTortas.Count > 0)
+				{
+					double Maximo = (from T in mTortas
+													 select T.Acumulado).Max();
+					DeterminarRangoCoordenadas(out double LngMin, out double LngMax,
+							out double LatMin, out double LatMax, out double LadoMax);
+
+					foreach (CTortaBing Torta in mTortas)
+					{
+						Torta.Lado = LadoMax * Math.Sqrt(Torta.Acumulado / Maximo);
 					}
 
 					mAbscisaCentro = (LngMax + LngMin) / 2;
@@ -493,24 +615,42 @@ namespace TableroPecasV5.Client.Logicas
 		}
 
 		public CLogicaVinculadorCoordenadas VinculadorCoordenadas { get; set; }
+		public CLogicaVinculadorWFS VinculadorWFS { get; set; }
 
 		public async void RecibirVinculos(CVinculoIndicadorCompletoCN Vinculo)
 		{
-			if (VinculadorCoordenadas != null)
+			try
 			{
-				VinculadorCoordenadas.LiberarMapa();
-			}
+				if (VinculadorCoordenadas != null && MostrarVinculadorManual)
+				{
+					VinculadorCoordenadas.LiberarMapa();
+				}
 
-			if (Vinculo != null && Vinculo.Detalles.Count > 0)
-			{
-				mVinculador = Vinculo;
 				MostrarVinculadorManual = false;
-				await DeterminarTortasAsync();
-				StateHasChanged();
+				MostrarVinculadorWFS = false;
+
+				if (Vinculo != null && Vinculo.Detalles.Count > 0)
+				{
+					mVinculador = Vinculo;
+					switch (Solicitud)
+					{
+						case DatosSolicitados.TortasManual:
+							await DeterminarTortasAsync();
+							break;
+						case DatosSolicitados.TortasGIS:
+							await DeterminarPosicionElementosWFSAsync();
+							break;
+					}
+					StateHasChanged();
+				}
+				else
+				{
+					Navegador.NavigateTo("Indicadores");
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				Navegador.NavigateTo("Indicadores");
+				CRutinas.DesplegarMsg(ex);
 			}
 		}
 
@@ -648,6 +788,8 @@ namespace TableroPecasV5.Client.Logicas
 
 		private CVinculoIndicadorCompletoCN mVinculador = null;
 
+		public CVinculoIndicadorCompletoCN Vinculador { get { return mVinculador; } }
+
 		private async Task PedirDatosVinculadorAsync()
 		{
 			mVinculador = await CContenedorDatos.LeerVinculoAsync(
@@ -682,7 +824,10 @@ namespace TableroPecasV5.Client.Logicas
 					MostrarVinculadorManual = true;
 					StateHasChanged();
 					break;
-
+				case DatosSolicitados.TortasGIS:
+					MostrarVinculadorWFS = true;
+					StateHasChanged();
+					break;
 			}
 
 		}
@@ -781,11 +926,9 @@ namespace TableroPecasV5.Client.Logicas
 				if (mbPrimerIntento)
 				{
 					mbPrimerIntento = false;
-					if (!MostrarVinculadorManual)
-					{
-						MostrarVinculadorManual = true;
-						StateHasChanged();
-					}
+					MostrarVinculadorManual = (Solicitud == DatosSolicitados.TortasManual);
+					MostrarVinculadorWFS = (Solicitud == DatosSolicitados.TortasGIS);
+				  StateHasChanged();
 				}
 				else
 				{

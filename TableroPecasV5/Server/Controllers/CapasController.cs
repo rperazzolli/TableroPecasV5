@@ -470,7 +470,7 @@ namespace TableroPecasV5.Server.Controllers
 			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
 			try
 			{
-				Task<WCFBPI.CRespuestaCapasGIS> Tarea = Cliente.ListarTodasLasCapasAsync(Ticket, true, true);
+				Task<WCFBPI.CRespuestaCapasGIS> Tarea = Cliente.ListarTodasLasCapasAsync(Ticket, true, false);
 				Tarea.Wait();
 				WCFBPI.CRespuestaCapasGIS Respuesta = Tarea.Result;
 				if (!Respuesta.RespuestaOK)

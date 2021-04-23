@@ -1,0 +1,17 @@
+﻿@using TableroPecasV5.Client.Listas
+@using TableroPecasV5.Client.Logicas 
+@inherits CLogicaLineaAsgCapaWFS
+
+<div style="width: 100%; height: 35px; display: flex;">
+  <div style="@EstiloElemento">
+    <p style="margin-left: 10px;">@Vinculo.ValorAsociado</p>
+  </div>
+  <div style="width: 47%; height: 35px; vertical-align: middle; margin-left: 2%;">
+     <Select TValue="string"  @bind-SelectedValue="@ElementoAsociado">
+       @foreach (CTextoTexto Linea in Elementos)
+			 {
+          <SelectItem TValue="string" Value="@Linea.Codigo">@Linea.Descripcion</SelectItem>
+			 }
+     </Select>
+  </div>
+</div>

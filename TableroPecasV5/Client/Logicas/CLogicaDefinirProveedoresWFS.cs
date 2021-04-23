@@ -21,6 +21,9 @@ namespace TableroPecasV5.Client.Logicas
 			}
 		}
 
+		[CascadingParameter]
+		public ComponentBase Contenedor { get; set; }
+
 		public void CerrarCapas()
 		{
 			HayCapas = false;
@@ -165,7 +168,13 @@ namespace TableroPecasV5.Client.Logicas
 
 		public void Cerrar()
 		{
-			//
+			if (Contenedor != null)
+			{
+				if (Contenedor is CLogicaVinculadorWFS VinculadorWFS)
+				{
+					VinculadorWFS.CerrarEditarProveedoresWFS();
+				}
+			}
 		}
 
 

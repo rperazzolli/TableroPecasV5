@@ -20,6 +20,14 @@
                               AlResponder="@RecibirVinculos"
                               @ref="VinculadorCoordenadas" />
     }
+    @if (MostrarVinculadorWFS)
+    {
+      <CVinculadorWFS Indicador="@CodigoIndicador"
+                      ClaseIndicador="@ClaseIndicador"
+                      ColumnaVinculo="@ColumnaPosicion"
+                      AlResponder="@RecibirVinculos"
+                      @ref="VinculadorWFS" />
+    }
   </CascadingValue>
 </div>
 

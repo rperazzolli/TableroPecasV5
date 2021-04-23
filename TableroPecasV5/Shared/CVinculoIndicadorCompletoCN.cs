@@ -21,7 +21,7 @@ namespace TableroPecasV5.Shared
   {
 
     //[JsonProperty("ClaseIndicador")]
-    public ClaseElemento ClaseIndicador{ get; set; }
+    public ClaseElemento ClaseIndicador { get; set; } = ClaseElemento.NoDefinida;
 
     /// <summary>
     /// Clase de vínculo
@@ -30,28 +30,28 @@ namespace TableroPecasV5.Shared
     public ClaseVinculo ClaseVinculada{ get; set; }
 
     //[JsonProperty("CodigoIndicador")]
-    public int CodigoIndicador{ get; set; }
+    public int CodigoIndicador { get; set; } = -1;
 
     /// <summary>
     /// Cuando hay una capa asociada, es el código de la capa.
     /// </summary>
     //[JsonProperty("CodigoVinculado")]
-    public int CodigoVinculado{ get; set; }
+    public int CodigoVinculado { get; set; } = -1;
 
     //[JsonProperty("ColumnaLat")]
-    public string ColumnaLat{ get; set; }
+    public string ColumnaLat { get; set; } = "";
 
     //[JsonProperty("ColumnaLng")]
-    public string ColumnaLng{ get; set; }
+    public string ColumnaLng { get; set; } = "";
 
     //[JsonProperty("NombreColumna")]
-    public string NombreColumna{ get; set; }
+    public string NombreColumna { get; set; } = "";
 
     //[JsonProperty("Rango")]
-    public double Rango{ get; set; }
+    public double Rango { get; set; } = 0;
 
     //[JsonProperty("TipoColumna")]
-    public ClaseVariable TipoColumna{ get; set; }
+    public ClaseVariable TipoColumna { get; set; } = ClaseVariable.NoDefinida;
 
   }
 
@@ -62,7 +62,7 @@ namespace TableroPecasV5.Shared
     public List<CVinculoDetalleCN> Detalles { get; set; }
 
     //[JsonProperty("Vinculo")]
-    public CVinculoIndicadorCN Vinculo { get; set; }
+    public CVinculoIndicadorCN Vinculo { get; set; } = new CVinculoIndicadorCN();
 
     public CVinculoIndicadorCompletoCN()
 		{

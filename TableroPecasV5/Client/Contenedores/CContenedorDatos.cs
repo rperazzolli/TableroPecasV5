@@ -334,6 +334,31 @@ namespace TableroPecasV5.Client.Contenedores
       }
     }
 
+    public async static Task<RespuestaCapaWFS> LeerCapaWFSAsync(HttpClient Http, Int32 Codigo, bool ForzarWeb)
+    {
+      try
+      {
+
+        RespuestaCapaWFS Respuesta = await Http.GetFromJsonAsync<RespuestaCapaWFS>(
+            "api/Capas/LeerCapaWFS?URL=" + Contenedores.CContenedorDatos.UrlBPI +
+            "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
+            "&Codigo=" + Codigo.ToString() +
+            "&ForzarWeb=" + CRutinas.BoolToStr(ForzarWeb));
+        if (!Respuesta.RespuestaOK)
+        {
+          throw new Exception(Respuesta.MsgErr);
+        }
+
+        return Respuesta;
+
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return null;
+      }
+    }
+
     public async static Task<List<CCapaWFSCN>> LeerCapasProveedorWFSAsync(HttpClient Http, Int32 Proveedor)
     {
       try

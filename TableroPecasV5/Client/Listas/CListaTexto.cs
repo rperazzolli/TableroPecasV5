@@ -22,4 +22,24 @@ namespace TableroPecasV5.Client.Listas
       Descripcion = Texto0;
     }
   }
+
+  public class CTextoTexto
+  {
+    public string Codigo { get; set; }
+    public string Descripcion { get; set; }
+    public object Referencia { get; set; } = null;
+
+    public CTextoTexto()
+    {
+      Codigo = "";
+      Descripcion = "";
+    }
+
+    public CTextoTexto(string Cod0, string Texto0)
+    {
+      Codigo = Cod0;
+      Descripcion = Texto0;
+    }
+  }
+
 }
