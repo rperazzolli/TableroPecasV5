@@ -163,77 +163,77 @@ namespace TableroPecasV5.Shared
   {
 
     //[JsonProperty("Agrupacion")]
-    public ModoAgruparDependiente Agrupacion { get; set; }
+    public ModoAgruparDependiente Agrupacion { get; set; } = ModoAgruparDependiente.NoDefinido;
 
     //[JsonProperty("CapaWFS")]
-    public int CapaWFS { get; set; }
+    public int CapaWFS { get; set; } = -1;
 
     //[JsonProperty("Clase")]
-    public ClaseElemento Clase { get; set; }
+    public ClaseElemento Clase { get; set; } = ClaseElemento.NoDefinida;
 
     //[JsonProperty(CodigoElemento")]
-    public int CodigoElemento { get; set; }
+    public int CodigoElemento { get; set; } = -1;
 
     //[JsonProperty("ColorCompuestoA")]
-    public byte ColorCompuestoA { get; set; }
+    public byte ColorCompuestoA { get; set; } = 255;
 
     //[JsonProperty("ColorCompuestoB")]
-    public byte ColorCompuestoB { get; set; }
+    public byte ColorCompuestoB { get; set; } = 255;
 
     //[JsonProperty("ColorCompuestoG")]
-    public byte ColorCompuestoG { get; set; }
+    public byte ColorCompuestoG { get; set; } = 255;
 
     //[JsonProperty("ColorCompuestoR")]
-    public byte ColorCompuestoR { get; set; }
+    public byte ColorCompuestoR { get; set; } = 255;
 
     //[JsonProperty("ColumnaGeoreferencia")]
-    public string ColumnaGeoreferencia { get; set; }
+    public string ColumnaGeoreferencia { get; set; } = "";
 
     //[JsonProperty(ColumnaLatitud")]
-    public string ColumnaLatitud { get; set; }
+    public string ColumnaLatitud { get; set; } = "";
 
     //[JsonProperty("ColumnaLongitud")]
-    public string ColumnaLongitud { get; set; }
+    public string ColumnaLongitud { get; set; } = "";
 
     //[JsonProperty("ColumnaValor")]
-    public string ColumnaValor { get; set; }
+    public string ColumnaValor { get; set; } = "";
 
     //[JsonProperty("Formula")]
-    public string Formula { get; set; }
+    public string Formula { get; set; } = "";
 
     //[JsonProperty("Intervalos")]
-    public ClaseIntervalo Intervalos { get; set; }
+    public ClaseIntervalo Intervalos { get; set; } = ClaseIntervalo.Lineal;
 
     //[JsonProperty("Minimo")]
-    public double Minimo { get; set; }
+    public double Minimo { get; set; } = 0;
 
     //[JsonProperty("Modo")]
-    public ModoGeoreferenciar Modo { get; set; }
+    public ModoGeoreferenciar Modo { get; set; } = ModoGeoreferenciar.Coordenadas;
 
     //[JsonProperty("Nombre")]
-    public string Nombre { get; set; }
+    public string Nombre { get; set; } = "";
 
     //[JsonProperty("Rango")]
-    public double Rango { get; set; }
+    public double Rango { get; set; } = 1d / 1440d;
 
     //[JsonProperty("Referencias")]
-    public List<double> Referencias { get; set; }
+    public List<double> Referencias { get; set; } = new List<double>();
 
     //[JsonProperty("Satisfactorio")]
-    public double Satisfactorio { get; set; }
+    public double Satisfactorio { get; set; } = 0;
 
     //[JsonProperty("Segmentos")]
-    public int Segmentos { get; set; }
+    public int Segmentos { get; set; } = 0;
 
     //[JsonProperty("Sobresaliente")]
-    public double Sobresaliente { get; set; }
+    public double Sobresaliente { get; set; } = 0;
 
     //[JsonProperty("Vinculo")]
-    public int Vinculo { get; set; }
+    public int Vinculo { get; set; } = -1;
 
     public CCapaWSSCN()
 		{
-      Referencias = new List<double>();
+      //
 		}
 
   }

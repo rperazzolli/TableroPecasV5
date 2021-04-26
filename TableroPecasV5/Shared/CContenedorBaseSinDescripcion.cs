@@ -9,6 +9,6 @@ namespace TableroPecasV5.Shared
 	public class CContenedorBaseSinDescripcion
 	{
 		//[JsonProperty("Codigo")]
-		public Int32 Codigo { get; set; }
+		public Int32 Codigo { get; set; } = -1;
 	}
 }

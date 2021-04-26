@@ -181,7 +181,7 @@ namespace TableroPecasV5.Client.Logicas
       {
         await JSRuntime.InvokeAsync<Task>((Punto.Agrupado ? "AgregarPushpinGrande" : "AgregarPushpin"), Args);
       }
-      catch (Exception ex)
+      catch (Exception)
       {
 //        Rutinas.CRutinas.DesplegarMsg(new Exception(Punto.Lng.ToString() + " " + Punto.Lat.ToString()));
       }

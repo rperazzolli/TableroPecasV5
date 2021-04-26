@@ -145,7 +145,9 @@ namespace TableroPecasV5.Client.Logicas
 			}
 		}
 
-		public async void Registrar()
+		private bool mbRegistrando = false;
+
+		public void Registrar()
 		{
 			CVinculoIndicadorCompletoCN VinculoLocal = CrearVinculador();
 			Int32 Codigo = Vinculador.Vinculo.Codigo;
@@ -154,17 +156,36 @@ namespace TableroPecasV5.Client.Logicas
 				HayBoton = false;
 				HayMensaje = true;
 				Mensaje = "Registrando";
-				StateHasChanged();
-				Codigo = await CContenedorDatos.RegistrarVinculoAsync(Http, VinculoLocal);
-				HayMensaje = false;
+				mbRegistrando = true;
 				StateHasChanged();
 			}
+			else
+			{
+				if (AlResponder != null)
+				{
+					AlResponder(VinculoLocal);
+				}
+			}
+		}
+
+		private async Task RegistrarVinculoAsync()
+		{
+			mbRegistrando = false;
+			CVinculoIndicadorCompletoCN VinculoLocal = CrearVinculador();
+			Int32 Codigo = Vinculador.Vinculo.Codigo;
+			Codigo = await CContenedorDatos.RegistrarVinculoAsync(Http, VinculoLocal);
+			HayMensaje = false;
+			StateHasChanged();
 			if (Codigo > 0)
 			{
 				if (AlResponder != null)
 				{
 					AlResponder(VinculoLocal);
 				}
+			}
+			else
+			{
+				Rutinas.CRutinas.DesplegarMsg(new Exception("No pudo registrar correctamente"));
 			}
 		}
 
@@ -363,6 +384,10 @@ namespace TableroPecasV5.Client.Logicas
 			{
 				_ = LeerCapasAsync();
 				return;
+			}
+			if (mbRegistrando)
+			{
+				await RegistrarVinculoAsync();
 			}
 			await base.OnAfterRenderAsync(firstRender);
 		}

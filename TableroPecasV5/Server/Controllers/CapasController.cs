@@ -712,5 +712,115 @@ namespace TableroPecasV5.Server.Controllers
 			return Retorno;
 		}
 
+		private CCapaWSSCN CopiarCapaWSS(WCFBPI.CCapaWSSCN Capa)
+		{
+			return new CCapaWSSCN()
+			{
+				Agrupacion = (ModoAgruparDependiente)(Int32)Capa.Agrupacion,
+				ColorCompuestoA = Capa.ColorCompuestoA,
+				ColorCompuestoB = Capa.ColorCompuestoB,
+				ColorCompuestoG = Capa.ColorCompuestoG,
+				ColorCompuestoR = Capa.ColorCompuestoR,
+				CapaWFS = Capa.CapaWFS,
+				Clase = (ClaseElemento)(Int32)Capa.Clase,
+				Codigo = Capa.Codigo,
+				CodigoElemento = Capa.CodigoElemento,
+				ColumnaGeoreferencia = Capa.ColumnaGeoreferencia,
+				ColumnaLatitud = Capa.ColumnaLatitud,
+				ColumnaLongitud = Capa.ColumnaLongitud,
+				ColumnaValor = Capa.ColumnaValor,
+				Formula = Capa.Formula,
+				Intervalos = (ClaseIntervalo)(Int32)Capa.Intervalos,
+				Minimo = Capa.Minimo,
+				Modo = (ModoGeoreferenciar)(Int32)Capa.Modo,
+				Nombre = Capa.Nombre,
+				Rango = Capa.Rango,
+				Referencias = CRutinas.CopiarVectorDoubles(Capa.Referencias),
+				Satisfactorio = Capa.Satisfactorio,
+				Segmentos = Capa.Segmentos,
+				Sobresaliente = Capa.Sobresaliente,
+				Vinculo = Capa.Vinculo
+			};
+		}
+
+		private WCFBPI.CCapaWSSCN CopiarCapaWSSBPI(CCapaWSSCN Capa)
+		{
+			return new WCFBPI.CCapaWSSCN()
+			{
+				Agrupacion = (WCFBPI.ModoAgruparDependiente)(Int32)Capa.Agrupacion,
+				ColorCompuestoA = Capa.ColorCompuestoA,
+				ColorCompuestoB = Capa.ColorCompuestoB,
+				ColorCompuestoG = Capa.ColorCompuestoG,
+				ColorCompuestoR = Capa.ColorCompuestoR,
+				CapaWFS = Capa.CapaWFS,
+				Clase = (WCFBPI.ClaseElemento)(Int32)Capa.Clase,
+				Codigo = Capa.Codigo,
+				CodigoElemento = Capa.CodigoElemento,
+				ColumnaGeoreferencia = Capa.ColumnaGeoreferencia,
+				ColumnaLatitud = Capa.ColumnaLatitud,
+				ColumnaLongitud = Capa.ColumnaLongitud,
+				ColumnaValor = Capa.ColumnaValor,
+				Formula = Capa.Formula,
+				Intervalos = (WCFBPI.ClaseIntervalo)(Int32)Capa.Intervalos,
+				Minimo = Capa.Minimo,
+				Modo = (WCFBPI.ModoGeoreferenciar)(Int32)Capa.Modo,
+				Nombre = Capa.Nombre,
+				Rango = Capa.Rango,
+				Referencias = CRutinas.CopiarVectorDoubles(Capa.Referencias),
+				Satisfactorio = Capa.Satisfactorio,
+				Segmentos = Capa.Segmentos,
+				Sobresaliente = Capa.Sobresaliente,
+				Vinculo = Capa.Vinculo
+			};
+		}
+
+		[HttpPost("InsertarCapaWSS")]
+		public RespuestaEnteros InsertarCapaWSS(string URL, string Ticket, [FromBody] CCapaWSSCN Capa)
+		{
+			RespuestaEnteros Retorno = new RespuestaEnteros();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				WCFBPI.CCapaWSSCN CapaBPI = CopiarCapaWSSBPI(Capa);
+				Task<WCFBPI.CRespuestaCodigo> Tarea = Cliente.RegistrarCapaWSSAsync(Ticket, CapaBPI);
+				Tarea.Wait();
+				WCFBPI.CRespuestaCodigo Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+				Retorno.Codigos.Add(Respuesta.Codigo);
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			return Retorno;
+		}
+
+		[HttpDelete("BorrarCapaWSS")]
+		public Respuesta BorrarCapaWSS(string URL, string Ticket, Int32 CodigoCapa)
+		{
+			RespuestaEnteros Retorno = new RespuestaEnteros();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				Task<WCFBPI.CRespuesta> Tarea = Cliente.BorrarCapaWSSAsync(Ticket, CodigoCapa);
+				Tarea.Wait();
+				WCFBPI.CRespuesta Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			return Retorno;
+		}
+
 	}
 }

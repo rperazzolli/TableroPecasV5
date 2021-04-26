@@ -176,6 +176,9 @@ namespace TableroPecasV5.Client.Logicas
 			{
 				Respuesta += Math.Abs(ColumnaDatos.ValorReal(Linea.Codigos[ColumnaDatos.Orden]));
 			}
+			if (Math.Abs(Respuesta) < 1e-100){
+				Respuesta = 0;
+			}
 			return Respuesta;
 		}
 
@@ -641,7 +644,6 @@ namespace TableroPecasV5.Client.Logicas
 							await DeterminarPosicionElementosWFSAsync();
 							break;
 					}
-					StateHasChanged();
 				}
 				else
 				{
@@ -907,6 +909,12 @@ namespace TableroPecasV5.Client.Logicas
 			{
 				Rectangulo RectPant = await CRutinas.ObtenerRectanguloElementoAsync(JSRuntime, Direccion);
 				Rectangulo RectMapa = await CRutinas.ObtenerExtremosMapaAsync(JSRuntime, PosicionMapa);
+				if (RectPant.width<0 || RectMapa.width < 0)
+				{
+					mbRedibujando = true;
+					StateHasChanged();
+					return;
+				}
 				double FactorAbsc = (RectPant.height * RectMapa.width) / (RectPant.width * RectMapa.height);
 				mbDibujarTortas = false;
 				foreach (CTortaBing Torta in mTortas)

@@ -44,7 +44,7 @@ namespace TableroPecasV5.Client.Logicas
 			}
 		}
 
-		public async void Dispose()
+		public void Dispose()
 		{
 			LiberarMapa();
 		}
