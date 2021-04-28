@@ -56,6 +56,8 @@ namespace TableroPecasV5.Client.Rutinas
     public const string FREC_SEMESTRAL = "Semestral"; // Unicamente se usa en indicadores manuales.
     public const string FREC_ANUAL = "Anual";
 
+    public const string NO_DEFINIDA = "No definida";
+
     public const bool TendenciasEnTarjeta = false;
 
     public const double ANCHO_COLUMNA_H = 25;

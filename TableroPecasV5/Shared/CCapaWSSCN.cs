@@ -202,13 +202,13 @@ namespace TableroPecasV5.Shared
     public string Formula { get; set; } = "";
 
     //[JsonProperty("Intervalos")]
-    public ClaseIntervalo Intervalos { get; set; } = ClaseIntervalo.Lineal;
+    public ClaseIntervalo Intervalos { get; set; } = ClaseIntervalo.NoDefinido;
 
     //[JsonProperty("Minimo")]
     public double Minimo { get; set; } = 0;
 
     //[JsonProperty("Modo")]
-    public ModoGeoreferenciar Modo { get; set; } = ModoGeoreferenciar.Coordenadas;
+    public ModoGeoreferenciar Modo { get; set; } = ModoGeoreferenciar.NoDefinido;
 
     //[JsonProperty("Nombre")]
     public string Nombre { get; set; } = "";

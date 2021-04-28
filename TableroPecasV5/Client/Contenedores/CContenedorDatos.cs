@@ -219,6 +219,55 @@ namespace TableroPecasV5.Client.Contenedores
       }
     }
 
+    public async static Task<string> VerificarBaseDatosAsync(HttpClient Http)
+    {
+      try
+      {
+
+        Respuesta Respuesta = await Http.GetFromJsonAsync<Respuesta>(
+            "api/Capas/ValidarBaseDatos?URL=" + Contenedores.CContenedorDatos.UrlBPI +
+            "&Ticket=" + Contenedores.CContenedorDatos.Ticket);
+
+        return Respuesta.MsgErr;
+
+      }
+      catch (Exception ex)
+      {
+        return CRutinas.TextoMsg(ex);
+      }
+    }
+
+    public async static Task<Int32> RegistrarCapaWSSAsync(HttpClient Http,
+          CCapaWSSCN Capa)
+    {
+      try
+      {
+
+        var Respuesta = await Http.PostAsJsonAsync<CCapaWSSCN>(
+              "api/Capas/InsertarCapaWSS?URL=" +
+              Contenedores.CContenedorDatos.UrlBPI +
+              "&Ticket=" + Contenedores.CContenedorDatos.Ticket, Capa);
+        if (!Respuesta.IsSuccessStatusCode)
+        {
+          throw new Exception(Respuesta.ReasonPhrase);
+        }
+
+        RespuestaEnteros RespuestaCodigo = await Respuesta.Content.ReadFromJsonAsync<RespuestaEnteros>();
+        if (!RespuestaCodigo.RespuestaOK)
+        {
+          throw new Exception(RespuestaCodigo.MsgErr);
+        }
+
+        return RespuestaCodigo.Codigos[0];
+
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return Capa.Codigo;
+      }
+    }
+
     public async static Task<CVinculoIndicadorCompletoCN> LeerVinculoAsync(HttpClient Http,
           ClaseElemento Clase, Int32 Indicador, string Columna)
     {
@@ -351,6 +400,32 @@ namespace TableroPecasV5.Client.Contenedores
         }
 
         return Respuesta;
+
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return null;
+      }
+    }
+
+    public async static Task<List<CCapaWSSCN>> ListarCapasWSSAsync(HttpClient Http, ClaseElemento ClaseIndicador,
+          Int32 CodigoIndicador)
+    {
+      try
+      {
+
+        RespuestaCapasWSS Respuesta = await Http.GetFromJsonAsync<RespuestaCapasWSS>(
+            "api/Capas/ListarCapasWSS?URL=" + Contenedores.CContenedorDatos.UrlBPI +
+            "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
+            "&ClaseElemento=" + ((Int32)ClaseIndicador).ToString() +
+            "&CodigoElemento=" + CodigoIndicador.ToString());
+        if (!Respuesta.RespuestaOK)
+        {
+          throw new Exception(Respuesta.MsgErr);
+        }
+
+        return Respuesta.Capas;
 
       }
       catch (Exception ex)

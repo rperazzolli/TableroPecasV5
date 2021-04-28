@@ -173,14 +173,7 @@ namespace TableroPecasV5.Client.Logicas
 			}
 		}
 
-		public Int32 Segmentos
-		{
-			get { return mCapaSeleccionada.Segmentos; }
-			set
-			{
-				mCapaSeleccionada.Segmentos = value;
-			}
-		}
+		public string Segmentos { get; set; } = "";
 
 		public string ColorSeleccionado { get; set; } = "";
 		public bool UsaVinculo { get; set; } = false;
@@ -282,22 +275,35 @@ namespace TableroPecasV5.Client.Logicas
 			else
 			{
 				ListaCapasWFS = Respuesta.CapasWFS;
+				ListaCapasWFS.Insert(0, new CCapaWFSCN()
+				{
+					Codigo = -1,
+					Descripcion = CRutinas.NO_DEFINIDA
+				});
 				StateHasChanged();
 			}
 		}
 
+		private List<CVinculoIndicadorCompletoCN> mVinculos = null;
+
 		private async Task LeerVinculosAsync()
 		{
-			List<CVinculoIndicadorCompletoCN> Vinculos = await CContenedorDatos.ListarVinculosAsync(Http, ClaseIndicador,Indicador);
-			if (Vinculos != null)
+			mVinculos = await CContenedorDatos.ListarVinculosAsync(Http, ClaseIndicador, Indicador);
+			if (mVinculos != null)
 			{
-				ListaVinculos = (from V in Vinculos
+				ListaVinculos = (from V in mVinculos
+												 where V.Vinculo.ClaseVinculada != ClaseVinculo.ColumnasGIS
 												 orderby V.Vinculo.NombreColumna
 												 select new CListaTexto()
 												 {
 													 Codigo = V.Vinculo.Codigo,
 													 Descripcion = V.Vinculo.NombreColumna
 												 }).ToList();
+				ListaVinculos.Insert(0, new CListaTexto()
+				{
+					Codigo = -1,
+					Descripcion = "No definido"
+				});
 				StateHasChanged();
 			}
 		}
@@ -307,34 +313,46 @@ namespace TableroPecasV5.Client.Logicas
 			get { return (Int32)mCapaSeleccionada.Intervalos; }
 			set
 			{
-				if (value != -1)
-				{
-					mCapaSeleccionada.Intervalos = (ClaseIntervalo)value;
-				}
+				mCapaSeleccionada.Intervalos = (ClaseIntervalo)value;
 			}
 		}
 
-		public bool PorIndicador { get; set; } = false;
-		public bool PorGradiente { get; set; } = false;
-
-		public void Coloracion(Int32 Opcion)
+		private async Task CargarListaCapasAsync()
 		{
-			PorIndicador = (Opcion == 1);
-			PorGradiente = (Opcion == 2);
+			CRutinas.DesplegarMsg("Prueba del mensaje");
+			ListaCapas = await CContenedorDatos.ListarCapasWSSAsync(Http, ClaseIndicador, Indicador);
+			OrdenarListaCapas();
 			StateHasChanged();
 		}
+
+		public List<CColumnaBase> ColumnasAjustadas { get; set; }
 
 		protected override Task OnInitializedAsync()
 		{
 			CrearLineasCalculo();
+			if (ListaCapas == null)
+			{
+				_ = CargarListaCapasAsync();
+			}
+			ColumnasAjustadas = (from C in Columnas
+													 orderby C.Nombre
+													 select C).ToList();
+			ColumnasAjustadas.Insert(0, new CColumnaBase()
+			{
+				Clase = ClaseVariable.NoDefinida,
+				Nombre = CRutinas.NO_DEFINIDA
+			});
 			return base.OnInitializedAsync();
 		}
 
 		protected override Task OnAfterRenderAsync(bool firstRender)
 		{
-			if (ListaCapasWFS == null)
+			if (ListaCapas != null)
 			{
-				_ = HacerCargaInicialAsync();
+				if (ListaCapasWFS == null)
+				{
+					_ = HacerCargaInicialAsync();
+				}
 			}
 			return base.OnAfterRenderAsync(firstRender);
 		}
@@ -349,9 +367,176 @@ namespace TableroPecasV5.Client.Logicas
 			mCapaSeleccionada.CodigoElemento = Indicador;
 		}
 
-		public void Registrar()
+		private void ExtraerColor()
 		{
-			//
+			if (mCapaSeleccionada != null)
+			{
+			  string Color = Coloreador.Color;
+			  mCapaSeleccionada.ColorCompuestoA = 255;
+				if (Color == "")
+				{
+					mCapaSeleccionada.ColorCompuestoB = 255;
+					mCapaSeleccionada.ColorCompuestoG = 255;
+					mCapaSeleccionada.ColorCompuestoR = 255;
+				}
+				else
+				{
+					Color = (Color.StartsWith("#") ? Color.Substring(1) : Color);
+					Int32 Paso = Color.Length / 3;
+					mCapaSeleccionada.ColorCompuestoR = (byte)Int32.Parse(Color.Substring(0, Paso), System.Globalization.NumberStyles.HexNumber);
+					mCapaSeleccionada.ColorCompuestoG = (byte)Int32.Parse(Color.Substring(Paso, Paso), System.Globalization.NumberStyles.HexNumber);
+					mCapaSeleccionada.ColorCompuestoB = (byte)Int32.Parse(Color.Substring(2*Paso, Paso), System.Globalization.NumberStyles.HexNumber);
+				}
+			}
+		}
+
+		private bool ColumnaIncorrecta(string Nombre)
+		{
+			return Nombre.Length == 0 || Nombre == CRutinas.NO_DEFINIDA;
+		}
+
+		private bool ExtraerDatos()
+		{
+			try
+			{
+				if (mCapaSeleccionada.Intervalos == ClaseIntervalo.NoDefinido)
+				{
+					return false;
+				}
+
+				if (!UsaCoordenadas && !UsaVinculo)
+				{
+					return false;
+				}
+
+				if (mCapaSeleccionada.Intervalos == ClaseIntervalo.NoDefinido || mCapaSeleccionada.Nombre.Length == 0 ||
+						ColumnaIncorrecta(mCapaSeleccionada.ColumnaValor))
+				{
+					return false;
+				}
+
+				mCapaSeleccionada.Clase = ClaseIndicador;
+				mCapaSeleccionada.CodigoElemento = Indicador;
+
+				ExtraerColor();
+
+				if (mCapaSeleccionada == null)
+				{
+					mCapaSeleccionada = new CCapaWSSCN();
+				}
+
+				mCapaSeleccionada.Modo = (UsaVinculo ? ModoGeoreferenciar.Vinculo : ModoGeoreferenciar.Coordenadas);
+
+				switch (mCapaSeleccionada.Modo)
+				{
+					case ModoGeoreferenciar.Coordenadas:
+						if (ColumnaIncorrecta(mCapaSeleccionada.ColumnaLatitud) ||
+							  ColumnaIncorrecta(mCapaSeleccionada.ColumnaLongitud))
+						{
+							return false;
+						}
+						break;
+					case ModoGeoreferenciar.Vinculo:
+						if (mCapaSeleccionada.Vinculo < 0)
+						{
+							return false;
+						}
+						CVinculoIndicadorCompletoCN Vinculo = (from V in mVinculos
+																				 where V.Vinculo.Codigo == mCapaSeleccionada.Vinculo
+																				 select V).FirstOrDefault();
+						mCapaSeleccionada.ColumnaGeoreferencia = (Vinculo == null ? "" : Vinculo.Vinculo.NombreColumna);
+						break;
+				}
+
+				switch (mCapaSeleccionada.Intervalos)
+				{
+					case ClaseIntervalo.Indicador:
+						if (mCapaSeleccionada.Minimo == mCapaSeleccionada.Satisfactorio ||
+								mCapaSeleccionada.Satisfactorio == mCapaSeleccionada.Sobresaliente)
+						{
+							return false;
+						}
+						break;
+					case ClaseIntervalo.Manual:
+						mCapaSeleccionada.Referencias = CRutinas.ListaAReales(Segmentos);
+						mCapaSeleccionada.Segmentos = mCapaSeleccionada.Referencias.Count;
+						if (mCapaSeleccionada.Segmentos < 1)
+						{
+							return false;
+						}
+						break;
+					case ClaseIntervalo.Cuantiles:
+					case ClaseIntervalo.Lineal:
+						mCapaSeleccionada.Segmentos = Int32.Parse(Segmentos);
+						if (mCapaSeleccionada.Segmentos < 1)
+						{
+							return false;
+						}
+						break;
+					default:
+						return false;
+				}
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
+		public Blazorise.ColorEdit Coloreador { get; set; }
+
+		private void OrdenarListaCapas()
+		{
+			ListaCapas.Sort(delegate (CCapaWSSCN C1, CCapaWSSCN C2)
+			{
+				return C1.Nombre.CompareTo(C2.Nombre);
+			});
+		}
+
+		public async void Registrar()
+		{
+			if (!ExtraerDatos())
+			{
+				HayMensaje = true;
+				HayBoton = true;
+				Mensaje = "Datos incompletos o incorrectos";
+				StateHasChanged();
+			}
+			else
+			{
+				HayMensaje = false;
+				StateHasChanged();
+				string RespVal = await CContenedorDatos.VerificarBaseDatosAsync(Http);
+				Int32 Codigo = await CContenedorDatos.RegistrarCapaWSSAsync(Http, mCapaSeleccionada);
+				if (Codigo > 0)
+				{
+					if (mCapaSeleccionada.Codigo < 0)
+					{
+						mCapaSeleccionada.Codigo = Codigo;
+						ListaCapas.Add(mCapaSeleccionada);
+						Nuevo();
+					}
+					else
+					{
+						ListaCapas = (from C in ListaCapas
+													where C.Codigo != Codigo
+													select C).ToList();
+						ListaCapas.Add(mCapaSeleccionada);
+						OrdenarListaCapas();
+						HayMensaje = false;
+						StateHasChanged();
+					}
+				}
+				else
+				{
+					HayBoton = true;
+					HayMensaje = true;
+					Mensaje = "No pudo registrar";
+					StateHasChanged();
+				}
+
+			}
 		}
 
 		public void Nuevo()

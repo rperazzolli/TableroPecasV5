@@ -362,7 +362,7 @@ input {
 
 .grilla-superior {
   display: grid;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: 30% 69%;
   grid-template-rows: 32px;
   grid-gap: 0px;
   padding: 1px 0;
@@ -371,7 +371,7 @@ input {
   .grilla-superior > div {
     text-align: center;
     padding: 1px 0;
-    font-size: 15px;
+    font-size: 11px;
   }
 
 .grilla-opciones {
@@ -385,13 +385,37 @@ input {
   .grilla-opciones > div {
     text-align: center;
     padding: 1px 0;
-    font-size: 15px;
+    font-size: 11px;
   }
 
 .elemento-doble {
   grid-column-start: span 2;
   display: inline-block;
 }
+
+/* Popup container */
+.popup {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+  /* The actual popup (appears on top) */
+  .popup .popuptext {
+    visibility: hidden;
+    width: 50%;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: fixed;
+    z-index: 100;
+    top: 25%;
+    left: 25%;
+    margin-left: 25%;
+    margin-top: 20%;
+  }
 
 
 

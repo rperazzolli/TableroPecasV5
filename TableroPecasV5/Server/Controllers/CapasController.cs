@@ -30,35 +30,38 @@ namespace TableroPecasV5.Server.Controllers
 					throw new Exception(Respuesta.MensajeError);
 				}
 
-				Retorno.Capas = (from C in Respuesta.Capas
-												 select new CCapaWSSCN()
-												 {
-													 Agrupacion = (ModoAgruparDependiente)((Int32)C.Agrupacion),
-													 CapaWFS = C.CapaWFS,
-													 Clase = (ClaseElemento)((Int32)C.Clase),
-													 Codigo = C.Codigo,
-													 CodigoElemento = C.CodigoElemento,
-													 ColorCompuestoA = C.ColorCompuestoA,
-													 ColorCompuestoB = C.ColorCompuestoB,
-													 ColorCompuestoG = C.ColorCompuestoG,
-													 ColorCompuestoR = C.ColorCompuestoR,
-													 ColumnaGeoreferencia = C.ColumnaGeoreferencia,
-													 ColumnaLatitud = C.ColumnaLatitud,
-													 ColumnaLongitud = C.ColumnaLongitud,
-													 ColumnaValor = C.ColumnaValor,
-													 Formula = C.Formula,
-													 Intervalos = (ClaseIntervalo)((Int32)C.Intervalos),
-													 Minimo = C.Minimo,
-													 Modo = (ModoGeoreferenciar)((Int32)C.Modo),
-													 Nombre = C.Nombre,
-													 Rango = C.Rango,
-													 Referencias = (from R in C.Referencias
-																					select R).ToList(),
-													 Satisfactorio = C.Satisfactorio,
-													 Segmentos = C.Segmentos,
-													 Sobresaliente = C.Sobresaliente,
-													 Vinculo = C.Vinculo
-												 }).ToList();
+				if (Respuesta.Capas != null)
+				{
+					Retorno.Capas = (from C in Respuesta.Capas
+													 select new CCapaWSSCN()
+													 {
+														 Agrupacion = (ModoAgruparDependiente)((Int32)C.Agrupacion),
+														 CapaWFS = C.CapaWFS,
+														 Clase = (ClaseElemento)((Int32)C.Clase),
+														 Codigo = C.Codigo,
+														 CodigoElemento = C.CodigoElemento,
+														 ColorCompuestoA = C.ColorCompuestoA,
+														 ColorCompuestoB = C.ColorCompuestoB,
+														 ColorCompuestoG = C.ColorCompuestoG,
+														 ColorCompuestoR = C.ColorCompuestoR,
+														 ColumnaGeoreferencia = C.ColumnaGeoreferencia,
+														 ColumnaLatitud = C.ColumnaLatitud,
+														 ColumnaLongitud = C.ColumnaLongitud,
+														 ColumnaValor = C.ColumnaValor,
+														 Formula = C.Formula,
+														 Intervalos = (ClaseIntervalo)((Int32)C.Intervalos),
+														 Minimo = C.Minimo,
+														 Modo = (ModoGeoreferenciar)((Int32)C.Modo),
+														 Nombre = C.Nombre,
+														 Rango = C.Rango,
+														 Referencias = (from R in C.Referencias
+																						select R).ToList(),
+														 Satisfactorio = C.Satisfactorio,
+														 Segmentos = C.Segmentos,
+														 Sobresaliente = C.Sobresaliente,
+														 Vinculo = C.Vinculo
+													 }).ToList();
+				}
 
 			}
 			catch (Exception ex)
@@ -354,6 +357,35 @@ namespace TableroPecasV5.Server.Controllers
 				URLProveedor = Capa.URLProveedor,
 				VersionProveedor = Capa.VersionProveedor
 			};
+		}
+
+		// GET: CapasController
+		[HttpGet("ValidarBaseDatos")]
+		public Respuesta ValidarBaseDatos(string URL, string Ticket)
+		{
+			Respuesta Retorno = new Respuesta();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				Task<WCFBPI.CRespuesta> Tarea = Cliente.VerificarBaseDatosAsync(Ticket);
+				Tarea.Wait();
+				WCFBPI.CRespuesta Respuesta = Tarea.Result;
+				Retorno.RespuestaOK = Respuesta.RespuestaOK;
+				Retorno.MsgErr = Respuesta.MensajeError;
+
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			finally
+			{
+				Cliente.Close();
+			}
+
+			return Retorno;
+
 		}
 
 		// GET: CapasController
@@ -783,6 +815,7 @@ namespace TableroPecasV5.Server.Controllers
 			{
 				WCFBPI.CCapaWSSCN CapaBPI = CopiarCapaWSSBPI(Capa);
 				Task<WCFBPI.CRespuestaCodigo> Tarea = Cliente.RegistrarCapaWSSAsync(Ticket, CapaBPI);
+				Cliente.VerificarBaseDatosAsync(Ticket);
 				Tarea.Wait();
 				WCFBPI.CRespuestaCodigo Respuesta = Tarea.Result;
 				if (!Respuesta.RespuestaOK)

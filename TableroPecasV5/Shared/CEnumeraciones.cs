@@ -56,6 +56,7 @@ namespace TableroPecasV5.Shared
 
   public enum ClaseIntervalo
   {
+    NoDefinido = -1,
     Indicador = 1,
     Lineal = 2,
     Cuantiles = 3,
@@ -74,6 +75,7 @@ namespace TableroPecasV5.Shared
 
   public enum ModoGeoreferenciar
   {
+    NoDefinido = -1,
     Vinculo = 1,
     Coordenadas = 2
   }

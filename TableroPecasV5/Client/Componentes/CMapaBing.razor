@@ -19,14 +19,14 @@
         <Select TValue="string" @bind-SelectedValue="@PreguntaElegida">
           @*<SelectItem Value="-1">No corresponde</SelectItem>*@
           @if (Preguntas != null)
-{
-        @foreach (CPreguntaPreguntaWISCN Pregunta in Preguntas)
-{
-        <SelectItem Style="@EstiloPregunta(Pregunta)" Value="@CodigoPregunta(Pregunta)">@TextoPregunta(Pregunta)</SelectItem>
-}
-      /**/
-}
-      /**/
+          {
+            @foreach (CPreguntaPreguntaWISCN Pregunta in Preguntas)
+            {
+              <SelectItem Style="@EstiloPregunta(Pregunta)" Value="@CodigoPregunta(Pregunta)">@TextoPregunta(Pregunta)</SelectItem>
+            }
+            /**/
+          }
+          /**/
         </Select>
       </Field>
     </ModalBody>
@@ -36,3 +36,5 @@
     </ModalFooter>
   </ModalContent>
 </Modal>
+
+
