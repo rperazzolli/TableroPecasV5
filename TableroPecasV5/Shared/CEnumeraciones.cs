@@ -60,7 +60,8 @@ namespace TableroPecasV5.Shared
     Indicador = 1,
     Lineal = 2,
     Cuantiles = 3,
-    Manual = 4
+    Manual = 4,
+    Cortes = 5
   }
 
   public enum ClaseCapa : int

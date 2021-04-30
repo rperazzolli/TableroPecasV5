@@ -535,6 +535,25 @@ namespace TableroPecasV5.Client.Contenedores
       }
     }
 
+    public async static Task<RespuestaTextos> LeerParametroWFSAsync(HttpClient Http,
+        Int32 Capa, string Parametro)
+    {
+      try
+      {
+
+        return await Http.GetFromJsonAsync<RespuestaTextos>(
+            "api/Parametros/LeerParametroWFS?URL=" + Contenedores.CContenedorDatos.UrlBPI +
+            "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
+            "&CodigoCapa=" + Capa.ToString() +
+            "&Parametro=" + Parametro);
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return null;
+      }
+    }
+
     public static string NombreOrigen(ClaseElemento Clase, Int32 Codigo)
 		{
       switch (Clase)

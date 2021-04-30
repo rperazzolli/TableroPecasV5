@@ -19,9 +19,9 @@
          style="width: 21px; height: 21px; display: inline-block; margin-left: 5px;" @onclick="@EditarCapas" />
   </div>
   <div id="@Direccion" style="width: 100%; height: calc(100% - 35px);">
-    @if (Proyecto == null)
+    @if (EstaLeyendo)
     {
-      <a>Por favor aguarde unos segundos</a>
+      <CAguardar/>
     }
   </div>
 
@@ -37,5 +37,15 @@
       </div>
     </CascadingValue>
   }
+
+  @if (MostrarDialogoVinculador)
+			{
+        <CascadingValue Value="this">
+          <CVinculadorWFS ClaseIndicador="@ClaseIndicador"
+                          ColumnaVinculo="@ColumnaGeoreferencia"
+                          Indicador="@CodigoIndicador"
+                          AlResponder="@FncRespuesta"/>
+        </CascadingValue>
+			}
 </div>
 

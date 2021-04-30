@@ -408,6 +408,52 @@ function DibujarPoligono(Posicion, Abscisas, Ordenadas, AbscCentro, OrdCentro, C
         }
     }
 }
+function DibujarPoligonoOpaco(Posicion, Abscisas, Ordenadas, AbscCentro, OrdCentro, A, R, G, B, Texto1, Texto2, Referencia, AnchoBorde) {
+    if (bingMap[Posicion] != null) {
+        var Capa;
+        if (bingMap[Posicion].map.layers.length == 2) {
+            Capa = bingMap[Posicion].map.layers[1];
+        }
+        else {
+            if (bingMap[Posicion].map.layers.length == 1) {
+                Capa = bingMap[Posicion].map.layers[0];
+            }
+            else {
+                Capa = null;
+            }
+        }
+        try {
+            //        var arr_names: number[] = new Array(4);
+            var Coords = new Array(Abscisas.length);
+            var i;
+            for (i = 0; i < Abscisas.length; i++) {
+                Coords[i] = new Microsoft.Maps.Location(Ordenadas[i], Abscisas[i]);
+            }
+            var Color = new Microsoft.Maps.Color(A, R, G, B);
+            //           Microsoft.Maps.CustomOverlay
+            var Poligono = new Microsoft.Maps.Polygon(Coords, {
+                strokeColor: 'gray',
+                fillColor: Color,
+                strokeThickness: AnchoBorde
+            });
+            Poligono.metadata = Referencia;
+            Microsoft.Maps.Events.addHandler(Poligono, 'click', pushpinClicked);
+            //    Capa.add(Poligono);
+            if (Capa == null) {
+                bingMap[Posicion].map.entities.push(Poligono);
+            }
+            else {
+                Capa.add(Poligono);
+            }
+            if (AbscCentro > -998) {
+                AgregarIconoCentro(Posicion, OrdCentro, AbscCentro, Texto1, Texto2, Referencia, Capa);
+            }
+        }
+        catch (exc) {
+            alert(exc.message);
+        }
+    }
+}
 function DibujarPoligonoHueco(Posicion, Abscisas, Ordenadas, AbscAdentro, OrdsAdentro, Color, Texto1, Texto2, Referencia) {
     if (bingMap[Posicion] != null) {
         var Capa;

@@ -521,6 +521,68 @@ function DibujarPoligono(Posicion: number, Abscisas: number[], Ordenadas: number
 
 }
 
+function DibujarPoligonoOpaco(Posicion: number, Abscisas: number[], Ordenadas: number[],
+    AbscCentro: number, OrdCentro: number,
+    A: number, R: number, G: number, B: number, Texto1: string, Texto2: string,
+    Referencia: string, AnchoBorde: number): void {
+
+    if (bingMap[Posicion] != null) {
+        var Capa: Microsoft.Maps.Layer;
+
+        if (bingMap[Posicion].map.layers.length == 2) {
+            Capa = bingMap[Posicion].map.layers[1];
+        }
+        else {
+            if (bingMap[Posicion].map.layers.length == 1) {
+                Capa = bingMap[Posicion].map.layers[0];
+            }
+            else {
+                Capa = null;
+            }
+        }
+
+        try {
+
+            //        var arr_names: number[] = new Array(4);
+
+            var Coords: Microsoft.Maps.Location[] = new Array(Abscisas.length);
+            var i;
+            for (i = 0; i < Abscisas.length; i++) {
+                Coords[i] = new Microsoft.Maps.Location(Ordenadas[i], Abscisas[i]);
+            }
+
+            var Color = new Microsoft.Maps.Color(A, R, G, B);
+
+            //           Microsoft.Maps.CustomOverlay
+            var Poligono = new Microsoft.Maps.Polygon(Coords, {
+                strokeColor: 'gray',
+                fillColor: Color,
+                strokeThickness: AnchoBorde
+            });
+
+            Poligono.metadata = Referencia;
+            Microsoft.Maps.Events.addHandler(Poligono, 'click', pushpinClicked);
+
+            //    Capa.add(Poligono);
+            if (Capa == null) {
+                bingMap[Posicion].map.entities.push(Poligono);
+            }
+            else {
+                Capa.add(Poligono);
+            }
+
+            if (AbscCentro > -998) {
+                AgregarIconoCentro(Posicion, OrdCentro, AbscCentro, Texto1, Texto2, Referencia, Capa);
+            }
+
+        }
+        catch (exc) {
+            alert(exc.message);
+        }
+    }
+
+}
+
 function DibujarPoligonoHueco(Posicion: number, Abscisas: number[], Ordenadas: number[],
     AbscAdentro: number[], OrdsAdentro: number[],
     Color: string, Texto1: string, Texto2: string, Referencia: string): void {

@@ -82,6 +82,11 @@ namespace TableroPecasV5.Client.Rutinas
       Anios = 4
     }
 
+    public static double DistanciaEntrePuntos2(CPosicionWFSCN P1, CPosicionWFSCN P2)
+		{
+      return (P1.X - P2.X) * (P1.X - P2.X) + (P1.Y - P2.Y) * (P1.Y - P2.Y);
+		}
+
     public async static Task LiberarMapaAsync(Microsoft.JSInterop.IJSRuntime JSRuntime, Int32 Posicion)
     {
       object[] Args = new object[1];
@@ -841,6 +846,17 @@ namespace TableroPecasV5.Client.Rutinas
       //}
     }
 
+    public static List<Int32> ListaAEnteros(string Lista)
+    {
+      string[] Datos = Lista.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+      List<Int32> Valores = new List<Int32>();
+      foreach (string Valor in Datos)
+      {
+        Valores.Add(Int32.Parse(Valor));
+      }
+      return Valores;
+    }
+
     public static List<double> ListaAReales(string Lista)
     {
       string[] Datos = Lista.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
@@ -903,206 +919,206 @@ namespace TableroPecasV5.Client.Rutinas
 
 
 
-    //public static Point PuntoIncorrecto()
-    //{
-    //  return new Point(-1000, -1000);
-    //}
+		//public static Point PuntoIncorrecto()
+		//{
+		//  return new Point(-1000, -1000);
+		//}
 
-    //private static Point PuntoDesdeCoordenadas(string Valor)
-    //{
-    //  if (Valor.Contains(" "))
-    //  {
-    //    try
-    //    {
-    //      string[] Valores = Valor.Trim().Split(' ');
-    //      return new Point(CRutinas.StrVFloat(Valores[0]), CRutinas.StrVFloat(Valores[1]));
-    //    }
-    //    catch (Exception)
-    //    {
-    //      //
-    //    }
-    //  }
-    //  return null;
+		//private static Point PuntoDesdeCoordenadas(string Valor)
+		//{
+		//  if (Valor.Contains(" "))
+		//  {
+		//    try
+		//    {
+		//      string[] Valores = Valor.Trim().Split(' ');
+		//      return new Point(CRutinas.StrVFloat(Valores[0]), CRutinas.StrVFloat(Valores[1]));
+		//    }
+		//    catch (Exception)
+		//    {
+		//      //
+		//    }
+		//  }
+		//  return null;
 
-    //}
+		//}
 
-    //public static Point PosicionValor(string Valor, CCapaWFSCN Capa)
-    //{
-    //  Point PuntoCoordenadas = PuntoDesdeCoordenadas(Valor);
-    //  if (PuntoCoordenadas != null && !double.IsNaN(PuntoCoordenadas.X) && !double.IsNaN(PuntoCoordenadas.Y))
-    //  {
-    //    return PuntoCoordenadas;
-    //  }
-    //  else
-    //  {
-    //    foreach CAreaWFSCN Area in Capa.Areas)
-    //    {
-    //      if (Area.Codigo.Equals(Valor, StringComparison.OrdinalIgnoreCase))
-    //      {
-    //        return new Point(Area.Centro.X, Area.Centro.Y);
-    //      }
-    //    }
+		//public static Point PosicionValor(string Valor, CCapaWFSCN Capa)
+		//{
+		//  Point PuntoCoordenadas = PuntoDesdeCoordenadas(Valor);
+		//  if (PuntoCoordenadas != null && !double.IsNaN(PuntoCoordenadas.X) && !double.IsNaN(PuntoCoordenadas.Y))
+		//  {
+		//    return PuntoCoordenadas;
+		//  }
+		//  else
+		//  {
+		//    foreach CAreaWFSCN Area in Capa.Areas)
+		//    {
+		//      if (Area.Codigo.Equals(Valor, StringComparison.OrdinalIgnoreCase))
+		//      {
+		//        return new Point(Area.Centro.X, Area.Centro.Y);
+		//      }
+		//    }
 
-    //    foreach CPuntoWFSCN Punto in Capa.Puntos)
-    //    {
-    //      if (Punto.Codigo.Equals(Valor, StringComparison.OrdinalIgnoreCase))
-    //      {
-    //        return new Plantillas.Point(Punto.Punto.X, Punto.Punto.Y);
-    //      }
-    //    }
-    //  }
+		//    foreach CPuntoWFSCN Punto in Capa.Puntos)
+		//    {
+		//      if (Punto.Codigo.Equals(Valor, StringComparison.OrdinalIgnoreCase))
+		//      {
+		//        return new Plantillas.Point(Punto.Punto.X, Punto.Punto.Y);
+		//      }
+		//    }
+		//  }
 
-    //  return PuntoIncorrecto();
+		//  return PuntoIncorrecto();
 
-    //}
+		//}
 
-    //private static bool TramoIntersectaPorIzq(CPosicionWFSCN P1, CPosicionWFSCN P2, Point Punto)
-    //{
-    //  if (P1.X > Punto.X && P2.X >= Punto.X)
-    //  {
-    //    return false;
-    //  }
-    //  else
-    //  {
-    //    if ((P1.Y > Punto.Y && P2.Y >= Punto.Y) || (P1.Y < Punto.Y && P2.Y <= Punto.Y))
-    //    {
-    //      return false;
-    //    }
-    //  }
-    //  if (P1.Y == P2.Y)
-    //  {
-    //    return (Punto.Y == P1.Y && P1.X <= Punto.X);
-    //  }
-    //  else
-    //  {
-    //    double AbscRefe = P1.X + (P2.X - P1.X) * (Punto.Y - P1.Y) / (P2.Y - P1.Y);
-    //    return (AbscRefe <= Punto.X);
-    //  }
-    //}
+		//private static bool TramoIntersectaPorIzq(CPosicionWFSCN P1, CPosicionWFSCN P2, Point Punto)
+		//{
+		//	if (P1.X > Punto.X && P2.X >= Punto.X)
+		//	{
+		//		return false;
+		//	}
+		//	else
+		//	{
+		//		if ((P1.Y > Punto.Y && P2.Y >= Punto.Y) || (P1.Y < Punto.Y && P2.Y <= Punto.Y))
+		//		{
+		//			return false;
+		//		}
+		//	}
+		//	if (P1.Y == P2.Y)
+		//	{
+		//		return (Punto.Y == P1.Y && P1.X <= Punto.X);
+		//	}
+		//	else
+		//	{
+		//		double AbscRefe = P1.X + (P2.X - P1.X) * (Punto.Y - P1.Y) / (P2.Y - P1.Y);
+		//		return (AbscRefe <= Punto.X);
+		//	}
+		//}
 
-    //public static bool AreaContienePunto(CAreaWFSCN Area, Point Punto)
-    //{
-    //  // el criterio es hacer una linea horizontal desde el infinito y verificar cuantas veces corta
-    //  // al contorno.
-    //  Int32 Cantidad = 0;
-    //  for (Int32 i = 1; i < Area.Contorno.Count; i++)
-    //  {
-    //    if (TramoIntersectaPorIzq(Area.Contorno[i - 1], Area.Contorno[i], Punto))
-    //    {
-    //      Cantidad++;
-    //    }
-    //  }
-    //  return ((Cantidad % 2) != 0);
-    //}
+		//public static bool AreaContienePunto(CAreaWFSCN Area, Point Punto)
+		//{
+		//	// el criterio es hacer una linea horizontal desde el infinito y verificar cuantas veces corta
+		//	// al contorno.
+		//	Int32 Cantidad = 0;
+		//	for (Int32 i = 1; i < Area.Contorno.Count; i++)
+		//	{
+		//		if (TramoIntersectaPorIzq(Area.Contorno[i - 1], Area.Contorno[i], Punto))
+		//		{
+		//			Cantidad++;
+		//		}
+		//	}
+		//	return ((Cantidad % 2) != 0);
+		//}
 
-    //public static bool PoligonoContienePunto(List<CPosicionWFSCN> Contorno, Point Punto)
-    //{
-    //  // el criterio es hacer una linea horizontal desde el infinito y verificar cuantas veces corta
-    //  // al contorno.
-    //  Int32 Cantidad = 0;
-    //  for (Int32 i = 1; i < Contorno.Count; i++)
-    //  {
-    //    if (TramoIntersectaPorIzq(Contorno[i - 1], Contorno[i], Punto))
-    //    {
-    //      Cantidad++;
-    //    }
-    //  }
-    //  return ((Cantidad % 2) != 0);
-    //}
+		//public static bool PoligonoContienePunto(List<CPosicionWFSCN> Contorno, Point Punto)
+		//{
+		//  // el criterio es hacer una linea horizontal desde el infinito y verificar cuantas veces corta
+		//  // al contorno.
+		//  Int32 Cantidad = 0;
+		//  for (Int32 i = 1; i < Contorno.Count; i++)
+		//  {
+		//    if (TramoIntersectaPorIzq(Contorno[i - 1], Contorno[i], Punto))
+		//    {
+		//      Cantidad++;
+		//    }
+		//  }
+		//  return ((Cantidad % 2) != 0);
+		//}
 
-    //public static CAreaWFSCN AreaCentroPunto(CCapaWFSCN Capa, Point Punto)
-    //{
-    //  double DistMin = double.MaxValue;
-    //  CAreaWFSCN Respuesta = null;
-    //  foreach (CAreaWFSCN Area in Capa.Areas)
-    //  {
-    //    double DistArea = (Area.Centro.X - Punto.X) * (Area.Centro.X - Punto.X) +
-    //        (Area.Centro.Y - Punto.Y) * (Area.Centro.Y - Punto.Y);
-    //    if (DistArea < DistMin)
-    //    {
-    //      DistMin = DistArea;
-    //      Respuesta = Area;
-    //    }
-    //  }
-    //  return (DistMin < 0.000001 ? Respuesta : null);
-    //}
+		//public static CAreaWFSCN AreaCentroPunto(CCapaWFSCN Capa, Point Punto)
+		//{
+		//  double DistMin = double.MaxValue;
+		//  CAreaWFSCN Respuesta = null;
+		//  foreach (CAreaWFSCN Area in Capa.Areas)
+		//  {
+		//    double DistArea = (Area.Centro.X - Punto.X) * (Area.Centro.X - Punto.X) +
+		//        (Area.Centro.Y - Punto.Y) * (Area.Centro.Y - Punto.Y);
+		//    if (DistArea < DistMin)
+		//    {
+		//      DistMin = DistArea;
+		//      Respuesta = Area;
+		//    }
+		//  }
+		//  return (DistMin < 0.000001 ? Respuesta : null);
+		//}
 
-    //public static CAreaWFSCN AreaContenedoraPunto(CCapaWFSCN Capa, Point Punto)
-    //{
-    //  foreach (CAreaWFSCN Area in Capa.Areas)
-    //  {
-    //    if (AreaContienePunto(Area, Punto))
-    //    {
-    //      return Area;
-    //    }
-    //  }
-    //  return null;
-    //}
+		//public static CAreaWFSCN AreaContenedoraPunto(CCapaWFSCN Capa, Point Punto)
+		//{
+		//  foreach (CAreaWFSCN Area in Capa.Areas)
+		//  {
+		//    if (AreaContienePunto(Area, Punto))
+		//    {
+		//      return Area;
+		//    }
+		//  }
+		//  return null;
+		//}
 
-    //public static double DistanciaCuadradaEntrePuntos(CPosicionWFSCN P1, Point P2)
-    //{
-    //  return (P1.X - P2.X) * (P1.X - P2.X) + (P1.Y - P2.Y) * (P1.Y - P2.Y);
-    //}
+		//public static double DistanciaCuadradaEntrePuntos(CPosicionWFSCN P1, Point P2)
+		//{
+		//  return (P1.X - P2.X) * (P1.X - P2.X) + (P1.Y - P2.Y) * (P1.Y - P2.Y);
+		//}
 
-    //public static string DeterminarAreaContenedora(Point Punto, CCapaWFSCN CapaWFS, string ValorResto,
-    //    bool PorCodigo = false, bool UsaCentro = false)
-    //{
-    //  CAreaWFSCN Area = (UsaCentro ? AreaCentroPunto(CapaWFS, Punto) :
-    //      AreaContenedoraPunto(CapaWFS, Punto));
-    //  if (Area == null && UsaCentro)
-    //  {
-    //    Area = AreaContenedoraPunto(CapaWFS, Punto);
-    //  }
-    //  return (Area == null ? ValorResto : (PorCodigo ? Area.Codigo : Area.Nombre));
-    //}
+		//public static string DeterminarAreaContenedora(Point Punto, CCapaWFSCN CapaWFS, string ValorResto,
+		//    bool PorCodigo = false, bool UsaCentro = false)
+		//{
+		//  CAreaWFSCN Area = (UsaCentro ? AreaCentroPunto(CapaWFS, Punto) :
+		//      AreaContenedoraPunto(CapaWFS, Punto));
+		//  if (Area == null && UsaCentro)
+		//  {
+		//    Area = AreaContenedoraPunto(CapaWFS, Punto);
+		//  }
+		//  return (Area == null ? ValorResto : (PorCodigo ? Area.Codigo : Area.Nombre));
+		//}
 
-    //public static CPuntoWFSCN PuntoMasCercano(CCapaWFSCN Capa, Point Punto, double Rango)
-    //{
-    //  double RangoRefe = Rango * 180 / (6378137.0 * Math.PI);
-    //  RangoRefe = RangoRefe * RangoRefe;
-    //  double DistMinima = 1000000000;
-    //  CPuntoWFSCN PuntoMasCercano = null;
-    //  foreach (CPuntoWFSCN PuntoWFS in Capa.Puntos)
-    //  {
-    //    double DistPunto = DistanciaCuadradaEntrePuntos(PuntoWFS.Punto, Punto);
-    //    if (DistPunto < DistMinima)
-    //    {
-    //      DistMinima = DistPunto;
-    //      PuntoMasCercano = PuntoWFS;
-    //    }
-    //  }
-    //  if (DistMinima <= RangoRefe)
-    //  {
-    //    return PuntoMasCercano;
-    //  }
-    //  else
-    //  {
-    //    return null;
-    //  }
-    //}
+		//public static CPuntoWFSCN PuntoMasCercano(CCapaWFSCN Capa, Point Punto, double Rango)
+		//{
+		//  double RangoRefe = Rango * 180 / (6378137.0 * Math.PI);
+		//  RangoRefe = RangoRefe * RangoRefe;
+		//  double DistMinima = 1000000000;
+		//  CPuntoWFSCN PuntoMasCercano = null;
+		//  foreach (CPuntoWFSCN PuntoWFS in Capa.Puntos)
+		//  {
+		//    double DistPunto = DistanciaCuadradaEntrePuntos(PuntoWFS.Punto, Punto);
+		//    if (DistPunto < DistMinima)
+		//    {
+		//      DistMinima = DistPunto;
+		//      PuntoMasCercano = PuntoWFS;
+		//    }
+		//  }
+		//  if (DistMinima <= RangoRefe)
+		//  {
+		//    return PuntoMasCercano;
+		//  }
+		//  else
+		//  {
+		//    return null;
+		//  }
+		//}
 
-    //public static string DeterminarPuntoMasCercano(Point Punto, CCapaWFSCN CapaWFS,
-    //    double Rango, string ValorResto, bool PorCodigo = false)
-    //{
-    //  CPuntoWFSCN PuntoWFS = PuntoMasCercano(CapaWFS, Punto, Rango);
-    //  return (PuntoWFS == null ? ValorResto : (PorCodigo ? PuntoWFS.Codigo : PuntoWFS.Nombre));
-    //}
+		//public static string DeterminarPuntoMasCercano(Point Punto, CCapaWFSCN CapaWFS,
+		//    double Rango, string ValorResto, bool PorCodigo = false)
+		//{
+		//  CPuntoWFSCN PuntoWFS = PuntoMasCercano(CapaWFS, Punto, Rango);
+		//  return (PuntoWFS == null ? ValorResto : (PorCodigo ? PuntoWFS.Codigo : PuntoWFS.Nombre));
+		//}
 
-    //public static string TextoPunto(Point Punto, CCapaWFSCN CapaWFS, double Rango,
-    //    string ValorResto, bool PorCodigo = false, bool UsaCentro = false)
-    //{
-    //  switch (CapaWFS.Elemento)
-    //  {
-    //    case ElementoWFS.Superficie:
-    //      return DeterminarAreaContenedora(Punto, CapaWFS, ValorResto, PorCodigo, UsaCentro);
-    //    case ElementoWFS.Punto:
-    //      return DeterminarPuntoMasCercano(Punto, CapaWFS, Rango, ValorResto, PorCodigo);
-    //    default:
-    //      return ValorResto;
-    //  }
-    //}
+		//public static string TextoPunto(Point Punto, CCapaWFSCN CapaWFS, double Rango,
+		//    string ValorResto, bool PorCodigo = false, bool UsaCentro = false)
+		//{
+		//  switch (CapaWFS.Elemento)
+		//  {
+		//    case ElementoWFS.Superficie:
+		//      return DeterminarAreaContenedora(Punto, CapaWFS, ValorResto, PorCodigo, UsaCentro);
+		//    case ElementoWFS.Punto:
+		//      return DeterminarPuntoMasCercano(Punto, CapaWFS, Rango, ValorResto, PorCodigo);
+		//    default:
+		//      return ValorResto;
+		//  }
+		//}
 
-    public const string ADENTRO = "SI";
+		public const string ADENTRO = "SI";
     public const string AFUERA = "NO";
 
     //public static List<string> ExtraerListaElementosWFS(CCapaWFSCN CapaWFS, bool PorCodigo = false)
