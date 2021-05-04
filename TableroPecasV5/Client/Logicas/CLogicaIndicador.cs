@@ -14,14 +14,14 @@ using TableroPecasV5.Shared;
 
 namespace TableroPecasV5.Client.Logicas
 {
-  public class CDetalleIndicador : ComponentBase, IDisposable
+  public class CLogicaIndicador : ComponentBase, IDisposable
   {
 
-    protected static CDetalleIndicador gPuntero = null;
+    protected static CLogicaIndicador gPuntero = null;
 
     private Int32 mCodigo = -1;
 
-    public static CDetalleIndicador gDetalle = null;
+    public static CLogicaIndicador gDetalle = null;
 
     public void FncResizeEvento(string Datos)
     {
@@ -474,8 +474,8 @@ namespace TableroPecasV5.Client.Logicas
     {
       get
       {
-        return Math.Max(180, Contenedores.CContenedorDatos.AltoPantallaIndicadores - 2 * Logicas.CDetalleIndicador.SEPARACION - 5 -
-        (Int32)Logicas.CDetalleIndicador.AltoTendenciaDefault);
+        return Math.Max(180, Contenedores.CContenedorDatos.AltoPantallaIndicadores - 2 * Logicas.CLogicaIndicador.SEPARACION - 5 -
+        (Int32)Logicas.CLogicaIndicador.AltoTendenciaDefault);
       }
     }
 
@@ -506,7 +506,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       if (Lnk.Ordenada < -998)
       {
-        Lnk.Ordenada = (Int32)Logicas.CDetalleIndicador.AltoTendenciaDefault + Logicas.CDetalleIndicador.SEPARACION + 5;
+        Lnk.Ordenada = (Int32)Logicas.CLogicaIndicador.AltoTendenciaDefault + Logicas.CLogicaIndicador.SEPARACION + 5;
       }
       return Lnk.Ordenada;
     }
@@ -1364,7 +1364,7 @@ namespace TableroPecasV5.Client.Logicas
       string Msg = "";
       try
       {
-        Logicas.CDetalleIndicador.Redimensionar(Nombre);
+        Logicas.CLogicaIndicador.Redimensionar(Nombre);
       }
       catch (Exception ex)
       {
@@ -1735,7 +1735,7 @@ namespace TableroPecasV5.Client.Logicas
       return Task.FromResult(Msg);
     }
 
-    public CDetalleIndicador()
+    public CLogicaIndicador()
     {
       CBaseGrafico.BordeSuperior = 0;
       gDetalle = this;

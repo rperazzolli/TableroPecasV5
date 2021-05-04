@@ -2,9 +2,12 @@
 
 
 <div style="position: absolute; width: 100%; height: 100%;">
+  @if (ComoComponenteBase)
+  {
   <div style="width: 100%; height: 28px; position: absolute;">
 
   </div>
+  }
   <div id="@Direccion" style="@EstiloMapaComponente">
     @if (!DatosCompletos)
     {
@@ -14,7 +17,7 @@
     {
       @if (SinDatos)
       {
-        <a>No hay datos disponibles</a>
+        <CAguardar/>
       }
       else
       {

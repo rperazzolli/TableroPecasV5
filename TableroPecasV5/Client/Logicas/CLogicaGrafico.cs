@@ -52,7 +52,7 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     [CascadingParameter]
-    Logicas.CDetalleIndicador Pagina { get; set; }
+    Logicas.CLogicaIndicador Pagina { get; set; }
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }

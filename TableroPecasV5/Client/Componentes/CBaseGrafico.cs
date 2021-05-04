@@ -60,7 +60,7 @@ namespace TableroPecasV5.Client.Componentes
     }
 
     [CascadingParameter]
-    public CDetalleIndicador Contenedor { get; set; }
+    public CLogicaIndicador Contenedor { get; set; }
 
     public void DeSeleccionar()
     {

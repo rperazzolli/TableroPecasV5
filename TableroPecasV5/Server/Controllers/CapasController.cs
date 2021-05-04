@@ -445,6 +445,13 @@ namespace TableroPecasV5.Server.Controllers
 					throw new Exception(Respuesta.MensajeError);
 				}
 
+				// provisorio.
+				foreach (WCFBPI.CAreaWFSCN Area in Respuesta.Capa.Areas)
+				{
+					Area.Codigo = CRutinas.LimitarTexto(Area.Codigo, 15);
+				}
+				// hasta acá.
+
 				Retorno.Capa = ProyectosController.CopiarCapaWFS(Respuesta.Capa);
 
 			}

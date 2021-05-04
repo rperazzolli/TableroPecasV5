@@ -37,7 +37,7 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     [CascadingParameter]
-    Logicas.CDetalleIndicador Pagina { get; set; }
+    Logicas.CLogicaIndicador Pagina { get; set; }
 
     public int AbscisaAbajo { get; set; }
     public int OrdenadaAbajo { get; set; }

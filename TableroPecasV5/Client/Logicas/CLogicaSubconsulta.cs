@@ -10,7 +10,7 @@ using TableroPecasV5.Client.Rutinas;
 
 namespace TableroPecasV5.Client.Logicas
 {
-	public class CLogicaSubconsulta : CDetalleIndicador
+	public class CLogicaSubconsulta : CLogicaIndicador
 	{
 
 		public static string gParametros = "";

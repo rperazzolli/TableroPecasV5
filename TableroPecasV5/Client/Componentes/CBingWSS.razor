@@ -15,7 +15,7 @@
         }
       }
     </Select>
-    <img src="~/Imagenes/mas.png"
+    <img src="Imagenes/mas.png"
          style="width: 21px; height: 21px; display: inline-block; margin-left: 5px;" @onclick="@EditarCapas" />
   </div>
   <div id="@Direccion" style="width: 100%; height: calc(100% - 35px);">
@@ -23,6 +23,23 @@
     {
       <CAguardar/>
     }
+    else
+			{
+        @if (HayCapa)
+				{
+          <CMapaGradiente @ref="MapaGradiente"
+                          CodigoElementoDimension="@CodigoElementoDimension"
+                          CodigoCapa="@CapaElegida"
+                          Direccion="@Direccion"
+                          Indicador="@Indicador"
+                          NivelFlotante="10"
+                          Proveedor="@ProveedorDatos"
+                          Abscisa="0"
+                          Ordenada="0"
+                          Ancho="@AnchoDisponible"
+                          Alto="@AltoDisponible"/>
+				}
+			}
   </div>
 
   @if (Editando)

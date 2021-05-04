@@ -32,7 +32,7 @@ namespace TableroPecasV5.Client.Logicas
     public event Rutinas.CRutinas.FncRefrescar AlAjustarVentanasFlotantes;
 
     [CascadingParameter]
-    Logicas.CDetalleIndicador Pagina { get; set; }
+    Logicas.CLogicaIndicador Pagina { get; set; }
 
     private Plantillas.CContenedorBlocks mBlocks = null;
 
@@ -96,9 +96,17 @@ namespace TableroPecasV5.Client.Logicas
       ModalTortasGIS.Show();
     }
 
+    [Inject]
+    public NavigationManager Navegador { get; set; }
+
     public void AbrirGISWSS()
     {
-      //
+      CLogicaBingWSS.gColumnas = Proveedor.Columnas;
+      CLogicaBingWSS.gLineas = Proveedor.DatosVigentes;
+      CLogicaBingWSS.gClaseElemento = Pagina.ClaseOrigen;
+      CLogicaBingWSS.gCodigoElemento = Pagina.Codigo;
+      CLogicaBingWSS.gCodigoElementoDimension = Pagina.CodigoElementoDimension;
+      Navegador.NavigateTo("PagBingWSS");
     }
 
     public CLogicaContenedorFiltros()
@@ -169,9 +177,6 @@ namespace TableroPecasV5.Client.Logicas
         ModalTortasGIS.Hide();
       }
     }
-
-    [Inject]
-    public NavigationManager Navegador { get; set; }
 
     public void AgregarPinsLL()
 		{
@@ -472,11 +477,11 @@ namespace TableroPecasV5.Client.Logicas
     private void PosicionarGrafico(ref CLinkGrafico Grafico)
     {
       // Ubicar la posicion de la tendencia.
-      int AbscisaMinima = (int)Logicas.CDetalleIndicador.AnchoTendenciasDefault + Logicas.CDetalleIndicador.ABSCISA_INI_TENDENCIAS +
-          Logicas.CDetalleIndicador.SEPARACION;
-      Grafico.Ancho = Contenedores.CContenedorDatos.AnchoPantallaIndicadores - Logicas.CDetalleIndicador.SEPARACION - AbscisaMinima;
+      int AbscisaMinima = (int)Logicas.CLogicaIndicador.AnchoTendenciasDefault + Logicas.CLogicaIndicador.ABSCISA_INI_TENDENCIAS +
+          Logicas.CLogicaIndicador.SEPARACION;
+      Grafico.Ancho = Contenedores.CContenedorDatos.AnchoPantallaIndicadores - Logicas.CLogicaIndicador.SEPARACION - AbscisaMinima;
       Grafico.Abscisa = (Grafico.Superior == null ? (AbscisaMinima - 25 * mGraficos.Count) : Grafico.Superior.Abscisa);
-      Grafico.Alto = Logicas.CDetalleIndicador.AltoTendenciaDefault;
+      Grafico.Alto = Logicas.CLogicaIndicador.AltoTendenciaDefault;
       Grafico.Ordenada = (Grafico.Superior == null ? (5 + 25 * mGraficos.Count) :
           (Int32)Math.Floor(Math.Min(Grafico.Superior.Ordenada + Grafico.Superior.Alto + SEP_FILTROS,
             Contenedores.CContenedorDatos.AltoPantalla - Grafico.Superior.Alto - SEP_FILTROS)));

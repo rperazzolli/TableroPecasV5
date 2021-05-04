@@ -31,8 +31,8 @@ namespace TableroPecasV5.Client.Logicas
 
     public CLogicaTendencias()
     {
-      Ancho = Logicas.CDetalleIndicador.AnchoTendenciasDefault;
-      Alto = Logicas.CDetalleIndicador.AltoTendenciaDefault;
+      Ancho = Logicas.CLogicaIndicador.AnchoTendenciasDefault;
+      Alto = Logicas.CLogicaIndicador.AltoTendenciaDefault;
       MesesTendencia = -1;
       AjustarDimensionesGrafico();
       Abscisa = 0;
@@ -580,7 +580,7 @@ namespace TableroPecasV5.Client.Logicas
     private List<CPunto> PuntosTendencia = null;
 
     [CascadingParameter]
-    Logicas.CDetalleIndicador Pagina { get; set; }
+    Logicas.CLogicaIndicador Pagina { get; set; }
 
     public void EventoMouseAbajo(Microsoft.AspNetCore.Components.Web.MouseEventArgs e)
     {

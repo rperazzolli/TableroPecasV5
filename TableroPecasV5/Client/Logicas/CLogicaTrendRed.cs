@@ -33,7 +33,7 @@ namespace TableroPecasV5.Client.Logicas
     public const double ALTO_TREND_RED = 180;
 
     [CascadingParameter]
-    public CDetalleIndicador Pagina { get; set; }
+    public CLogicaIndicador Pagina { get; set; }
 
     public CLogicaTrendRed()
     {

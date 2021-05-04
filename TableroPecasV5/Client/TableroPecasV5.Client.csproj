@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Componentes\CBingWSS.razor" />
     <Content Remove="Componentes\CColorPicker.razor" />
     <Content Remove="Componentes\Ejemplo.razor" />
     <Content Remove="Contenedores\CContenedorFiltros.razor" />

@@ -18,15 +18,17 @@ namespace TableroPecasV5.Client.Logicas
 	{
 		public static ClaseElemento gClaseElemento;
 		public static Int32 gCodigoElemento;
+		public static Int32 gCodigoElementoDimension = -1;
 		public static List<CColumnaBase> gColumnas;
 		public static List<CLineaComprimida> gLineas;
 		private static Int32 gCodigoPantalla = 0;
 
 		public ClaseElemento ClaseIndicador { get; set; }
 		public Int32 CodigoIndicador { get; set; }
+		public Int32 CodigoElementoDimension { get; set; }
 		public List<CColumnaBase> Columnas { get; set; }
 		public List<CLineaComprimida> Lineas { get; set; }
-		public bool Editando { get; set; } = false;
+		public bool Editando { get; set; }
 		public List<CCapaWSSCN> CapasWSS { get; set; }
 		public CLogicaDefinirCapaWSS DefinidorCapas { get; set; }
 		public bool EstaLeyendo { get; set; } = false;
@@ -34,26 +36,6 @@ namespace TableroPecasV5.Client.Logicas
 		private Int32 mCodigoPantalla;
 
 		private CCapaComodin mCapaComodin = null;
-
-		public CProveedorComprimido Proveedor { get; set; }
-
-		private void AcumularValor(ref List<CParValores> Lista, Int32 Pos, Int32 PosColDatos, Int32 Posicion)
-		{
-			switch (Proveedor.Columnas[PosColDatos].Clase)
-			{
-				case ClaseVariable.Entero:
-					Lista[Pos].ValorElemento += (Int32)Proveedor.Columnas[PosColDatos].Valores[Posicion];
-					break;
-				case ClaseVariable.Real:
-					Lista[Pos].ValorElemento += (double)Proveedor.Columnas[PosColDatos].Valores[Posicion];
-					break;
-				default:
-					Lista[Pos].ValorElemento++;
-					break;
-			}
-			Lista[Pos].Cantidad++;
-		}
-
 
 		private string mNombre0;
 		private Int32 mCodigo0;
@@ -111,10 +93,21 @@ namespace TableroPecasV5.Client.Logicas
 		public CColumnaBase ColumnaGeoreferencia { get; set; }
 		public CVinculoIndicadorCompletoCN Vinculador { get; set; }
 		public bool MostrarDialogoVinculador { get; set; } = false;
+		public CLogicaMapaGradiente MapaGradiente { get; set; }
+
+		public Int32 AnchoDisponible
+		{
+			get { return CContenedorDatos.AnchoPantalla - 45; }
+		}
+
+		public Int32 AltoDisponible
+		{
+			get { return CContenedorDatos.AltoPantalla - 45; }
+		}
 
 		private async Task VerificarVinculacionCompletaAsync()
 		{
-			ColumnaGeoreferencia = Proveedor.ColumnaNombre(mCapa.ColumnaGeoreferencia);
+			ColumnaGeoreferencia = mProveedor.ColumnaNombre(mCapa.ColumnaGeoreferencia);
 			if (ColumnaGeoreferencia == null)
 			{
 				throw new Exception("Falta columna " + mCapa.ColumnaGeoreferencia);
@@ -245,6 +238,24 @@ namespace TableroPecasV5.Client.Logicas
 			}
 		}
 
+		private CProveedorComprimido mProveedor = null;
+
+		public CProveedorComprimido ProveedorDatos
+		{
+			get
+			{
+				if (mProveedor == null)
+				{
+					mProveedor = new CProveedorComprimido(ClaseIndicador, CodigoIndicador)
+					{
+						Columnas = Columnas,
+						Datos = Lineas
+					};
+				}
+				return mProveedor;
+			}
+		}
+
 		private List<CDatosSC> mDatosSC;
 		private string mszFormula = "";
 
@@ -261,6 +272,14 @@ namespace TableroPecasV5.Client.Logicas
 
 		}
 
+		public CDatoIndicador Indicador
+		{
+			get
+			{
+				return (CodigoIndicador < 0 ? null : CContenedorDatos.IndicadorDesdeCodigo(CodigoIndicador));
+			}
+		}
+
 		public string Direccion
 		{
 			get { return "BING_CAPA_WSS_" + mCodigoPantalla.ToString(); }
@@ -269,6 +288,13 @@ namespace TableroPecasV5.Client.Logicas
 		private Int32 mCodigoCapaElegida = -1;
 		private CCapaWSSCN mCapa = null;
 		private CCapaWSSCN mCapaDibujada = null;
+
+		public CCapaWSSCN CapaWSS
+		{
+			get { return mCapa; }
+		}
+
+		public bool HayCapa { get; set; } = false;
 
 		public Int32 CapaElegida
 		{
@@ -281,9 +307,17 @@ namespace TableroPecasV5.Client.Logicas
 					mCapa = (from C in CapasWSS
 									 where C.Codigo == mCodigoCapaElegida
 									 select C).FirstOrDefault();
+					HayCapa = (mCapa != null);
 					StateHasChanged();
 				}
 			}
+		}
+
+		public void FncCerrarEditor ()
+		{
+			Editando = false;
+			CapasWSS = DefinidorCapas.ListaCapas;
+			StateHasChanged();
 		}
 
 		public void EditarCapas()
@@ -294,9 +328,11 @@ namespace TableroPecasV5.Client.Logicas
 
 		protected override Task OnInitializedAsync()
 		{
+			Editando = false;
 			mCodigoPantalla = gCodigoPantalla++;
 			ClaseIndicador = gClaseElemento;
 			CodigoIndicador = gCodigoElemento;
+			CodigoElementoDimension = gCodigoElementoDimension;
 			Columnas = gColumnas;
 			Lineas = gLineas;
 			return base.OnInitializedAsync();
@@ -666,9 +702,9 @@ namespace TableroPecasV5.Client.Logicas
 		private void CentrarElMapa()
 		{
 			double LatMax = double.MinValue;
-			double LatMin = double.MinValue;
+			double LatMin = double.MaxValue;
 			double LngMax = double.MinValue;
-			double LngMin = double.MinValue;
+			double LngMin = double.MaxValue;
 			foreach (Posicion Posicion in mValores.Keys)
 			{
 				LatMin = Math.Min(LatMin, Posicion.Ordenada);
@@ -692,50 +728,65 @@ namespace TableroPecasV5.Client.Logicas
 
 		private async Task CargarDatosAsociadosCapaAsync()
 		{
-			if (mPosicionBingMaps >= 0)
+			try
 			{
-				await CRutinas.LimpiarContenidoMapaAsync(JSRuntime, mPosicionBingMaps);
-			}
-
-			if (mCapaWFS == null || mCapaWFS.Codigo != mCapa.CapaWFS)
-			{
-				RespuestaCapaWFS RespCapa = await CContenedorDatos.LeerCapaWFSAsync(Http, mCapa.CapaWFS, false);
-				if (RespCapa != null && RespCapa.RespuestaOK)
+				if (mPosicionBingMaps >= 0)
 				{
-					mCapaWFS = RespCapa.Capa;
+					await CRutinas.LimpiarContenidoMapaAsync(JSRuntime, mPosicionBingMaps);
 				}
-			}
 
-			if (mCapa.Modo == ModoGeoreferenciar.Vinculo &&
-				(mVinculo == null || mVinculo.Vinculo.Codigo != mCapa.Vinculo))
+				if (mCapa == null)
+				{
+					StateHasChanged();
+					return;
+				}
+
+				if (mCapaWFS == null || mCapaWFS.Codigo != mCapa.CapaWFS)
+				{
+					RespuestaCapaWFS RespCapa = await CContenedorDatos.LeerCapaWFSAsync(Http, mCapa.CapaWFS, false);
+					if (RespCapa != null && RespCapa.RespuestaOK)
+					{
+						mCapaWFS = RespCapa.Capa;
+					}
+				}
+
+				if (mCapa.Modo == ModoGeoreferenciar.Vinculo &&
+					(mVinculo == null || mVinculo.Vinculo.Codigo != mCapa.Vinculo))
+				{
+					mVinculo = await CContenedorDatos.LeerVinculoAsync(Http, ClaseIndicador, CodigoIndicador, mCapa.ColumnaGeoreferencia);
+				}
+
+				mValores = new Dictionary<Posicion, List<double>>();
+
+				switch (mVinculo.Vinculo.ClaseVinculada)
+				{
+					case ClaseVinculo.ColumnasGIS:
+						DeterminarValoresPorCoordenadas();
+						break;
+					default:
+						await DeterminarValoresPorVinculoAsync();
+						break;
+				}
+
+				UbicarEnLosElementos();
+
+				CrearReferencias();
+
+				AjustarColoresPares();
+
+				CentrarElMapa();
+
+				CrearCapaComodin();
+
+				mbRedibujarDatos = true;
+
+			  StateHasChanged();
+
+			}
+			catch (Exception ex)
 			{
-				mVinculo = await CContenedorDatos.LeerVinculoAsync(Http, ClaseIndicador, CodigoIndicador, mCapa.ColumnaGeoreferencia);
+				CRutinas.DesplegarMsg(ex);
 			}
-
-			switch (mVinculo.Vinculo.ClaseVinculada)
-			{
-				case ClaseVinculo.ColumnasGIS:
-					DeterminarValoresPorCoordenadas();
-					break;
-				default:
-					await DeterminarValoresPorVinculoAsync();
-					break;
-			}
-
-			UbicarEnLosElementos();
-
-			CrearReferencias();
-
-			AjustarColoresPares();
-
-			CentrarElMapa();
-
-			CrearCapaComodin();
-
-			mbRedibujarDatos = true;
-
-			StateHasChanged();
-
 		}
 
 		private Posicion UbicarPosicionEnCapaVinculo(string Codigo)
@@ -799,12 +850,12 @@ namespace TableroPecasV5.Client.Logicas
 				}
 			}
 
-			CColumnaBase ColumnaVinculo = (CColumnaReal)(from C in Columnas
-																									 where C.Nombre == mCapa.ColumnaGeoreferencia
-																									 select C).FirstOrDefault();
-			CColumnaBase ColumnaValor = (CColumnaReal)(from C in Columnas
-																								 where C.Nombre == mCapa.ColumnaValor
-																								 select C).FirstOrDefault();
+			CColumnaBase ColumnaVinculo = (from C in Columnas
+																		 where C.Nombre.Equals(mCapa.ColumnaGeoreferencia, StringComparison.InvariantCultureIgnoreCase)
+																		 select C).FirstOrDefault();
+			CColumnaBase ColumnaValor = (from C in Columnas
+																	 where C.Nombre == mCapa.ColumnaValor
+																	 select C).FirstOrDefault();
 			foreach (CLineaComprimida Linea in Lineas)
 			{
 				Posicion Posicion = null;
@@ -846,6 +897,7 @@ namespace TableroPecasV5.Client.Logicas
 			}
 			else
 			{
+				ValorPunto = new List<double>();
 				ValorPunto.Add(Valor);
 				ValorPunto.Add(1);
 				mValores.Add(Posicion, ValorPunto);
@@ -864,8 +916,6 @@ namespace TableroPecasV5.Client.Logicas
 			CColumnaBase ColumnaValor = (CColumnaReal)(from C in Columnas
 																								 where C.Nombre == mCapa.ColumnaValor
 																								 select C).FirstOrDefault();
-
-			mValores = new Dictionary<Posicion, List<double>>();
 
 			if (ColumnaAbsc != null && ColumnaOrd != null && ColumnaValor != null) {
 				foreach (CLineaComprimida Linea in Lineas)
@@ -1054,41 +1104,43 @@ namespace TableroPecasV5.Client.Logicas
 		{
 			try
 			{
-				if (mCapa != mCapaDibujada)
-				{
-					mCapaDibujada = mCapa;
-					_ = CargarDatosAsociadosCapaAsync();
-				}
+//				if (mCapa != mCapaDibujada)
+//				{
+//					mCapaDibujada = mCapa;
+//					_ = CargarDatosAsociadosCapaAsync();
+//				}
 
-				if (mPosicionBingMaps < 0 && mNivelZoom > 0)
-				{
+//				if (mPosicionBingMaps < 0 && mNivelZoom > 0)
+//				{
 
-					object[] Args = new object[7];
-					Args[0] = mPosicionBingMaps;
-					Args[1] = '#' + Direccion; // mProyecto.LatCentro;
-					Args[2] = mLatCentro;
-					Args[3] = mLngCentro;
-					Args[4] = mNivelZoom;
-					Args[5] = false;
-					Args[6] = false;
-					try
-					{
-						string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
-						//gAlHacerViewChange = FncProcesarViewChange;
-						//gAlHacerClick = FncProcesarClick;
-						mPosicionBingMaps = Int32.Parse(PosLocal);
-					}
-					catch (Exception ex)
-					{
-						CRutinas.DesplegarMsg(ex);
-					}
-				}
+//					object[] Args = new object[7];
+//					Args[0] = mPosicionBingMaps;
+//					Args[1] = '#' + Direccion; // mProyecto.LatCentro;
+//					Args[2] = mLatCentro;
+//					Args[3] = mLngCentro;
+//					Args[4] = mNivelZoom;
+//					Args[5] = false;
+//					Args[6] = false;
+//					try
+//					{
+//						string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
+//						//gAlHacerViewChange = FncProcesarViewChange;
+//						//gAlHacerClick = FncProcesarClick;
+//						mPosicionBingMaps = Int32.Parse(PosLocal);
+//					}
+//					catch (Exception ex)
+//					{
+//						CRutinas.DesplegarMsg(ex);
+//					}
+//				}
 
-				if (mPosicionBingMaps >= 0 && mbRedibujarDatos)
-				{
-					mbRedibujarDatos = false;
-					await RedibujarMapaAsync();
-				}
+//				if (mPosicionBingMaps >= 0 && mbRedibujarDatos)
+//				{
+//					mbRedibujarDatos = false;
+//					HayCapa = true;
+//					StateHasChanged();
+////					await RedibujarMapaAsync();
+//				}
 
 			}
 			catch (Exception ex)
@@ -1129,6 +1181,11 @@ namespace TableroPecasV5.Client.Logicas
 			{
 				throw new Exception("No es ValorPosicion");
 			}
+		}
+
+		public override int GetHashCode()
+		{
+			return (Int32)Math.Floor(Abscisa + Ordenada);
 		}
 
 		bool IEquatable<Posicion>.Equals(Posicion Otro)

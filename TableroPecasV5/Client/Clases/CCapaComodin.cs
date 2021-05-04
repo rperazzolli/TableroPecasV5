@@ -298,10 +298,20 @@ namespace TableroPecasV5.Client.Clases
         if (Par != null)
         {
           string ColorArea = ColorDesdePar(Par);
-          foreach (CAreaWFSCN Area in ListarSubAreas(MacroArea))
+          List<CAreaWFSCN> Areas = ListarSubAreas(MacroArea);
+          CAreaWFSCN AreaCentro = (from A in Areas
+                                   where A.Centro != null
+                                   select A).FirstOrDefault();
+          foreach (CAreaWFSCN Area in Areas)
           {
-            await DibujarAreaColorAsync(JSRuntime, Area, ColorArea, Posicion, CRutinas.ValorATexto(Par.ValorElemento));
+            if (Area != AreaCentro)
+            {
+              await DibujarAreaColorAsync(JSRuntime, Area, ColorArea, Posicion,
+                  CRutinas.ValorATexto(Par.ValorElemento), false);
+            }
           }
+          await DibujarAreaColorAsync(JSRuntime, AreaCentro, ColorArea, Posicion,
+              CRutinas.ValorATexto(Par.ValorElemento), true);
         }
       }
     }
@@ -401,11 +411,23 @@ namespace TableroPecasV5.Client.Clases
     {
       foreach (CAreaWFSCN Area in CapaWFS.Areas)
       {
-        await DibujarAreaColorAsync(JSRuntime, Area, "lightblue", Posicion);
+        List<CAreaWFSCN> Areas = ListarSubAreas(Area);
+        CAreaWFSCN AreaCentro = (from A in Areas
+                                 where A.Centro != null
+                                 select A).FirstOrDefault();
+        foreach (CAreaWFSCN SubArea in Areas)
+        {
+          if (SubArea != AreaCentro)
+          {
+            await DibujarAreaColorAsync(JSRuntime, Area, "lightblue", Posicion, "", false);
+          }
+        }
+        await DibujarAreaColorAsync(JSRuntime, AreaCentro, "lightblue", Posicion, "", true);
       }
     }
 
-    private async Task DibujarAreaColorAsync(IJSRuntime JSRuntime, CAreaWFSCN Area, string Color, Int32 Posicion, string Valor = "")
+    private async Task DibujarAreaColorAsync(IJSRuntime JSRuntime, CAreaWFSCN Area, string Color, 
+      Int32 Posicion, string Valor = "", bool bPrimera = true)
     {
       if (Area.Contorno != null && Area.Contorno.Count > 1)
       {
@@ -422,8 +444,8 @@ namespace TableroPecasV5.Client.Clases
         Args[0] = Posicion;
         Args[1] = Abscisas;
         Args[2] = Ordenadas;
-        Args[3] = (Area.Centro == null ? -1000 : Area.Centro.X);
-        Args[4] = (Area.Centro == null ? -1000 : Area.Centro.Y);
+        Args[3] = (Area.Centro == null || !bPrimera ? -1000 : Area.Centro.X);
+        Args[4] = (Area.Centro == null || !bPrimera ? -1000 : Area.Centro.Y);
         Args[5] = Color;
         Args[6] = Area.Nombre;
         Args[7] = Valor;

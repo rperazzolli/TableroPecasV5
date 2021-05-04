@@ -10,6 +10,12 @@ namespace TableroPecasV5.Server.Rutinas
 {
   public static class CRutinas
   {
+
+    public static string LimitarTexto(string Texto, Int32 LargoMax)
+		{
+      return (Texto.Length <= LargoMax ? Texto : Texto.Substring(Texto.Length - LargoMax));
+		}
+
     private static BasicHttpBinding ObtenerBND()
     {
       Int32 LimiteMaximo = 1000 * (Int32)Math.Pow(2, 16);

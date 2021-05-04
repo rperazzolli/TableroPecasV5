@@ -15,6 +15,19 @@ namespace TableroPecasV5.Client.Logicas
 	public class CLogicaDefinirCapaWSS : ComponentBase
 	{
 
+		public CLogicaDefinirCapaWSS()
+		{
+			if (Columnas != null)
+			{
+				return;
+			}
+		}
+
+		public delegate void FncCerrar();
+
+		[Parameter]
+		public FncCerrar AlCerrar { get; set; } = null;
+
 		[Parameter]
 		public List<CColumnaBase> Columnas { get; set; } = null;
 
@@ -34,7 +47,10 @@ namespace TableroPecasV5.Client.Logicas
 		public void CerrarMsg()
 		{
 			HayMensaje = false;
-			StateHasChanged();
+			if (AlCerrar != null)
+			{
+				AlCerrar();
+			}
 		}
 
 		public Int32 ModoCalculo
@@ -54,7 +70,10 @@ namespace TableroPecasV5.Client.Logicas
 
 		public void Cerrar()
 		{
-			//
+			if (AlCerrar != null)
+			{
+				AlCerrar();
+			}
 		}
 
 		public string EstiloCapa(CCapaWSSCN Capa)
@@ -72,6 +91,17 @@ namespace TableroPecasV5.Client.Logicas
 				if (mCapaSeleccionada != value)
 				{
 					mCapaSeleccionada = value;
+					if (mCapaSeleccionada == null)
+					{
+						ColorSeleccionado = "";
+					}
+					else
+					{
+						ColorSeleccionado =  "#" + mCapaSeleccionada.ColorCompuestoR.ToString("X2") +
+							mCapaSeleccionada.ColorCompuestoG.ToString("X2") +
+				      mCapaSeleccionada.ColorCompuestoB.ToString("X2");
+
+					}
 					NoSeleccionado = (mCapaSeleccionada == null);
 				}
 			}
@@ -254,7 +284,7 @@ namespace TableroPecasV5.Client.Logicas
 		{
 			get
 			{
-				return "width: 100%; height: 40px; text-align: right; position: relative; margin-top: 5px;";
+				return "width: calc(100% - 10px); height: 40px; text-align: right; position: relative; margin-top: 5px; margin-left: 5px;";
 			}
 		}
 
@@ -507,7 +537,7 @@ namespace TableroPecasV5.Client.Logicas
 			{
 				HayMensaje = false;
 				StateHasChanged();
-				string RespVal = await CContenedorDatos.VerificarBaseDatosAsync(Http);
+				//string RespVal = await CContenedorDatos.VerificarBaseDatosAsync(Http);
 				Int32 Codigo = await CContenedorDatos.RegistrarCapaWSSAsync(Http, mCapaSeleccionada);
 				if (Codigo > 0)
 				{

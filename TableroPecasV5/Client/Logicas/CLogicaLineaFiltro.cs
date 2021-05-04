@@ -10,7 +10,7 @@ namespace TableroPecasV5.Client.Logicas
 	{
 
 		[CascadingParameter]
-		Logicas.CDetalleIndicador Pagina { get; set; }
+		Logicas.CLogicaIndicador Pagina { get; set; }
 
 		[CascadingParameter]
 		Plantillas.CContenedorBlocks Blocks { get; set; }

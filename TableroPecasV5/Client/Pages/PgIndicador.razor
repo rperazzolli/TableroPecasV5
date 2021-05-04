@@ -2,7 +2,7 @@
 @using System.Threading.Tasks;
 @using TableroPecasV5.Shared;
 @using TableroPecasV5.Client.Componentes 
-@inherits TableroPecasV5.Client.Logicas.CDetalleIndicador
+@inherits TableroPecasV5.Client.Logicas.CLogicaIndicador
 @inject IJSRuntime JSRuntime
 
 <div id="BASE_INDICADOR" style="background-color: #f8f9fa; overflow: auto; position: relative; width: 100%; height: calc(100vh - 0px);"
@@ -195,15 +195,6 @@
                                                                    Abscisa="@AbscisaTendencia" Ordenada="@OrdenadaTendencia"
                                                                    Indicador="@Indicador" CodigoUnico="@Codigo"
                                                                    Alarmas="@ComponenteReloj.Alarmas"/>
-      </div>
-    }
-
-    @if (ComponenteFiltros != null && ComponenteFiltros.Proveedor != null)
-    {
-      <div style="width: 100%; position: absolute; height: 100%; z-index: 90;">
-        <CDefinirCapaWSS ClaseIndicador="ClaseElemento.Indicador"
-                         Indicador="@ComponenteFiltros.Indicador.Codigo"
-                         Columnas="@ComponenteFiltros.Proveedor.Columnas" />
       </div>
     }
 

@@ -9,16 +9,10 @@ namespace TableroPecasV5.Client.Logicas
 	public class CLogicaAguardar : ComponentBase
 	{
 		[Parameter]
-		public Int32 Abscisa { get; set; }
+		public Int32 Abscisa { get; set; } = 0;
 
 		[Parameter]
-		public Int32 Ordenada { get; set; }
-
-		[Parameter]
-		public double Ancho { get; set; }
-
-		[Parameter]
-		public double Alto { get; set; }
+		public Int32 Ordenada { get; set; } = 0;
 
 		public string Estilo()
 		{

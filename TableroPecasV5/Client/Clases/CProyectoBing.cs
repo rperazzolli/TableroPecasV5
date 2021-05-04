@@ -195,30 +195,13 @@ namespace TableroPecasV5.Client.Clases
           LngMax = Math.Max(LngMax, Preg.Abscisa);
         }
 
+        NivelZoom = CRutinas.UbicarNivelZoom(
+          (AnchoRefe < 0 ? Contenedores.CContenedorDatos.AnchoPantalla - 40 : AnchoRefe),
+          (AltoRefe < 0 ? Contenedores.CContenedorDatos.AltoPantalla - 40 : AltoRefe),
+          LngMax - LngMin, LatMax - LatMin);
+
         LatCentro = (LatMin + LatMax) / 2;
         LngCentro = (LngMin + LngMax) / 2;
-
-        double Relacion1 = (LatMax - LatMin) * 650 / AltoRefe;
-        double Relacion2 = (LngMax - LngMin) * 1280 / AnchoRefe;
-        double Salto = Math.Max(Relacion1, Relacion2);
-        if (Salto == 0)
-        {
-          NivelZoom = 10;
-        }
-        else
-        {
-          Salto *= Math.Pow(2, 7);
-          for (Int32 i = 15; i > 1; i--)
-          {
-            if (Salto < 1.5)
-            {
-              NivelZoom = i;
-              return;
-            }
-            Salto /= 2;
-          }
-          NivelZoom = 1;
-        }
 
       }
     }

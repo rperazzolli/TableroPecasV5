@@ -1,5 +1,82 @@
-﻿<h3>PgBingWSS</h3>
+﻿@page "/PagBingWSS"
+@using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Componentes
+@inherits Logicas.CLogicaBingWSS
 
-@code {
+<div style="width: 100%; height: 100%; position: relative;">
+  <div style="width: 100%; height: 32px; background: lightgray;">
+    <label style="margin-left: 10px; display: inline-block;">Capas definidas</label>
+    <Select Style="width: 250px; display: inline-block; margin-left: 5px;" TValue="int" @bind-SelectedValue="@CapaElegida">
+      <SelectItem TValue="int" Value="-1">Ninguna</SelectItem>
+      @if (CapasWSS != null)
+      {
+        @foreach (CCapaWSSCN Capa in CapasWSS)
+        {
+          <SelectItem TValue="int" Value="@Capa.Codigo">@Capa.Nombre</SelectItem>
+        }
+      }
+    </Select>
+    <img src="Imagenes/mas.png"
+         style="width: 21px; height: 21px; display: inline-block; margin-left: 5px;" @onclick="@EditarCapas" />
+  </div>
+  <div id="@Direccion" style="width: 100%; height: calc(100% - 35px); background: red;">
+    @if (EstaLeyendo)
+    {
+      <div style="width: 100%; height: 100%; position: absolute;">
+        <CAguardar Abscisa="0"
+                   Ordenada="0"/>
+      </div>
+    }
+    else
+    {
+      @if (HayCapa)
+      {
+        <div style="width: 100%; height: 100%; position: absolute; margin: 0px;">
+          <CMapaGradiente @ref="MapaGradiente"
+                          CodigoElementoDimension="@CodigoElementoDimension"
+                          CodigoCapa="@CapaElegida"
+                          Direccion="@Direccion"
+                          Indicador="@Indicador"
+                          NivelFlotante="10"
+                          Proveedor="@ProveedorDatos"
+                          Abscisa="0"
+                          Ordenada="0"
+                          Ancho="-1"
+                          Alto="-1"
+                          Capa="@CapaWSS"
+                          ComoComponente="false"/>
+        </div>
+      }
+    }
 
-}
+    @if (Editando)
+    {
+      <div style="width: 100%; height: 100%; position: absolute;">
+        <CascadingValue Value="this">
+          <div style="width: 100%; height: 100%; position: absolute; margin-top: 0px; z-index: 20;">
+            <CDefinirCapaWSS @ref="DefinidorCapas"
+                             ClaseIndicador="@ClaseIndicador"
+                             Indicador="@CodigoIndicador"
+                             Columnas="@Columnas"
+                             ListaCapas="@CapasWSS"
+                             AlCerrar="@FncCerrarEditor" />
+          </div>
+        </CascadingValue>
+      </div>
+    }
+    @if (MostrarDialogoVinculador)
+    {
+      <div style="width: 100%; height: 100%; position: absolute;">
+        <CascadingValue Value="this">
+          <CVinculadorWFS ClaseIndicador="@ClaseIndicador"
+                          ColumnaVinculo="@ColumnaGeoreferencia"
+                          Indicador="@CodigoIndicador"
+                          AlResponder="@FncRespuesta" />
+        </CascadingValue>
+      </div>
+    }
+  </div>
+
+
+</div>
+
