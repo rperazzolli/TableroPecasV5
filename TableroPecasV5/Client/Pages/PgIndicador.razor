@@ -37,9 +37,7 @@
     @if (HayAlarmaReducida)
     {
       <div class="Centrada" style="background: white; display: inline; float: none; text-align: center; margin-top: 10px;">
-        <button class="Boton20" @onclick="@CrearFiltroDatosAsync">
-          <img src="Imagenes/Detalle.png" />
-        </button>
+        <img class="Img20" src="Imagenes/Detalle.png" @onclick="@CrearFiltroDatosAsync"/>
         <button class="Boton20">
           <img src="Imagenes/Comentario.png" />
         </button>
@@ -104,7 +102,8 @@
               <TableroPecasV5.Client.Componentes.FiltroTextos @ref="Link.Componente" NivelFlotante="@Link.NivelFlotante"
                                                               Ancho="@Link.Ancho" Alto="@AltoFiltro" Abscisa="@Link.Abscisa"
                                                               Ordenada="@Link.Ordenada"
-                                                              CodigoUnico="@Link.PosicionUnica" />
+                                                              CodigoUnico="@Link.PosicionUnica"
+                                                              Link="@Link"/>
             </div>
           }
         }

@@ -157,6 +157,13 @@ button.Boton20 {
   vertical-align: top;
 }
 
+img.Img20 {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: inline;
+}
+
 .Img20 {
   width: 20px;
   height: 20px;
@@ -311,6 +318,7 @@ button.EnSubMenu {
   margin-left: 20px;
   margin-top: 2px;
   font-size: 11px;
+  font-family: sans-serif;
   text-align: left;
   display: inline-block;
   padding-top: 0px;

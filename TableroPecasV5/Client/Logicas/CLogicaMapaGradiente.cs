@@ -42,7 +42,14 @@ namespace TableroPecasV5.Client.Logicas
     public Int32 CodigoCapa
     {
       get { return CodigoCapaBase; }
-      set { CodigoCapaBase = value; }
+      set
+      {
+        if (value != CodigoCapaBase && value > 0)
+        {
+          DatosCompletos = false;
+        }
+        CodigoCapaBase = value;
+      }
     }
 
     [Parameter]
@@ -115,7 +122,14 @@ namespace TableroPecasV5.Client.Logicas
     public CCapaWSSCN Capa
     {
       get { return mCapa; }
-      set { mCapa = value; }
+      set
+      {
+        if (mCapa != value && value != null)
+        {
+          DatosCompletos = false;
+        }
+        mCapa = value;
+      }
     }
 
     [Parameter]

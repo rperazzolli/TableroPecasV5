@@ -513,15 +513,16 @@ namespace TableroPecasV5.Client.Logicas
 
     public string EstiloFiltro(CLinkFiltros Lnk)
     {
-      Int32 AnchoLocal = Math.Max(185, (from L in ComponenteFiltros.Links
-                                        where L.PosicionUnica == Lnk.PosicionUnica
-                                        select L.Ancho).FirstOrDefault());
+      Int32 AnchoLocal = Math.Max(Lnk.Ancho, Math.Max(185, (from L in ComponenteFiltros.Links
+                                                            where L.PosicionUnica == Lnk.PosicionUnica
+                                                            select L.Ancho).FirstOrDefault()));
 
       return "width: " + AnchoLocal.ToString() + "px; height: " +
         AltoFiltro.ToString() +
         "px; margin-left: " + AbscisaFiltro(Lnk).ToString() +
         "px; margin-top: " + OrdenadaFiltro(Lnk).ToString() +
-        "px; position: absolute; text-align: center; z-index: " + Lnk.NivelFlotante.ToString() + ";";
+        "px; position: absolute; text-align: center; z-index: " + Lnk.NivelFlotante.ToString() +
+        "; resize: horizontal; overflow: hidden;";
     }
 
     public string EstiloGrafico(CLinkGrafico Lnk)
@@ -1268,10 +1269,20 @@ namespace TableroPecasV5.Client.Logicas
 
     public void IniciarDragFiltro(CLinkFiltros Filtro)
     {
+      CambioMedidas(Filtro);
       mFiltroDrag = Filtro;
       mLineaDrag = null;
       mGrillaDrag = null;
       mGraficoDrag = null;
+    }
+
+    public async void CambioMedidas(CLinkFiltros Filtro)
+    {
+      object[] Args = new object[1];
+      Args[0] = IdFiltro(Filtro);
+      string Dimensiones = await JSRuntime.InvokeAsync<string>("FuncionesJS.getRectangulo", Args);
+      List<double> Valores = CRutinas.ListaAReales(Dimensiones);
+      Filtro.Ancho = (Int32)Valores[2];
     }
 
     public void IniciarDragLinea(LineaFiltro Linea)

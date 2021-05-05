@@ -19,34 +19,27 @@
     <img src="Imagenes/mas.png"
          style="width: 21px; height: 21px; display: inline-block; margin-left: 5px;" @onclick="@EditarCapas" />
   </div>
-  <div id="@Direccion" style="width: 100%; height: calc(100% - 35px); background: red;">
+  <div id="@Direccion" style="width: 100%; height: calc(100% - 35px); background: white;">
+    <div style="width: 100%; height: 100%; position: absolute; margin: 0px;">
+      <CMapaGradiente @ref="MapaGradiente"
+                      CodigoElementoDimension="@CodigoElementoDimension"
+                      Direccion="@Direccion"
+                      Indicador="@Indicador"
+                      NivelFlotante="10"
+                      Proveedor="@ProveedorDatos"
+                      Abscisa="0"
+                      Ordenada="0"
+                      Ancho="-1"
+                      Alto="-1"
+                      Capa="@CapaWSS"
+                      ComoComponente="false" />
+    </div>
     @if (EstaLeyendo)
     {
       <div style="width: 100%; height: 100%; position: absolute;">
         <CAguardar Abscisa="0"
-                   Ordenada="0"/>
+                   Ordenada="0" />
       </div>
-    }
-    else
-    {
-      @if (HayCapa)
-      {
-        <div style="width: 100%; height: 100%; position: absolute; margin: 0px;">
-          <CMapaGradiente @ref="MapaGradiente"
-                          CodigoElementoDimension="@CodigoElementoDimension"
-                          CodigoCapa="@CapaElegida"
-                          Direccion="@Direccion"
-                          Indicador="@Indicador"
-                          NivelFlotante="10"
-                          Proveedor="@ProveedorDatos"
-                          Abscisa="0"
-                          Ordenada="0"
-                          Ancho="-1"
-                          Alto="-1"
-                          Capa="@CapaWSS"
-                          ComoComponente="false"/>
-        </div>
-      }
     }
 
     @if (Editando)

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Blazor.Extensions.Canvas;
 using System.Net.Http;
 using System.Net.Http.Json;
+using Microsoft.JSInterop;
 using Blazor.Extensions.Canvas.Canvas2D;
 using Blazor.Extensions.Canvas.Model;
 using TableroPecasV5.Client.Clases;
@@ -80,6 +81,47 @@ namespace TableroPecasV5.Client.Rutinas
       Dias = 2,
       Meses = 3,
       Anios = 4
+    }
+
+    private static Dictionary<string, double> gDimensionesTexto = new Dictionary<string, double>();
+
+    private static object OBJ_LOCK = new object();
+
+    public static async Task AsegurarDimensionFuenteAsync(IJSRuntime JSRuntime, string Fuente, Int32 Alto)
+    {
+      string Texto = Fuente + " " + Alto.ToString();
+      double Valor;
+      if (!gDimensionesTexto.TryGetValue(Texto, out Valor))
+      {
+        object[] Args = new object[3];
+        Args[0] = Alto;
+        Args[1] = Fuente;
+        Args[2] = 1;
+        Valor = await JSRuntime.InvokeAsync<double>("FuncionesJS.ObtenerDimensiones", Args);
+        try
+        {
+          gDimensionesTexto.Add(Texto, Valor);
+        }
+        catch (Exception ex)
+        {
+          CRutinas.DesplegarMsg(ex);
+        }
+      }
+    }
+
+      public static double TamanioLetraMedia(string Fuente, Int32 Alto)
+    {
+      string Texto = Fuente + " " + Alto.ToString();
+      double Valor;
+      if (gDimensionesTexto.TryGetValue(Texto, out Valor))
+      {
+        return Valor;
+      }
+      else
+			{
+        return 8;
+			}
+
     }
 
     public static double DistanciaEntrePuntos2(CPosicionWFSCN P1, CPosicionWFSCN P2)

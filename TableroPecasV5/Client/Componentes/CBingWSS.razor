@@ -2,10 +2,10 @@
 @using TableroPecasV5.Client.Componentes
 @inherits Logicas.CLogicaBingWSS
 
-<div style="width: 100%; height: 100%; position: relative;">
+<div style="width: 100%; height: 100%; position: relative; overflow: hidden;">
   <div style="width: 100%; height: 28px; background: lightgray;">
     <label style="margin-left: 10px; display: inline-block;">Capas definidas</label>
-    <Select Style="width: 250px; display: inline-block; margin-left: 5px;" TValue="int" @bind-SelectedValue="@CapaElegida">
+    <Select Style="width: 250px; display: inline-block; margin-left: 5px;" disabled="@EstaLeyendo" TValue="int" @bind-SelectedValue="@CapaElegida">
       <SelectItem TValue="int" Value="-1">Ninguna</SelectItem>
       @if (CapasWSS != null)
       {
@@ -18,28 +18,24 @@
     <img src="Imagenes/mas.png"
          style="width: 21px; height: 21px; display: inline-block; margin-left: 5px;" @onclick="@EditarCapas" />
   </div>
-  <div id="@Direccion" style="width: 100%; height: calc(100% - 35px);">
-    @if (EstaLeyendo)
+  <div id="@Direccion" style="width: 100%; height: calc(100% - 28px);">
+    <CMapaGradiente @ref="MapaGradiente"
+                    CodigoElementoDimension="@CodigoElementoDimension"
+                    Capa="@CapaWSS"
+                    Direccion="@Direccion"
+                    Indicador="@Indicador"
+                    NivelFlotante="10"
+                    Proveedor="@ProveedorDatos"
+                    Abscisa="0"
+                    Ordenada="0"
+                    Ancho="@AnchoDisponible"
+                    Alto="@AltoDisponible" />
+    @*@if (EstaLeyendo)
     {
-      <CAguardar/>
-    }
-    else
-			{
-        @if (HayCapa)
-				{
-          <CMapaGradiente @ref="MapaGradiente"
-                          CodigoElementoDimension="@CodigoElementoDimension"
-                          CodigoCapa="@CapaElegida"
-                          Direccion="@Direccion"
-                          Indicador="@Indicador"
-                          NivelFlotante="10"
-                          Proveedor="@ProveedorDatos"
-                          Abscisa="0"
-                          Ordenada="0"
-                          Ancho="@AnchoDisponible"
-                          Alto="@AltoDisponible"/>
-				}
-			}
+    <div style="width: 100%; height: 100%; position: absolute;">
+      <CAguardar />
+    </div>
+    }*@
   </div>
 
   @if (Editando)

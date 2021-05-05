@@ -42,6 +42,23 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+    public async Task LimpiarContenidoMapaAsync()
+    {
+      if (mPosicionMapBing >= 0)
+      {
+        object[] Args = new object[1];
+        Args[0] = mPosicionMapBing;
+        try
+        {
+          await JSRuntime.InvokeAsync<string>("LiberarPushpins", Args);
+        }
+        catch (Exception)
+        {
+          // Ignora lo que puede ocurrir porque al cerrar puede dar una excepcion.
+        }
+      }
+    }
+
     public CDatoIndicador IndicadorBase { get; set; }
 
     public Int32 CodigoElementoDimensionBase { get; set; }
@@ -64,7 +81,7 @@ namespace TableroPecasV5.Client.Logicas
 
     public bool ComoComponenteBase { get; set; } = true;
 
-    public bool DatosCompletos { get; set; } = false;
+    public bool DatosCompletos { get; set; } = true;
 
     protected List<CDatosPrmWFS> mListaPrm = new List<CDatosPrmWFS>();
 
@@ -851,6 +868,8 @@ namespace TableroPecasV5.Client.Logicas
 
     }
 
+    private bool mbHayDatosDibujados = false;
+
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
 
@@ -868,6 +887,16 @@ namespace TableroPecasV5.Client.Logicas
       }
       try
       {
+        if (mCapa == null && CodigoCapaBase <= 0)
+        {
+          if (mbHayDatosDibujados)
+          {
+            mbHayDatosDibujados = false;
+            _ = LimpiarContenidoMapaAsync();
+          }
+          SinDatos = false;
+          return;
+        }
         if (!DatosCompletos)
         {
           _ = HacerLecturaInicialAsync();
@@ -875,32 +904,42 @@ namespace TableroPecasV5.Client.Logicas
         }
         else
         {
+
+          if (mCapa == null || mProyectoBing == null)
+					{
+            return;
+					}
+
           if (ReubicarCentro)
           {
             mProyectoBing.UbicarCentro(AbscisaBase < 0 ? Contenedores.CContenedorDatos.AnchoPantalla : AnchoBase,
                 AbscisaBase < 0 ? (Contenedores.CContenedorDatos.AltoPantalla - 45) : (AltoBase - 45));
             ReubicarCentro = false;
           }
-          object[] Args = new object[7];
-          Args[0] = mPosicionMapBing;
-          Args[1] = '#' + DireccionBase;
-          Args[2] = mProyectoBing.LatCentro;
-          Args[3] = mProyectoBing.LngCentro;
-          Args[4] = mProyectoBing.NivelZoom;
-          Args[5] = false;
-          Args[6] = false;
           try
           {
             if (mPosicionMapBing < 0)
             {
+              object[] Args = new object[7];
+              Args[0] = mPosicionMapBing;
+              Args[1] = '#' + DireccionBase;
+              Args[2] = mProyectoBing.LatCentro;
+              Args[3] = mProyectoBing.LngCentro;
+              Args[4] = mProyectoBing.NivelZoom;
+              Args[5] = false;
+              Args[6] = false;
               string CodigoMapa = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
               mPosicionMapBing = Int32.Parse(CodigoMapa);
             }
-            await mProyectoBing.DibujarGradientesAsync(JSRuntime, mPosicionMapBing);
-            if ((AnchoBase > 800 && AltoBase > 500) || (AnchoBase < 0 && AltoBase < 0))
+            if (mPosicionMapBing >= 0)
             {
-              // dibujar las referencias.
-              await DibujarReferenciasAsync();
+              mbHayDatosDibujados = true;
+              await mProyectoBing.DibujarGradientesAsync(JSRuntime, mPosicionMapBing);
+              if ((AnchoBase > 800 && AltoBase > 500) || (AnchoBase < 0 && AltoBase < 0))
+              {
+                // dibujar las referencias.
+                await DibujarReferenciasAsync();
+              }
             }
           }
           catch (Exception ex)

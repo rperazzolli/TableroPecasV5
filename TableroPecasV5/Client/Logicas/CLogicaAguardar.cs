@@ -17,7 +17,7 @@ namespace TableroPecasV5.Client.Logicas
 		public string Estilo()
 		{
 			return "width: 100%; height: 100%; margin-left: " + Abscisa.ToString() + "px; margin-top: " + Ordenada.ToString() +
-				"px; background: #BEC9E7; text-align: center; position: absolute; opacity: 0.5;";
+				"px; background: #BEC9E7; text-align: center; position: absolute; opacity: 0.5; border: 1px solid #b0b0b0";
 		}
 
 	}

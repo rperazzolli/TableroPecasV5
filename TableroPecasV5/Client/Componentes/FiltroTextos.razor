@@ -3,7 +3,7 @@
 @using TableroPecasV5.Client.Datos; 
 @inherits Logicas.CLogicaFiltroTextos
 
-<div style="height: 25px; text-align: left; margin-left: 5px; width: 100%; " @onmousedown="@EventoMouseAbajo">
+<div style="height: 25px; text-align: left; margin-left: 5px; width: 100%;" @onmousedown="@EventoMouseAbajo">
   <a class="TextoNombreFiltro" style="@EstiloNombre">@Filtrador.Columna.Nombre</a>
 </div>
 
@@ -11,7 +11,11 @@
   <div class="BarraComandosFiltro">
     @if (!ColumnaFecha)
     {
-    <a class="fa fa-bars EstiloBoton" @onclick="@Agrupar"></a>
+      <a class="fa fa-plus EstiloBoton" style="margin-right: 1px;" @onclick="@Agrandar"></a>
+    }
+    @if (!ColumnaFecha)
+    {
+      <a class="fa fa-bars EstiloBoton" @onclick="@Agrupar"></a>
     }
     <a class="fas fa-filter EstiloBoton" @onclick="@Filtrar"></a>
     <a class="far fa-window-close EstiloBoton" @onclick="@Cerrar"></a>
@@ -63,7 +67,7 @@
     @foreach (CElementoFilaAsociativaFecha Fila in FilasFechaEnPantallaVisibles)
     {
     <div style="width: 100%;">
-      <div class="BarraColorFiltro" style="@EstiloBandaAbajo(Fila)" />
+      <div class="BarraColorFiltro" style="@EstiloBandaAbajo(Fila)"/>
       <div class="DivTextoFiltro" style="@EstiloFilaTexto(Fila)">
         <a class="TextoFiltro" style="@EstiloFilaTextoFecha(Fila)">@Fila.Nombre</a>
       </div>

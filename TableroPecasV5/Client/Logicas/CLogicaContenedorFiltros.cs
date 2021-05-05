@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Blazorise;
 using TableroPecasV5.Client.Datos;
@@ -109,15 +110,23 @@ namespace TableroPecasV5.Client.Logicas
       Navegador.NavigateTo("PagBingWSS");
     }
 
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
     public CLogicaContenedorFiltros()
     {
       mLinks = new List<CLinkFiltros>();
       mGraficos = new List<CLinkGrafico>();
       Abscisa = 15;
-
     }
 
-    public string OpcionCantidad
+		protected override async Task OnInitializedAsync()
+		{
+      await Rutinas.CRutinas.AsegurarDimensionFuenteAsync(JSRuntime, "Microsoft Sans Serif", 11);
+      await base.OnInitializedAsync();
+		}
+
+		public string OpcionCantidad
     {
       get { return (EsPuntos ? "Puntos" : "Cantidad"); }
     }

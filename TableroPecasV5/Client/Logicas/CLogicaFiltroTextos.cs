@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.JSInterop;
 using Blazorise;
 using Microsoft.AspNetCore.Components;
 using TableroPecasV5.Client.Datos;
@@ -20,6 +20,9 @@ namespace TableroPecasV5.Client.Logicas
 //    private ModoAgruparDependiente mModo;
     private CFiltrador mFiltrador;
     private List<CElementoFilaAsociativa> mFilasPantalla = new List<CElementoFilaAsociativa>();
+
+    [CascadingParameter]
+    public CLogicaIndicador IndicadorContenedor { get; set; }
 
     public void Dispose()
     {
@@ -54,6 +57,9 @@ namespace TableroPecasV5.Client.Logicas
     {
       get { return mFilasPantalla; }
     }
+
+    [Parameter]
+    public CLinkFiltros Link { get; set; }
 
     public List<CElementoFilaAsociativaFecha> FilasFechaEnPantallaVisibles
     {
@@ -502,12 +508,28 @@ namespace TableroPecasV5.Client.Logicas
 
     public string EstiloNombre
     {
-      get { return "max-width: " + (Ancho - (ColumnaFecha ? 60 : 75)).ToString() + "px;"; }
+      get { return "max-width: " + (Ancho - (ColumnaFecha ? 76 : 91)).ToString() + "px;"; }
     }
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
 
     public string EstiloFilaTexto(CElementoFilaAsociativa Fila)
     {
-      return "width: " + (Ancho - 10).ToString() + "px; color: black;" + (Fila.Seleccionado ? " font-weight: bold;" : "");
+      if (Fila.HayValor)
+      {
+        Int32 AnchoValores = Fila.AnchoTextoValor();
+        return "color: black;" +
+          (Fila.Seleccionado ? " font-weight: bold;" : "") +
+          "width: " + (Ancho - 10 - AnchoValores).ToString() + "px;";
+      }
+      else
+      {
+        return "color: black;" +
+          (Fila.Seleccionado ? " font-weight: bold;" : "") +
+          "width: " + (Ancho - 10).ToString() + "px;";
+      }
+
     }
 
     public string EstiloFilaTextoFecha(CElementoFilaAsociativaFecha Fila)
@@ -534,7 +556,7 @@ namespace TableroPecasV5.Client.Logicas
 
     public string EstiloFilaValor(CElementoFilaAsociativa Fila)
     {
-      return "width: "+ (Ancho - 10).ToString()+"px; color: black; ";
+      return "width: "+ (Ancho - 10).ToString()+ "px; color: black; font-family: 'Microsoft Sans Serif';";
     }
 
     public void AjustarVigenciaFilas()
@@ -632,6 +654,12 @@ namespace TableroPecasV5.Client.Logicas
         ModalAgrupar.Show();
       }
     }
+
+    public void Agrandar()
+		{
+      Link.Ancho += Link.Ancho / 4;
+      IndicadorContenedor.Refrescar();
+		}
 
     public void ImponerFiltrosAsociados(List<Int32> Codigos)
     {

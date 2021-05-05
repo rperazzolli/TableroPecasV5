@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.JSInterop;
 using System.Threading.Tasks;
 using TableroPecasV5.Client.Plantillas;
 using TableroPecasV5.Client.Rutinas;
@@ -1911,6 +1912,13 @@ namespace TableroPecasV5.Client.Datos
       //
     }
 
+    public Int32 AnchoTextoValor()
+		{
+      Int32 Caracteres = TextoValor.Length;
+      double AnchoUnico = CRutinas.TamanioLetraMedia("Microsoft Sans Serif", 11);
+      return (Int32)Math.Floor(AnchoUnico * Caracteres + 5.5);
+		}
+
     public string FuenteNombre
     {
       get { return "font-weight: "+(mbVigente ? "bold;" : "normal;"); }
@@ -2019,6 +2027,14 @@ namespace TableroPecasV5.Client.Datos
       get { return mCantidad; }
       set { mCantidad = value; }
     }
+
+    public bool HayValor
+		{
+      get
+			{
+        return (mbVigente || mCantidad > 0) && !double.IsNaN(mValor);
+			}
+		}
 
     public string TextoValor
     {

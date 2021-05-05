@@ -9,17 +9,13 @@
   </div>
   }
   <div id="@Direccion" style="@EstiloMapaComponente">
-    @if (!DatosCompletos)
+    @if (!DatosCompletos && Capa != null)
     {
-      <a>Por favor aguarde unos segundos</a>
+      <TableroPecasV5.Client.Componentes.CAguardar/>
     }
     else
     {
-      @if (SinDatos)
-      {
-        <CAguardar/>
-      }
-      else
+      @if (DatosCompletos && mCapa != null)
       {
         <div id="@NombreReferencias" style="@EstiloReferencias">
           <Blazor.Extensions.Canvas.BECanvas @ref="@CanvasReferencia" Height="@AltoReferencia" Width="@AnchoReferencia"/>

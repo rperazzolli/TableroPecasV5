@@ -64,7 +64,7 @@
 
   @if (Clase == ClaseGrafico.BarrasH)
   {
-    <div style="width: 100%; height: calc(100% - 32px); overflow: hidden; display: inline-block; float: left; background-color: red; position: relative; margin: 30px 0px 0px 0px; background-color: white;">
+    <div style="width: 100%; height: calc(100% - 32px); overflow: hidden; display: inline-block; float: left; background-color: white; position: relative; margin: 30px 0px 0px 0px; background-color: white;">
       <div id="@NombreElemento" style="@EstiloCanvasApiladas"
            @onclick="@EventoMouseUp" @onscroll="@FncScroll">
         <Blazor.Extensions.Canvas.BECanvas Width="@AnchoGraficoApilado" Height="@AltoCanvas" @ref="@CanvasGrafico" />
