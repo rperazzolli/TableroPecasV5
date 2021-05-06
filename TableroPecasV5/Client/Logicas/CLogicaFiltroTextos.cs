@@ -8,6 +8,7 @@ using TableroPecasV5.Client.Datos;
 using TableroPecasV5.Client.Clases;
 using TableroPecasV5.Client.Componentes;
 using TableroPecasV5.Shared;
+using System.Threading.Tasks;
 
 namespace TableroPecasV5.Client.Logicas
 {
@@ -71,7 +72,7 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
+		public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
     {
       if (Pagina.LineaDrag != null)
       {
@@ -91,7 +92,7 @@ namespace TableroPecasV5.Client.Logicas
 
           Filtrar();
 
-          if (Ancho != 270)
+          if (Ancho < 270)
           {
             Ancho = 270;
             if (AlCambiarAncho != null)
@@ -508,11 +509,24 @@ namespace TableroPecasV5.Client.Logicas
 
     public string EstiloNombre
     {
-      get { return "max-width: " + (Ancho - (ColumnaFecha ? 76 : 91)).ToString() + "px;"; }
+      get
+      {
+//        _ = DeterminarDimensionesAsync();
+        return "max-width: calc(100% - " + (ColumnaFecha ? 60 : 75).ToString() + "px;)";
+      }
     }
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
+
+  //  private async Task DeterminarDimensionesAsync()
+		//{
+  //    object[] Args = new object[1];
+  //    Args[0] = CLogicaIndicador.IdFiltro(Link);
+  //    string Dimensiones = await JSRuntime.InvokeAsync<string>("FuncionesJS.getRectangulo", Args);
+  //    List<double> Valores = Rutinas.CRutinas.ListaAReales(Dimensiones);
+  //    Link.Ancho = (Int32)Valores[2];
+  //  }
 
     public string EstiloFilaTexto(CElementoFilaAsociativa Fila)
     {
@@ -521,13 +535,13 @@ namespace TableroPecasV5.Client.Logicas
         Int32 AnchoValores = Fila.AnchoTextoValor();
         return "color: black;" +
           (Fila.Seleccionado ? " font-weight: bold;" : "") +
-          "width: " + (Ancho - 10 - AnchoValores).ToString() + "px;";
+          "width: calc(100% - " + (10 + AnchoValores).ToString() + "px);";
       }
       else
       {
         return "color: black;" +
           (Fila.Seleccionado ? " font-weight: bold;" : "") +
-          "width: " + (Ancho - 10).ToString() + "px;";
+          "width: calc(100% - 10px);";
       }
 
     }
@@ -535,7 +549,7 @@ namespace TableroPecasV5.Client.Logicas
     public string EstiloFilaTextoFecha(CElementoFilaAsociativaFecha Fila)
     {
       Int32 ii = 35 + 15 * Fila.Saltos;
-      return "width: " + (Ancho - ii - 15).ToString() + "px; color: black;" + (Fila.Seleccionado ? " font-weight: bold;" : "") +
+      return "width: calc(100% - " + (ii + 15).ToString() + "px); color: black;" + (Fila.Seleccionado ? " font-weight: bold;" : "") +
         " margin-left: " + ii.ToString() + "px;";
     }
 
@@ -556,7 +570,7 @@ namespace TableroPecasV5.Client.Logicas
 
     public string EstiloFilaValor(CElementoFilaAsociativa Fila)
     {
-      return "width: "+ (Ancho - 10).ToString()+ "px; color: black; font-family: 'Microsoft Sans Serif';";
+      return "width: calc(100% - 10px); color: black; font-family: 'Microsoft Sans Serif';";
     }
 
     public void AjustarVigenciaFilas()

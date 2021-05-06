@@ -1,4 +1,43 @@
 ﻿@inherits Logicas.CLogicaDatosIndicador
 
-<div style="width: 100%; height: 100%; position: absolute; overflow: auto;">
+<div style="width: 90%; height: 100%; position: relative; overflow-x: hidden; margin: 0% 5%;">
+  <p>@Datos.Comentario</p>
+  <p>Frecuencia: @Datos.Frecuencia</p>
+  <hr />
+  @if (Alarma != null)
+  {
+    <div style="width: 90%;">
+      @if (Alarma.Minimo != Alarma.Sobresaliente)
+      {
+        <div style="width: 10px; height: 20px; background: red; float: left;" />
+        <div style="width: 10px; height: 20px; background: yellow; float: left;" />
+        <label style="margin-left: 5px; float: left;">Mínimo: @Alarma.Minimo</label><br />
+
+        <div style="width: 10px; height: 20px; background: yellow; float: left;" />
+        <div style="width: 10px; height: 20px; background: lightgreen; float: left;" />
+        <label style="margin-left: 5px; float: left;">Satisfactorio: @Alarma.Satisfactorio</label><br />
+
+        <div style="width: 10px; height: 20px; background: lightgreen; float: left;" />
+        <div style="width: 10px; height: 20px; background: blue; float: left;" />
+        <label style="margin-left: 5px; float: left;">Sobresaliente: @Alarma.Sobresaliente</label><br />
+
+        <hr />
+      }
+
+      <label style="width: 50px; float: left;">Valor</label>
+      <label style="width: 80px; float: left;">@Alarma.Valor</label>
+      <label>@Alarma.FechaInicial.ToString("dd/MM/yyyy")</label>
+      @if (Alarma.Minimo!=Alarma.Sobresaliente)
+			{
+        <img style="width: 20px; height: 20px; margin-left: 5px;" src="@LinkFlecha"/>
+			}
+      <br />
+
+      <label style="width: 50px; float: left;">Anterior</label>
+      <label style="width: 80px; float: left;">@Alarma.ValorAnterior</label><br />
+
+    </div>
+
+  }
+
 </div>

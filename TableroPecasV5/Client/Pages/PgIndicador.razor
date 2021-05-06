@@ -20,15 +20,31 @@
     <p />
     @if (Contenedores.CContenedorDatos.SiempreTendencia)
     {
-      <div class="Centrada" style="width: 350px; height: 180px;">
-        <TableroPecasV5.Client.Componentes.CTendRed @ref="ComponenteTendRed" Indicador="@Indicador" />
-      </div>
+  <div class="Centrada" style="width: 350px; height: 180px;">
+    @if (VerDetalleIndicador)
+    {
+      <TableroPecasV5.Client.Componentes.CDatosIndicador Datos="@Indicador"
+                                                         Alarma="@UltimaAlarma"/>
     }
     else
     {
-      <div class="Centrada" style="width: 110px; height: 60px;">
-        <TableroPecasV5.Client.Componentes.CReloj @ref="ComponenteReloj" Indicador="@Indicador" />
-      </div>
+      <TableroPecasV5.Client.Componentes.CTendRed @ref="ComponenteTendRed" Indicador="@Indicador" />
+    }
+  </div>
+    }
+    else
+    {
+  <div class="Centrada" style="width: 110px; height: 60px;">
+    @if (VerDetalleIndicador)
+    {
+      <TableroPecasV5.Client.Componentes.CDatosIndicador Datos="@Indicador"
+                                                         Alarma="@UltimaAlarma" />
+    }
+    else
+    {
+      <TableroPecasV5.Client.Componentes.CReloj @ref="ComponenteReloj" Indicador="@Indicador" />
+    }
+  </div>
     }
     <br />
     @Valor()
@@ -36,33 +52,27 @@
 
     @if (HayAlarmaReducida)
     {
-      <div class="Centrada" style="background: white; display: inline; float: none; text-align: center; margin-top: 10px;">
-        <img class="Img20" src="Imagenes/Detalle.png" @onclick="@CrearFiltroDatosAsync"/>
-        <button class="Boton20">
-          <img src="Imagenes/Comentario.png" />
-        </button>
-      </div>
+  <div class="Centrada" style="background: white; display: inline; float: none; text-align: center; margin-top: 10px;">
+    <img class="Img20" src="Imagenes/Detalle.png" @onclick="@CrearFiltroDatosAsync" />
+    <img class="Img20" src="Imagenes/Comentario.png" />
+    <img class="Img20" src="Imagenes/IndicPend.png" @onclick="@VerDetalles" />
+  </div>
     }
 
     @if (ComponenteReloj != null && ComponenteReloj.Alarmas != null && ComponenteReloj.Alarmas.Count > 0)
     {
-      <div class="Centrada" style="background: white; display: inline; float: none; text-align: center; margin-top: 10px;">
-        @if (SinTendencia == "enabled")
-        {
-        <button class="Boton20" @onclick="@CrearTendencias">
-          <img src="Imagenes/Tendencia.png" class="Img20" />
-        </button>
-        }
-        @if (HayTendencias)
-        {
-          <button class="Boton20 @SinTendencia" @onclick="@CrearFiltroDatosAsync">
-            <img src="Imagenes/Detalle.png" />
-          </button>
-        }
-        <button class="Boton20">
-          <img src="Imagenes/Comentario.png" />
-        </button>
-      </div>
+  <div class="Centrada" style="background: white; display: inline; float: none; text-align: center; margin-top: 10px;">
+    @if (SinTendencia == "enabled")
+    {
+      <img class="Img20" src="Imagenes/Tendencia.png" @onclick="@CrearTendencias" />
+    }
+    @if (HayTendencias)
+    {
+      <img class="Img20" src="Imagenes/Detalle.png" @onclick="@CrearFiltroDatosAsync" />
+    }
+    <img class="Img20" src="Imagenes/Comentario.png" />
+    <img class="Img20" src="Imagenes/IndicPend.png" @onclick="@VerDetalles" />
+  </div>
     }
     @if (AguardandoReloj)
     {
@@ -98,7 +108,8 @@
           if (Link.PosicionEnPantalla >= 0)
           {
             <div id="@IdFiltro(Link)" class="ui-widget-content"
-                 style="@EstiloFiltro(Link)" draggable="true" @ondragstart="@(() => IniciarDragFiltro(Link))">
+                 style="@EstiloFiltro(Link)" draggable="true" @ondragstart="@(() => IniciarDragFiltro(Link))"
+                 @onmouseup="@(() => CambioMedidas(Link))">
               <TableroPecasV5.Client.Componentes.FiltroTextos @ref="Link.Componente" NivelFlotante="@Link.NivelFlotante"
                                                               Ancho="@Link.Ancho" Alto="@AltoFiltro" Abscisa="@Link.Abscisa"
                                                               Ordenada="@Link.Ordenada"

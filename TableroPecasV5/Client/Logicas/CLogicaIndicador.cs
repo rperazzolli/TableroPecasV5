@@ -667,6 +667,14 @@ namespace TableroPecasV5.Client.Logicas
     [Inject]
     public HttpClient Http { get; set; }
 
+    public bool VerDetalleIndicador { get; set; } = false;
+
+    public void VerDetalles()
+		{
+      VerDetalleIndicador = !VerDetalleIndicador;
+      StateHasChanged();
+		}
+
     public async Task CrearFiltroDatosAsync()
     {
       Int32 Periodo = -1;
@@ -752,6 +760,14 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     protected List<CInformacionAlarmaCN> mAlarmasImpuestas = null;
+
+    public CInformacionAlarmaCN UltimaAlarma
+		{
+      get
+			{
+        return (Alarmas != null && Alarmas.Count > 0 ? Alarmas.Last() : null);
+			}
+		}
 
     protected List<CInformacionAlarmaCN> Alarmas
 		{
@@ -1349,7 +1365,7 @@ namespace TableroPecasV5.Client.Logicas
 			}
     }
 
-    public string IdFiltro(CLinkFiltros Lnk)
+    public static string IdFiltro(CLinkFiltros Lnk)
     {
       return "IDFiltro" + Lnk.PosicionEnPantalla.ToString();
     }
@@ -1503,15 +1519,14 @@ namespace TableroPecasV5.Client.Logicas
       {
         _ = LeerAlarmasAsync(false);
       }
-//      this.PonerMobil();
-      this.PonerEventoClick();
-      Task Respuesta = base.OnAfterRenderAsync(firstRender);
-      if (ComponenteFiltros != null && ComponenteFiltros.LinksAnteriores != null)
-      {
-        ComponenteFiltros.Links.AddRange(ComponenteFiltros.LinksAnteriores);
-        ComponenteFiltros.LinksAnteriores = null;
-        StateHasChanged();
-      }
+      //this.PonerEventoClick();
+      //Task Respuesta = base.OnAfterRenderAsync(firstRender);
+      //if (ComponenteFiltros != null && ComponenteFiltros.LinksAnteriores != null)
+      //{
+      //  ComponenteFiltros.Links.AddRange(ComponenteFiltros.LinksAnteriores);
+      //  ComponenteFiltros.LinksAnteriores = null;
+      //  StateHasChanged();
+      //}
       await base.OnAfterRenderAsync(firstRender);
     }
 
