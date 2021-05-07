@@ -6,244 +6,251 @@
 
 <div style="width: 100%; height: 100%; background: lightgray; opacity: 0.5"></div>
 <div style="width: 80%; left: 10%; top: 10%; height: 70%; overflow: hidden; background-color: white; position: absolute;">
-  @if (ListaCapas == null || ListaCapasWFS == null || HayMensaje)
+  @if (Aguardando)
   {
-    @if (HayMensaje)
-    {
-      <div style="width: 100%; height: 100%; background: lightgray; opacity: 0.5; text-align: center; position: absolute;">
-        <div style="vertical-align: middle;">
-          <p>@Mensaje</p>
-          @if (HayBoton)
-          {
-            <button style="width: 80px; height: 25px;" @onclick="@CerrarMsg">Cerrar</button>
-          }
-        </div>
-      </div>
-    }
-    else
-    {
-      <CAguardar />
-    }
+    <CAguardar />
   }
   else
   {
-    <div style="width: 100%; height: 100%; position: relative; margin: 0px; overflow-x: hidden; overflow-y: auto; display: inline-block; padding: 0px;">
-      <div style="background: #007DFF; height: 29px; width: calc(100% - 10px); text-align: left; margin: 5px; position: relative;">
-        <div style="width: 100%; height: 100%; position: absolute;">
-          <label style="vertical-align: central; margin-left: 5px; font-size: 15px; color: white; position: absolute;">Ubicar datos sobre capas WFS</label>
-          <div style="width: 25px; height: 25px; color: white; position: absolute; margin-left: calc(100% - 25px); margin-top: 0px; text-align: center; vertical-align: central; font-size: 15px; cursor: pointer;" @onclick="@Cerrar">X</div>
-        </div>
-      </div>
-
-      <div style="width: calc(100% - 10px); height: 25px; position: relative; margin-top: 0px; margin-left: 5px; background: lightgray;">
-        <div style="width: 45%; height: 100%; text-align: center; display: inline-block;">
-          <label style="width: 100%;"><b>Gráficos definidos</b></label>
-        </div>
-        <div style="width: 50%; height: 100%; text-align: center; display: inline-block;">
-          <label style="width: 100%;"><b>Datos para capa en edición</b></label>
-        </div>
-      </div>
-
-      <div style="width: 100%; height: calc(100% - 125px); overflow-y: hidden; overflow-x: hidden; position: relative; margin-top: 0px;">
-        <div style="width: 45%; height: 100%; overflow-y: auto; overflow-x: hidden; vertical-align: top; display: inline-block;">
-          @if (ListaCapas != null)
-          {
-            @foreach (CCapaWSSCN Capa in ListaCapas)
+    @if (ListaCapas == null || ListaCapasWFS == null || HayMensaje)
+    {
+      @if (HayMensaje)
+      {
+        <div style="width: 100%; height: 100%; background: lightgray; opacity: 0.5; text-align: center; position: absolute;">
+          <div style="vertical-align: middle;">
+            <p>@Mensaje</p>
+            @if (HayBoton)
             {
-              <div style="width: 95%; height: 32px; margin-left: 5%;">
-                <p style="@EstiloCapa(Capa)" @onclick="((e) => { SeleccionarWSS(Capa); })">@Capa.Nombre</p>
-              </div>
-            }
-          }
-        </div>
-
-        <div style="width: 50%; height: 100%; padding: 5px; overflow-y: auto; vertical-align: top; display: inline-block;">
-          <p />
-          <div class="grilla-superior">
-            <div>Nombre</div>
-            <div>
-              <input style="@EstiloInput" type="text" @bind-value="@NombreCapa" />
-            </div>
-          </div>
-
-          <div class="grilla-superior">
-            <div>Capa WFS</div>
-            @if (ListaCapasWFS != null)
-            {
-              <div>
-                <Select TValue="int" @bind-SelectedValue="@CapaWFS">
-                  @foreach (CCapaWFSCN Capa in ListaCapasWFS)
-                  {
-                    <SelectItem TValue="int" Value="@Capa.Codigo">@Capa.Descripcion</SelectItem>
-                  }
-                </Select>
-              </div>
+              <button style="width: 80px; height: 25px;" @onclick="@CerrarMsg">Cerrar</button>
             }
           </div>
+        </div>
+      }
+      else
+      {
+        <CAguardar />
+      }
+    }
+    else
+    {
+      <div style="width: 100%; height: 100%; position: relative; margin: 0px; overflow-x: hidden; overflow-y: auto; display: inline-block; padding: 0px;">
+        <div style="background: #007DFF; height: 29px; width: calc(100% - 10px); text-align: left; margin: 5px; position: relative;">
+          <div style="width: 100%; height: 100%; position: absolute;">
+            <label style="vertical-align: central; margin-left: 5px; font-size: 15px; color: white; position: absolute;">Ubicar datos sobre capas WFS</label>
+            <div style="width: 25px; height: 25px; color: white; position: absolute; margin-left: calc(100% - 25px); margin-top: 0px; text-align: center; vertical-align: central; font-size: 15px; cursor: pointer;" @onclick="@Cerrar">X</div>
+          </div>
+        </div>
 
-          <div class="grilla-superior">
-            <div>Columna valor</div>
-            @if (Columnas != null)
+        <div style="width: calc(100% - 10px); height: 25px; position: relative; margin-top: 0px; margin-left: 5px; background: lightgray;">
+          <div style="width: 45%; height: 100%; text-align: center; display: inline-block;">
+            <label style="width: 100%;"><b>Gráficos definidos</b></label>
+          </div>
+          <div style="width: 50%; height: 100%; text-align: center; display: inline-block;">
+            <label style="width: 100%;"><b>Datos para capa en edición</b></label>
+          </div>
+        </div>
+
+        <div style="width: 100%; height: calc(100% - 125px); overflow-y: hidden; overflow-x: hidden; position: relative; margin-top: 0px;">
+          <div style="width: 45%; height: 100%; overflow-y: auto; overflow-x: hidden; vertical-align: top; display: inline-block;">
+            @if (ListaCapas != null)
             {
-              <div>
-                <Select TValue="string" @bind-SelectedValue="@ColumnaValor">
-                  @foreach (CColumnaBase Columna in ColumnasAjustadas)
-                  {
-                    <SelectItem TValue="string" Value="@Columna.Nombre">@Columna.Nombre</SelectItem>
-                  }
-                </Select>
-              </div>
-            }
-          </div>
-
-          <div class="grilla-superior">
-            <div>Cálculo</div>
-            <div>
-              <Select TValue="int" @bind-SelectedValue="@ModoCalculo">
-                @foreach (CListaTexto Linea in ListaCalculo)
-                {
-                  <SelectItem TValue="int" Value="@Linea.Codigo">@Linea.Descripcion</SelectItem>
-                }
-              </Select>
-            </div>
-          </div>
-
-          <div class="grilla-superior">
-            <div>Georeferenciación</div>
-            <div>
-              <input type="radio" name="georef" @onclick="((e) => { Georeferencias(1); })" /><label>Vínculo</label>
-              <input type="radio" style="margin-left: 15px;" name="georef" @onclick="((e) => { Georeferencias(2); })" /><label>Coordenadas</label>
-            </div>
-          </div>
-
-          @if (UsaVinculo)
-          {
-            <div class="grilla-superior">
-              <div>Vínculo</div>
-              @if (ListaVinculos != null)
+              @foreach (CCapaWSSCN Capa in ListaCapas)
               {
-                <Select TValue="int" @bind-SelectedValue="@CodigoVinculo">
-                  @foreach (CListaTexto Linea in ListaVinculos)
+                <div style="width: 95%; height: 32px; margin-left: 5%;">
+                  <p style="@EstiloCapa(Capa)" @onclick="((e) => { SeleccionarWSS(Capa); })">@Capa.Nombre</p>
+                </div>
+              }
+            }
+          </div>
+
+          <div style="width: 50%; height: 100%; padding: 5px; overflow-y: auto; vertical-align: top; display: inline-block;">
+            <p />
+            <div class="grilla-superior">
+              <div>Nombre</div>
+              <div>
+                <input style="@EstiloInput" type="text" @bind-value="@NombreCapa" />
+              </div>
+            </div>
+
+            <div class="grilla-superior">
+              <div>Capa WFS</div>
+              @if (ListaCapasWFS != null)
+              {
+                <div>
+                  <Select TValue="int" @bind-SelectedValue="@CapaWFS">
+                    @foreach (CCapaWFSCN Capa in ListaCapasWFS)
+                    {
+                      <SelectItem TValue="int" Value="@Capa.Codigo">@Capa.Descripcion</SelectItem>
+                    }
+                  </Select>
+                </div>
+              }
+            </div>
+
+            <div class="grilla-superior">
+              <div>Columna valor</div>
+              @if (Columnas != null)
+              {
+                <div>
+                  <Select TValue="string" @bind-SelectedValue="@ColumnaValor">
+                    @foreach (CColumnaBase Columna in ColumnasAjustadas)
+                    {
+                      <SelectItem TValue="string" Value="@Columna.Nombre">@Columna.Nombre</SelectItem>
+                    }
+                  </Select>
+                </div>
+              }
+            </div>
+
+            <div class="grilla-superior">
+              <div>Cálculo</div>
+              <div>
+                <Select TValue="int" @bind-SelectedValue="@ModoCalculo">
+                  @foreach (CListaTexto Linea in ListaCalculo)
                   {
                     <SelectItem TValue="int" Value="@Linea.Codigo">@Linea.Descripcion</SelectItem>
                   }
                 </Select>
+              </div>
+            </div>
+
+            <div class="grilla-superior">
+              <div>Georeferenciación</div>
+              <div>
+                <input type="radio" name="georef" @onclick="((e) => { Georeferencias(1); })" /><label>Vínculo</label>
+                <input type="radio" style="margin-left: 15px;" name="georef" @onclick="((e) => { Georeferencias(2); })" /><label>Coordenadas</label>
+              </div>
+            </div>
+
+            @if (UsaVinculo)
+            {
+              <div class="grilla-superior">
+                <div>Vínculo</div>
+                @if (ListaVinculos != null)
+                {
+                  <Select TValue="int" @bind-SelectedValue="@CodigoVinculo">
+                    @foreach (CListaTexto Linea in ListaVinculos)
+                    {
+                      <SelectItem TValue="int" Value="@Linea.Codigo">@Linea.Descripcion</SelectItem>
+                    }
+                  </Select>
+                }
+              </div>
+            }
+            else
+            {
+              if (UsaCoordenadas && Columnas != null)
+              {
+                <div class="grilla-superior">
+                  <div>Latitud</div>
+                  <div>
+                    <Select TValue="string" @bind-SelectedValue="@ColumnaLat">
+                      @foreach (CColumnaBase Columna in ColumnasAjustadas)
+                      {
+                        <SelectItem TValue="string" Value="@Columna.Nombre">@Columna.Nombre</SelectItem>
+                      }
+                    </Select>
+                  </div>
+                </div>
+
+                <div class="grilla-superior">
+                  <div>Longitud</div>
+                  <div>
+                    <Select TValue="string" @bind-SelectedValue="@ColumnaLng">
+                      @foreach (CColumnaBase Columna in ColumnasAjustadas)
+                      {
+                        <SelectItem TValue="string" Value="@Columna.Nombre">@Columna.Nombre</SelectItem>
+                      }
+                    </Select>
+                  </div>
+                </div>
+
+                <div class="grilla-superior">
+                  <div>Rango [º]</div>
+                  <div>
+                    <input style="@EstiloInput" type="number" @bind-value="@Rango" />
+                  </div>
+                </div>
+
               }
+            }
+
+            <div class="grilla-superior">
+              <div>Intervalos</div>
+              <div>
+                <Select TValue="int" @bind-SelectedValue="@IntervaloImpuesto">
+                  @foreach (CListaTexto Intervalo in ListaIntervalos)
+                  {
+                    <SelectItem TValue="int" Value="@Intervalo.Codigo">@Intervalo.Descripcion</SelectItem>
+                  }
+                </Select>
+              </div>
             </div>
-          }
-          else
-          {
-            if (UsaCoordenadas && Columnas != null)
+
+            @if (IntervaloImpuesto == (Int32)ClaseIntervalo.Indicador)
             {
               <div class="grilla-superior">
-                <div>Latitud</div>
+                <div>Mínimo</div>
                 <div>
-                  <Select TValue="string" @bind-SelectedValue="@ColumnaLat">
-                    @foreach (CColumnaBase Columna in ColumnasAjustadas)
-                    {
-                      <SelectItem TValue="string" Value="@Columna.Nombre">@Columna.Nombre</SelectItem>
-                    }
-                  </Select>
+                  <input style="@EstiloInput" type="number" @bind-value="@Minimo" />
                 </div>
               </div>
 
               <div class="grilla-superior">
-                <div>Longitud</div>
+                <div>Satisfactorio</div>
                 <div>
-                  <Select TValue="string" @bind-SelectedValue="@ColumnaLng">
-                    @foreach (CColumnaBase Columna in ColumnasAjustadas)
-                    {
-                      <SelectItem TValue="string" Value="@Columna.Nombre">@Columna.Nombre</SelectItem>
-                    }
-                  </Select>
+                  <input style="@EstiloInput" type="number" @bind-value="@Satisfactorio" />
                 </div>
               </div>
 
               <div class="grilla-superior">
-                <div>Rango [º]</div>
+                <div>Sobresaliente</div>
                 <div>
-                  <input style="@EstiloInput" type="number" @bind-value="@Rango" />
+                  <input style="@EstiloInput" type="number" @bind-value="@Sobresaliente" />
                 </div>
               </div>
 
             }
-          }
+            else
+            {
+              @if (IntervaloImpuesto > 0)
+              {
 
-          <div class="grilla-superior">
-            <div>Intervalos</div>
-            <div>
-              <Select TValue="int" @bind-SelectedValue="@IntervaloImpuesto">
-                @foreach (CListaTexto Intervalo in ListaIntervalos)
-                {
-                  <SelectItem TValue="int" Value="@Intervalo.Codigo">@Intervalo.Descripcion</SelectItem>
-                }
-              </Select>
-            </div>
+                <div class="grilla-superior">
+                  <div>Color</div>
+                  <div>
+                    <ColorEdit @ref="Coloreador" Style="height: 25px;" Color="@ColorSeleccionado" />
+                  </div>
+                </div>
+
+                <div class="grilla-superior">
+                  @if (IntervaloImpuesto == 4)
+                  {
+                    <div>Límites</div>
+                  }
+                  else
+                  {
+                    <div>Divisiones</div>
+                  }
+                  <div>
+                    <input style="@EstiloInput" type="text" @bind-value="@Segmentos" />
+                  </div>
+                </div>
+
+              }
+            }
           </div>
+        </div>
 
-          @if (IntervaloImpuesto == (Int32)ClaseIntervalo.Indicador)
-          {
-            <div class="grilla-superior">
-              <div>Mínimo</div>
-              <div>
-                <input style="@EstiloInput" type="number" @bind-value="@Minimo" />
-              </div>
-            </div>
+        <p />
+        <p />
 
-            <div class="grilla-superior">
-              <div>Satisfactorio</div>
-              <div>
-                <input style="@EstiloInput" type="number" @bind-value="@Satisfactorio" />
-              </div>
-            </div>
-
-            <div class="grilla-superior">
-              <div>Sobresaliente</div>
-              <div>
-                <input style="@EstiloInput" type="number" @bind-value="@Sobresaliente" />
-              </div>
-            </div>
-
-          }
-          else
-          {
-            @if (IntervaloImpuesto > 0)
-            {
-
-              <div class="grilla-superior">
-                <div>Color</div>
-                <div>
-                  <ColorEdit @ref="Coloreador" Style="height: 25px;" Color="@ColorSeleccionado"/>
-                </div>
-              </div>
-
-              <div class="grilla-superior">
-                @if (IntervaloImpuesto == 4)
-                {
-                  <div>Límites</div>
-                }
-                else
-                {
-                  <div>Divisiones</div>
-                }
-                <div>
-                  <input style="@EstiloInput" type="text" @bind-value="@Segmentos" />
-                </div>
-              </div>
-
-            }
-          }
+        <div style="@EstiloBotones">
+          <button style="width: 180px; height: 25px;" @onclick="@Registrar">Registrar</button>
+          <button style="width: 180px; height: 25px; margin-left: 2px;" @onclick="@Nuevo">Nueva</button>
+          <button style="width: 80px; height: 25px; margin-left: 2px;" disabled="@NoSeleccionado" @onclick="@Borrar">Borrar</button>
         </div>
       </div>
-
-      <p />
-      <p />
-
-      <div style="@EstiloBotones">
-        <button style="width: 180px; height: 25px;" @onclick="@Registrar">Registrar</button>
-        <button style="width: 180px; height: 25px; margin-left: 2px;" @onclick="@Nuevo">Nueva</button>
-        <button style="width: 80px; height: 25px; margin-left: 2px;" disabled="@NoSeleccionado" @onclick="@Borrar">Borrar</button>
-      </div>
-    </div>
+    }
   }
 </div>

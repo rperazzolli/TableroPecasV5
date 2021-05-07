@@ -524,6 +524,8 @@ namespace TableroPecasV5.Client.Logicas
 			});
 		}
 
+		public bool Aguardando { get; set; } = false;
+
 		public async void Registrar()
 		{
 			if (!ExtraerDatos())
@@ -535,34 +537,40 @@ namespace TableroPecasV5.Client.Logicas
 			}
 			else
 			{
+				Aguardando = true;
 				HayMensaje = false;
 				StateHasChanged();
-				//string RespVal = await CContenedorDatos.VerificarBaseDatosAsync(Http);
-				Int32 Codigo = await CContenedorDatos.RegistrarCapaWSSAsync(Http, mCapaSeleccionada);
-				if (Codigo > 0)
+				try
 				{
-					if (mCapaSeleccionada.Codigo < 0)
+					Int32 Codigo = await CContenedorDatos.RegistrarCapaWSSAsync(Http, mCapaSeleccionada);
+					if (Codigo > 0)
 					{
-						mCapaSeleccionada.Codigo = Codigo;
-						ListaCapas.Add(mCapaSeleccionada);
-						Nuevo();
+						if (mCapaSeleccionada.Codigo < 0)
+						{
+							mCapaSeleccionada.Codigo = Codigo;
+							ListaCapas.Add(mCapaSeleccionada);
+							Nuevo();
+						}
+						else
+						{
+							ListaCapas = (from C in ListaCapas
+														where C.Codigo != Codigo
+														select C).ToList();
+							ListaCapas.Add(mCapaSeleccionada);
+							OrdenarListaCapas();
+							HayMensaje = false;
+						}
 					}
 					else
 					{
-						ListaCapas = (from C in ListaCapas
-													where C.Codigo != Codigo
-													select C).ToList();
-						ListaCapas.Add(mCapaSeleccionada);
-						OrdenarListaCapas();
-						HayMensaje = false;
-						StateHasChanged();
+						HayBoton = true;
+						HayMensaje = true;
+						Mensaje = "No pudo registrar";
 					}
 				}
-				else
+				finally
 				{
-					HayBoton = true;
-					HayMensaje = true;
-					Mensaje = "No pudo registrar";
+					Aguardando = false;
 					StateHasChanged();
 				}
 

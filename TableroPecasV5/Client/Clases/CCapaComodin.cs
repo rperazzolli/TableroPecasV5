@@ -287,7 +287,8 @@ namespace TableroPecasV5.Client.Clases
       }
     }
 
-    public async Task DibujarAreasGradienteAsync(IJSRuntime JSRuntime, Int32 Posicion)
+    public async Task DibujarAreasGradienteAsync(IJSRuntime JSRuntime, Int32 Posicion,
+        bool VerLabels = true)
     {
 
       foreach (CAreaWFSCN MacroArea in CapaWFS.Areas)
@@ -311,7 +312,7 @@ namespace TableroPecasV5.Client.Clases
             }
           }
           await DibujarAreaColorAsync(JSRuntime, AreaCentro, ColorArea, Posicion,
-              CRutinas.ValorATexto(Par.ValorElemento), true);
+              CRutinas.ValorATexto(Par.ValorElemento), VerLabels);
         }
       }
     }

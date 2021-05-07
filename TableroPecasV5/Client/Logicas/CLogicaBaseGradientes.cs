@@ -59,6 +59,23 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+    protected bool mbVerLabels = true;
+    public bool VerLabelsCapa
+    {
+      get { return mbVerLabels; }
+      set
+      {
+        if (mbVerLabels != value)
+        {
+          mbVerLabels = value;
+          if (mCapa != null)
+          {
+            ForzarRedibujoCapa();
+          }
+        }
+      }
+    }
+
     public CDatoIndicador IndicadorBase { get; set; }
 
     public Int32 CodigoElementoDimensionBase { get; set; }
@@ -870,6 +887,13 @@ namespace TableroPecasV5.Client.Logicas
 
     private bool mbHayDatosDibujados = false;
 
+    public async void ForzarRedibujoCapa()
+		{
+      await LimpiarContenidoMapaAsync();
+      mbHayDatosDibujados = false;
+      StateHasChanged();
+		}
+
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
 
@@ -934,7 +958,7 @@ namespace TableroPecasV5.Client.Logicas
             if (mPosicionMapBing >= 0)
             {
               mbHayDatosDibujados = true;
-              await mProyectoBing.DibujarGradientesAsync(JSRuntime, mPosicionMapBing);
+              await mProyectoBing.DibujarGradientesAsync(JSRuntime, mPosicionMapBing, mbVerLabels);
               if ((AnchoBase > 800 && AltoBase > 500) || (AnchoBase < 0 && AltoBase < 0))
               {
                 // dibujar las referencias.

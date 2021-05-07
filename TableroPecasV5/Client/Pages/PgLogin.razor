@@ -1,10 +1,10 @@
 ﻿@page "/Login"
 @inherits TableroPecasV5.Client.Logicas.CLogicaLogin
 
-  <div style="margin: 20px 20% 0% 20%; max-width: 400px; align-content: center;">
+  <div style="@Estilo">
     @if (TableroPecasV5.Client.Contenedores.CContenedorDatos.HabilitarLogin)
     {
-      <div class="form" style="background-color: #ffffff; padding-top: 20px; border-color: gray; border-width: 1px;">
+      <div class="form" style="background-color: #ffffff; width: 400px; padding-top: 20px; border-color: gray; border-width: 1px;">
 
         <div class="imgcontainer" style="margin-top: 20px;">
           <img src="Imagenes/Login_Red.png">

@@ -61,7 +61,82 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    public bool AguardandoReloj { get; set; } = !Contenedores.CContenedorDatos.SiempreTendencia;
+    public Int32 PosicionPuntoTendencia
+    {
+      get
+      {
+        return mPosicionPuntoTendencia;
+      }
+      set
+      {
+        mPosicionPuntoTendencia = value;
+      }
+    }
+
+    private static void CopiarDatosEntreLogicaIndicadores(CLogicaIndicador L1, CLogicaIndicador L2)
+		{
+      L2.mCodigo = L1.mCodigo;
+      L2.mPosicionPuntoTendencia = L1.mPosicionPuntoTendencia;
+      L2.AguardandoReloj = L1.AguardandoReloj;
+      L2.AguardandoFiltros = L1.AguardandoFiltros;
+      L2.NivelReloj = L1.NivelReloj;
+      L2.TendenciasAmpliadas = L1.TendenciasAmpliadas;
+      L2.NivelTendencias = L1.NivelTendencias;
+      L2.NivelGrilla = L1.NivelGrilla;
+      L2.NivelFiltros = L1.NivelFiltros;
+      L2.mAlarmas = L1.mAlarmas;
+      L2.mbLeyo = L1.mbLeyo;
+      L2.mPosicionPuntoTendencia = L1.mPosicionPuntoTendencia;
+      L2.CodigoElementoDimension = L1.CodigoElementoDimension;
+      L2.Curvas = L1.Curvas;
+      L2.mBlocksDatos = L1.mBlocksDatos;
+      L2.mAbscisaTendenciaAnterior = L1.mAbscisaTendenciaAnterior;
+      L2.mAbscisaTendencia = L1.mAbscisaTendencia;
+      L2.mOrdenadaTendencia = L1.mOrdenadaTendencia;
+      L2.mOrdenadaTendenciaAnterior = L1.mOrdenadaTendenciaAnterior;
+      L2.mAnchoTendencia = L1.mAnchoTendencia;
+      L2.mAnchoTendenciaAnterior = L1.mAnchoTendenciaAnterior;
+      L2.mAltoTendencia = L1.mAltoTendencia;
+      L2.mAltoTendenciaAnterior = L1.mAltoTendenciaAnterior;
+      L2.HayAlarmaReducida = L1.HayAlarmaReducida;
+      L2.HayFiltroDatos = L1.HayFiltroDatos;
+      L2.HayTendencias = L1.HayTendencias;
+      L2.mComponenteReloj = L1.mComponenteReloj;
+      L2.mComponenteTendencias = L1.mComponenteTendencias;
+      L2.mComponenteTendRed = L1.mComponenteTendRed;
+      L2.mComponenteFiltros = L1.mComponenteFiltros;
+      L2.mDimensionCaracter = L1.mDimensionCaracter;
+      L2.Indicador = L1.Indicador;
+      L2.VerDetalleIndicador = L1.VerDetalleIndicador;
+      L2.ClaseOrigen = L1.ClaseOrigen;
+      L2.CodigoOrigen = L1.CodigoOrigen;
+      L2.mColumnasDataset = L1.mColumnasDataset;
+      L2.mProveedor = L1.mProveedor;
+      L2.mPeriodoDataset = L1.mPeriodoDataset;
+		}
+
+    private void EliminarRelacionesComponentes(CLogicaIndicador L)
+		{
+      L.mComponenteFiltros.Contenedor = this;
+      if (L.mComponenteFiltros.Grilla != null)
+      {
+        L.mComponenteFiltros.Grilla.Componente = null;
+      }
+      foreach (CLinkFiltros Lnk in L.mComponenteFiltros.Links)
+			{
+        Lnk.Componente = null;
+			}
+      foreach (CLinkGrafico Lnk in L.mComponenteFiltros.Graficos)
+      {
+        Lnk.Componente = null;
+      }
+    }
+
+    protected static CLogicaIndicador gLogicaIndicadorAnterior = null;
+
+		#region Datos
+
+		public bool AguardandoReloj { get; set; } = !Contenedores.CContenedorDatos.SiempreTendencia;
 
     public bool AguardandoFiltros { get; set; } = true;
 
@@ -74,7 +149,7 @@ namespace TableroPecasV5.Client.Logicas
       get { return (ComponenteReloj == null ? 1 : ComponenteReloj.NivelFlotante); }
       set
       {
-        if (value!=NivelReloj && ComponenteReloj != null)
+        if (value != NivelReloj && ComponenteReloj != null)
         {
           ComponenteReloj.ImponerNivelFlotante(value);
         }
@@ -101,7 +176,11 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+    private List<CInformacionAlarmaCN> mAlarmas = null;
+
     protected bool mbLeyo = false;
+
+    private bool mbRetrocediendo = false; // cuando se recuperan los datos de memoria.
 
     [Parameter]
     public Int32 Codigo
@@ -111,6 +190,22 @@ namespace TableroPecasV5.Client.Logicas
       {
         if (mCodigo != value)
         {
+          if (gLogicaIndicadorAnterior!=null && gLogicaIndicadorAnterior.mCodigo == value)
+					{
+            
+            CopiarDatosEntreLogicaIndicadores(gLogicaIndicadorAnterior, this);
+            EliminarRelacionesComponentes(this);
+            if (HayFiltroDatos)
+						{
+              mbRetrocediendo = true;
+              _ = CrearFiltroDatosAsync();
+						}
+            return;
+					}
+          else
+					{
+            gLogicaIndicadorAnterior = null;
+					}
           mbLeyo = false;
           mCodigo = value;
           try
@@ -133,21 +228,58 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     private Int32 mPosicionPuntoTendencia = -1;
-    public Int32 PosicionPuntoTendencia
-    {
-      get
-      {
-        return mPosicionPuntoTendencia;
-      }
-      set
-      {
-        mPosicionPuntoTendencia = value;
-      }
-    }
-
     public Int32 CodigoElementoDimension { get; set; } = -1;
 
     public static string Ayuda { get; set; } = "AA";
+
+    public ObservableCollection<Clases.CCurvaTendencia> Curvas { get; set; } = new ObservableCollection<Clases.CCurvaTendencia>();
+
+    private long mAnchoTendencia = AnchoTendenciasDefault;
+
+    private long mAltoTendencia = AltoTendenciaDefault;
+
+    private Int32 mAbscisaTendencia = ABSCISA_INI_TENDENCIAS;
+
+    private Int32 mOrdenadaTendencia = 5;
+
+    private Int32 mPeriodoDataset = -1;
+    private List<CColumnaBase> mColumnasDataset;
+    private CProveedorComprimido mProveedor = null;
+
+    public bool VerDetalleIndicador { get; set; } = false;
+
+    public ClaseElemento ClaseOrigen { get; set; } = ClaseElemento.NoDefinida;
+    public Int32 CodigoOrigen { get; set; } = -1;
+
+    protected List<CInformacionAlarmaCN> mAlarmasImpuestas = null;
+
+    private List<BlockDatosZip> mBlocksDatos = new List<BlockDatosZip>();
+
+    private Int32 mAbscisaTendenciaAnterior = -999999;
+    private Int32 mOrdenadaTendenciaAnterior = -999999;
+    private long mAnchoTendenciaAnterior = -999999;
+    private long mAltoTendenciaAnterior = -999999;
+
+    public bool HayTendencias { get; set; }
+    public bool HayFiltroDatos { get; set; } = false;
+
+    private CReloj mComponenteReloj = null;
+    private CTendRed mComponenteTendRed = null;
+
+    private bool mbAlarmaReducida = false;
+    private CComponenteTendencias mComponenteTendencias = null;
+
+    private CContenedorFiltros mComponenteFiltros = null;
+    private CLinkGrafico mGraficoDrag = null;
+    private CLinkFiltros mFiltroDrag = null;
+    private LineaFiltro mLineaDrag = null;
+    private CLinkGrilla mGrillaDrag = null;
+    private double mDimensionCaracter = -1;
+    private string mbSinTendencia = "disabled";
+    private CBaseGrafico mGraficoSeleccionadoImpuesto = null;
+    private CDatoIndicador mIndicador = null;
+
+    #endregion
 
     [JSInvokable]
     public static Task FncAyudaAsync()
@@ -162,7 +294,6 @@ namespace TableroPecasV5.Client.Logicas
       return new Task(null);
 
     }
-    public ObservableCollection<Clases.CCurvaTendencia> Curvas { get; set; } = new ObservableCollection<Clases.CCurvaTendencia>();
 
     private async Task LeerAlarmasAsync(bool Forzadas)
     {
@@ -223,6 +354,7 @@ namespace TableroPecasV5.Client.Logicas
         StateHasChanged();
       }
     }
+
     public void PonerContenedorFiltroArriba()
 		{
       if (NivelFiltros < 8)
@@ -267,7 +399,6 @@ namespace TableroPecasV5.Client.Logicas
       return (long)Math.Floor(R + 0.5);
     }
 
-    private long mAnchoTendencia = AnchoTendenciasDefault;
     public long AnchoTendencia
     {
       get
@@ -290,8 +421,6 @@ namespace TableroPecasV5.Client.Logicas
       get { return Math.Max(250, Contenedores.CContenedorDatos.AltoPantallaIndicadores / 3); }
     }
 
-    private long mAltoTendencia = AltoTendenciaDefault;
-
     public long AltoTendencia
     {
       get
@@ -308,8 +437,6 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private Int32 mAbscisaTendencia = ABSCISA_INI_TENDENCIAS;
-
     public Int32 AbscisaTendencia
     {
       get
@@ -322,7 +449,6 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private Int32 mOrdenadaTendencia = 5;
     public Int32 OrdenadaTendencia
     {
       get
@@ -533,7 +659,8 @@ namespace TableroPecasV5.Client.Logicas
         "px; margin-top: " + Lnk.Ordenada.ToString() + "px; position: absolute; text-align: " +
         (Lnk.Clase == ClaseGrafico.BarrasH ? "left" : "center") +
         "; z-index: " + Lnk.NivelFlotante.ToString() + ";" +
-        (Lnk.Clase == ClaseGrafico.BarrasH ? " overflow: hidden;" : "");
+        (Lnk.Clase == ClaseGrafico.BarrasH ? " overflow: hidden;" : "")+
+        " resize: both; overflow: hidden;";
     }
 
     public string EstiloGrilla
@@ -552,27 +679,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       HayTendencias = true;
       StateHasChanged();
-      //AguardandoReloj = true;
-      //StateHasChanged();
-      //try
-      //{
-      //  if (ComponenteReloj.Alarmas == null || ComponenteReloj.Alarmas.Count < 2)
-      //  {
-      //    ComponenteReloj.ImponerAlarmas(null);
-      //    await LeerAlarmasAsync(true);
-      //    HayTendencias = true;
-      //  }
-      //}
-      //finally
-      //{
-      //  AguardandoReloj = false;
-      //  StateHasChanged();
-      //}
     }
-
-    private Int32 mPeriodoDataset = -1;
-    private List<CColumnaBase> mColumnasDataset;
-    private CProveedorComprimido mProveedor = null;
 
     private BlockDatosZip DatosYaLeidos(Int32 Periodo)
     {
@@ -623,12 +730,17 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-
-
     private bool ProcesoDatosYaLeidos(Int32 Periodo)
     {
       try
       {
+
+        if (mbRetrocediendo && mProveedor != null)
+        {
+          mbRetrocediendo = false;
+          ActualizarDatosVentanas(false);
+          return true;
+        }
         BlockDatosZip Block = DatosYaLeidos(Periodo);
         if (Block == null)
         {
@@ -666,8 +778,6 @@ namespace TableroPecasV5.Client.Logicas
 
     [Inject]
     public HttpClient Http { get; set; }
-
-    public bool VerDetalleIndicador { get; set; } = false;
 
     public void VerDetalles()
 		{
@@ -739,9 +849,6 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    public ClaseElemento ClaseOrigen { get; set; } = ClaseElemento.NoDefinida;
-    public Int32 CodigoOrigen { get; set; } = -1;
-
     private BlockDatosZip BlockDatosPeriodo(Int32 Periodo)
     {
       foreach (BlockDatosZip Block in mBlocksDatos)
@@ -759,13 +866,11 @@ namespace TableroPecasV5.Client.Logicas
       return (BlockDatosPeriodo(Periodo) != null);
     }
 
-    protected List<CInformacionAlarmaCN> mAlarmasImpuestas = null;
-
     public CInformacionAlarmaCN UltimaAlarma
 		{
       get
 			{
-        return (Alarmas != null && Alarmas.Count > 0 ? Alarmas.Last() : null);
+        return Contenedores.CContenedorDatos.AlarmaIndicadorDesdeGlobal(Indicador.Codigo, CodigoElementoDimension); // (Alarmas != null && Alarmas.Count > 0 ? Alarmas.Last() : null);
 			}
 		}
 
@@ -774,7 +879,8 @@ namespace TableroPecasV5.Client.Logicas
       get
 			{
         return (mAlarmasImpuestas == null ?
-            (ComponenteTendencias == null ? ComponenteTendRed.Alarmas : ComponenteTendencias.Alarmas) :
+            (ComponenteTendencias == null ?
+            (ComponenteTendRed == null ? null : ComponenteTendRed.Alarmas) : ComponenteTendencias.Alarmas) :
             mAlarmasImpuestas);
 			}
 		}
@@ -860,8 +966,6 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private List<BlockDatosZip> mBlocksDatos = new List<BlockDatosZip>();
-    
     private void CargarDatosDatasetBin(RespuestaDatasetBin Tabla)
     {
       try
@@ -1019,11 +1123,6 @@ namespace TableroPecasV5.Client.Logicas
 			}
     }
 
-    private Int32 mAbscisaTendenciaAnterior = -999999;
-    private Int32 mOrdenadaTendenciaAnterior = -999999;
-    private long mAnchoTendenciaAnterior = -999999;
-    private long mAltoTendenciaAnterior = -999999;
-
     public void ReposicionarTendencias(int Abscisa, int Ordenada, int Ancho, int Alto, bool Encima)
     {
       if (ComponenteTendencias != null)
@@ -1142,9 +1241,6 @@ namespace TableroPecasV5.Client.Logicas
       StateHasChanged();
 		}
 
-    public bool HayTendencias { get; set; }
-    public bool HayFiltroDatos { get; set; } = false;
-
     public CLinkGrilla Grilla
     {
       get
@@ -1160,9 +1256,6 @@ namespace TableroPecasV5.Client.Logicas
 			}
     }
 
-    private CReloj mComponenteReloj = null;
-    private CTendRed mComponenteTendRed = null;
-
     public CReloj ComponenteReloj
     {
       get { return mComponenteReloj; }
@@ -1170,11 +1263,15 @@ namespace TableroPecasV5.Client.Logicas
       {
         mComponenteReloj = value;
         AguardandoReloj = false;
+        if (gLogicaIndicadorAnterior != null)
+				{
+          mComponenteReloj.AlarmasLeidas = gLogicaIndicadorAnterior.ComponenteReloj.Alarmas;
+          mComponenteReloj.ImponerAlarmas(gLogicaIndicadorAnterior.ComponenteReloj.Alarmas);
+				}
         ComponenteReloj.ImponerPosicion(10, 5, 260, 200);
       }
     }
 
-    private bool mbAlarmaReducida = false;
     public bool HayAlarmaReducida
 		{
       get
@@ -1202,7 +1299,6 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private CComponenteTendencias mComponenteTendencias = null;
     public CComponenteTendencias ComponenteTendencias
     {
       get { return mComponenteTendencias; }
@@ -1212,7 +1308,7 @@ namespace TableroPecasV5.Client.Logicas
         mComponenteTendencias.FncReposicionarArriba = PonerTendenciaArriba;
         CLogicaTendencias.DimensionCaracter = mDimensionCaracter;
         ComponenteTendencias.ImponerPosicion(ABSCISA_INI_TENDENCIAS, 5, (Int32)AnchoTendenciasDefault, (Int32)AltoTendenciaDefault);
-        mComponenteTendencias.EjecutarRefresco = FncRefrescar;
+        mComponenteTendencias.EjecutarRefresco = Refrescar;
         mComponenteTendencias.AlCambiarPunto += ReposicionarDatasetAsync;
       }
     }
@@ -1222,11 +1318,6 @@ namespace TableroPecasV5.Client.Logicas
       NivelTendencias = 2;
       NivelFiltros = 2;
 		}
-
-    private void FncRefrescar()
-    {
-      StateHasChanged();
-    }
 
     private async Task ReposicionarDatasetAsync()
     {
@@ -1241,7 +1332,27 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private CContenedorFiltros mComponenteFiltros = null;
+    private void CopiarDatosComponenteFiltros()
+		{
+      mComponenteFiltros.Links = gLogicaIndicadorAnterior.ComponenteFiltros.Links;
+			foreach (CLinkFiltros Lnk in mComponenteFiltros.Links)
+			{
+				Lnk.Componente = null;
+			}
+
+			mComponenteFiltros.Graficos = gLogicaIndicadorAnterior.ComponenteFiltros.Graficos;
+			foreach (CLinkGrafico Lnk in mComponenteFiltros.Graficos)
+			{
+				Lnk.Componente = null;
+			}
+
+			if (mComponenteFiltros.Grilla != null)
+			{
+				mComponenteFiltros.Grilla.Componente = null;
+			}
+
+		}
+
     public CContenedorFiltros ComponenteFiltros
     {
       get { return mComponenteFiltros; }
@@ -1255,6 +1366,10 @@ namespace TableroPecasV5.Client.Logicas
         mComponenteFiltros.PuntoSeleccionado = (mComponenteTendencias == null ? null : mComponenteTendencias.AlarmaParaDatos);
         mComponenteFiltros.ImponerPosicion(10, 215, 260, AltoContenedor);
         mComponenteFiltros.ProveedorImpuesto = ProveedorComprimido();
+        if (gLogicaIndicadorAnterior!=null && gLogicaIndicadorAnterior.ComponenteFiltros != null)
+				{
+          CopiarDatosComponenteFiltros();
+				}
       }
     }
 
@@ -1263,11 +1378,6 @@ namespace TableroPecasV5.Client.Logicas
       Grilla = null;
       StateHasChanged();
     }
-
-    private CLinkGrafico mGraficoDrag = null;
-    private CLinkFiltros mFiltroDrag = null;
-    private LineaFiltro mLineaDrag = null;
-    private CLinkGrilla mGrillaDrag = null;
 
     public LineaFiltro LineaDrag
 		{
@@ -1301,6 +1411,17 @@ namespace TableroPecasV5.Client.Logicas
       Filtro.Ancho = (Int32)Valores[2];
     }
 
+    public async void CambioMedidasGrafico(CLinkGrafico Grafico)
+    {
+      object[] Args = new object[1];
+      Args[0] = IdGrafico(Grafico.CodigoUnico);
+      string Dimensiones = await JSRuntime.InvokeAsync<string>("FuncionesJS.getRectangulo", Args);
+      List<double> Valores = CRutinas.ListaAReales(Dimensiones);
+      Grafico.Ancho = (Int32)Valores[2];
+      Grafico.Alto = (Int32)Valores[3];
+      Grafico.Componente.Redibujar();
+    }
+
     public void IniciarDragLinea(LineaFiltro Linea)
     {
       mFiltroDrag = null;
@@ -1316,6 +1437,17 @@ namespace TableroPecasV5.Client.Logicas
       mGrillaDrag = Grilla;
       mGraficoDrag = null;       
     }
+
+    public void CopiarDatosFiltro(CLogicaFiltroTextos Filtro)
+		{
+      if (gLogicaIndicadorAnterior != null && gLogicaIndicadorAnterior.ComponenteFiltros!=null)
+			{
+        CLinkFiltros LnkAntes = (from L in gLogicaIndicadorAnterior.ComponenteFiltros.Links
+                                           where L.Componente.Filtrador.Columna.Nombre == Filtro.Filtrador.Columna.Nombre
+                                           select L).FirstOrDefault();
+        Filtro.CopiarDatos(LnkAntes.Componente);
+			}
+		}
 
     public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
     {
@@ -1479,7 +1611,6 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private double mDimensionCaracter = -1;
     private async Task BuscarDimensionCaracter()
     {
       if (mDimensionCaracter < 0)
@@ -1538,14 +1669,12 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private string mbSinTendencia = "disabled";
     public string SinTendencia
     {
       get { return mbSinTendencia; }
       set { mbSinTendencia = value; }
     }
 
-    private CDatoIndicador mIndicador = null;
     public CDatoIndicador Indicador
     {
       get { return mIndicador; }
@@ -1554,7 +1683,8 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    public virtual string NombreIndicador
+
+   public virtual string NombreIndicador
     {
       get { return (Indicador == null ? "No definido" : Indicador.Descripcion); }
     }
@@ -1564,29 +1694,27 @@ namespace TableroPecasV5.Client.Logicas
       get { return (Indicador == null ? "" : Indicador.Unidades); }
     }
 
-    private List<CInformacionAlarmaCN> mAlarmas = null;
-
     public string Valor()
     {
 
-      if (Indicador == null)
+      if (Indicador == null || mComponenteReloj == null)
       {
-        return "";
+        return "--";
       }
 
-      if (mAlarmas == null)
+      if (ComponenteReloj.AlarmasLeidas == null)
 			{
         _ = LeerAlarmasAsync(false);
-        return "";
+        return "--";
 			}
 
-      if (mAlarmas.Count == 0)
+      if (ComponenteReloj.AlarmasLeidas.Count == 0)
       {
-        return "";
+        return "--";
       }
       else
       {
-        return CRutinas.ValorATexto(mAlarmas.Last().Valor, Indicador.Decimales);
+        return CRutinas.ValorATexto(ComponenteReloj.AlarmasLeidas.Last().Valor, Indicador.Decimales);
       }
     }
 
@@ -1678,8 +1806,6 @@ namespace TableroPecasV5.Client.Logicas
                 select C).FirstOrDefault();
       }
 		}
-
-    private CBaseGrafico mGraficoSeleccionadoImpuesto = null;
 
     private void FncSeleccionarGrafico(CBaseGrafico Grafico)
     {
@@ -1775,10 +1901,21 @@ namespace TableroPecasV5.Client.Logicas
     public void Dispose()
     {
       TableroPecasV5.CEventosJS.OnResize -= FncResizeEvento;
-      if (mProveedor != null)
-      {
-        mProveedor = null;
+      if (gLogicaIndicadorAnterior != null) {
+        if (gLogicaIndicadorAnterior.Codigo != Codigo)
+        {
+          gLogicaIndicadorAnterior.Dispose();
+          if (gLogicaIndicadorAnterior.mProveedor != null)
+          {
+            gLogicaIndicadorAnterior.mProveedor = null;
+          }
+        }
       }
+      else
+      {
+        gLogicaIndicadorAnterior = new CLogicaIndicador();
+      }
+      CopiarDatosEntreLogicaIndicadores(this, gLogicaIndicadorAnterior);
     }
 
   }

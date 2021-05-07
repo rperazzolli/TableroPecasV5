@@ -1017,7 +1017,10 @@ namespace TableroPecasV5.Client.Logicas
       foreach (CLinkFiltros Link in mLinks)
       {
         Link.Filtrador.Proveedor = Proveedor;
-        Link.Componente.Filtrador = Link.Filtrador;
+        if (Link.Componente != null)
+        {
+          Link.Componente.Filtrador = Link.Filtrador;
+        }
       }
 
       foreach (CLinkGrafico Link in mGraficos)
@@ -1388,6 +1391,10 @@ namespace TableroPecasV5.Client.Logicas
           mComponente.AlCambiarAncho += FncRefresco;
           mComponente.AlCerrarFiltro += FncCerrar;
           mComponente.Filtrador.AlImponerFiltrosAsociados += FncAjustarListasValor;
+          if (mComponente.Contenedor != null)
+					{
+            mComponente.Contenedor.CopiarDatosFiltro(mComponente);
+					}
         }
       }
     }

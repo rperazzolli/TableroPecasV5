@@ -35,6 +35,8 @@ namespace TableroPecasV5.Client.Logicas
 
 		private Int32 mCodigoPantalla;
 
+		public bool VerLabels { get; set; } = true;
+
 		public CColumnaBase ColumnaGeoreferencia { get; set; }
 		public CVinculoIndicadorCompletoCN Vinculador { get; set; }
 		public bool MostrarDialogoVinculador { get; set; } = false;

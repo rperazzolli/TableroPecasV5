@@ -25,6 +25,18 @@ namespace TableroPecasV5.Client.Logicas
     [CascadingParameter]
     public CLogicaIndicador IndicadorContenedor { get; set; }
 
+    private CLogicaFiltroTextos mDatosAntes = null; // para cuando se va hacia atras.
+    public void CopiarDatos(CLogicaFiltroTextos Otro)
+    {
+      Abscisa = Otro.Abscisa;
+      Ordenada = Otro.Ordenada;
+      Ancho = Otro.Ancho;
+      MinimoRango = Otro.MinimoRango;
+      MaximoRango = Otro.MaximoRango;
+      ColumnaAgrupadora = Otro.ColumnaAgrupadora;
+      mDatosAntes = Otro;
+    }
+
     public void Dispose()
     {
       if (mFiltrador != null)
@@ -252,6 +264,25 @@ namespace TableroPecasV5.Client.Logicas
       return CodigoValor(Rutinas.CRutinas.CodificarFechaHora(Fecha), MenorIgual);
     }
 
+    private void CopiarSeleccionFilasFecha()
+		{
+      if (FilasFechaEnPantallaVisibles != null && mDatosAntes.FilasFechaEnPantallaVisibles != null)
+      {
+        foreach (CElementoFilaAsociativaFecha Otra in (from F in mDatosAntes.FilasFechaEnPantallaVisibles
+                                                       where F.Seleccionado
+                                                       select F).ToList())
+        {
+          CElementoFilaAsociativaFecha Fila = (from F in FilasFechaEnPantallaVisibles
+                                               where F.Nombre == Otra.Nombre
+                                               select F).FirstOrDefault();
+          if (Fila != null)
+          {
+            Fila.Seleccionado = true;
+          }
+        }
+      }
+    }
+
     private void ArmarFilasFecha()
     {
       mFiltrador.CrearFilasFecha();
@@ -269,10 +300,21 @@ namespace TableroPecasV5.Client.Logicas
       }
       else
       {
-        List<string> Seleccionadas = (mFilasPantalla == null || mFilasPantalla.Count == 0 ? Filtrador.ValoresSeleccionados :
+        List<string> Seleccionadas;
+        if (mDatosAntes == null)
+        {
+          Seleccionadas = (mFilasPantalla == null || mFilasPantalla.Count == 0 ? Filtrador.ValoresSeleccionados :
             (from F in mFilasPantalla
              where F.Seleccionado
              select F.Nombre).ToList());
+        }
+        else
+				{
+          Seleccionadas = (from F in mDatosAntes.FilasEnPantalla
+                           where F.Seleccionado
+                           select F.Nombre).ToList();
+				}
+        mDatosAntes = null;
 
         mFilasPantalla.Clear();
         mFiltrador.AjustarPorcentajes();

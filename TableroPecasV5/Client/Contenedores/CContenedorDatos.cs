@@ -624,19 +624,19 @@ namespace TableroPecasV5.Client.Contenedores
 
     public static CInformacionAlarmaCN AlarmaIndicadorDesdeGlobal(Int32 Indicador, Int32 Dimension)
     {
-      List<CInformacionAlarmaCN> DatosLocales = (from A in gAlarmasIndicador
-                                                 where A.CodigoIndicador == Indicador &&
-                                                   A.ElementoDimension == Dimension
-                                                 orderby A.Periodo
-                                                 select A).ToList();
-      if (DatosLocales != null && DatosLocales.Count > 0)
+      if (gAlarmasIndicador != null)
       {
-        return DatosLocales.Last();
+        List<CInformacionAlarmaCN> DatosLocales = (from A in gAlarmasIndicador
+                                                   where A.CodigoIndicador == Indicador &&
+                                                     A.ElementoDimension == Dimension
+                                                   orderby A.Periodo
+                                                   select A).ToList();
+        if (DatosLocales != null && DatosLocales.Count > 0)
+        {
+          return DatosLocales.Last();
+        }
       }
-      else
-      {
-        return null;
-      }
+      return null;
     }
 
     public static async Task<List<CInformacionAlarmaCN>> ObtenerAlarmasIndicadorAsync(HttpClient Cliente,

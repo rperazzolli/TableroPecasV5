@@ -15,8 +15,13 @@ namespace TableroPecasV5.Client.Logicas
   public class CLogicaLogin: ComponentBase
   {
 
-    public CLogicaLogin()
+    public string Estilo
 		{
+      get
+			{
+        return "margin-top: 20px; margin-left: "+((Contenedores.CContenedorDatos.AnchoPantalla-400)/2).ToString()+
+          "px; width: 400px; text-align: center;";
+			}
 		}
 
     private string mszUsuario = "";
@@ -108,7 +113,7 @@ namespace TableroPecasV5.Client.Logicas
             Contenedores.CContenedorDatos.CodigoUsuario = Datos.CodigoUsuario;
             Contenedores.CContenedorDatos.TendenciasEnTarjeta = Datos.TendenciasEnTarjeta;
             Contenedores.CContenedorDatos.DesciendeEnRojo = Datos.DesciendeEnRojo;
-            Contenedores.CContenedorDatos.SiempreTendencia = Datos.SiempreTendencia;
+            Contenedores.CContenedorDatos.SiempreTendencia = false; // Datos.SiempreTendencia;
             Contenedores.CContenedorDatos.PoneEtiquetas = Datos.PoneEtiquetas;
             Contenedores.CContenedorDatos.RespetaSentido = Datos.RespetaSentido;
             Contenedores.CContenedorDatos.ImprimirPDF = Datos.ImprimirPDF;

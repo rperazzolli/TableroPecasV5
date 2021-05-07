@@ -253,41 +253,12 @@ namespace TableroPecasV5.Client.Clases
 			}
     }
 
-    public async Task DibujarGradientesAsync(IJSRuntime JSRuntime, Int32 Posicion)
+    public async Task DibujarGradientesAsync(IJSRuntime JSRuntime, Int32 Posicion, bool VerLabels = true)
     {
       foreach (CCapaComodin Capa in CapasCompletas)
       {
-        await Capa.DibujarAreasGradienteAsync(JSRuntime, Posicion);
+        await Capa.DibujarAreasGradienteAsync(JSRuntime, Posicion, VerLabels);
       }
-    }
-
-    private CCapaBingCN mCapaEnLectura;
-
-    private void AjustarColorOpacidad(CCapaComodin Capa)
-    {
-      if (mCapaEnLectura == null)
-      {
-        Capa.Opacidad = 128;
-        Capa.ColorWFS = System.Drawing.Color.Gray;
-      }
-      else
-      {
-        Capa.Opacidad = mCapaEnLectura.Opacidad;
-        Capa.ColorWFS = System.Drawing.Color.FromArgb(255,
-            mCapaEnLectura.Rojo, mCapaEnLectura.Verde, mCapaEnLectura.Azul);
-      }
-    }
-
-    private CCapaComodin UbicarCapaComodin(List<CCapaComodin> Capas, CCapaBingCN CapaBing)
-    {
-      foreach (CCapaComodin Capa in Capas)
-      {
-        if (Capa.Clase == CapaBing.Clase && Capa.CodigoCapa == CapaBing.CodigoCapa)
-        {
-          return Capa;
-        }
-      }
-      return null;
     }
 
   }

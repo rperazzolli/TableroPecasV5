@@ -32,6 +32,13 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     [Parameter]
+    public bool VerLabels
+    {
+      get { return VerLabelsCapa; }
+      set { VerLabelsCapa = value; }
+    }
+
+    [Parameter]
     public Int32 CodigoElementoDimension
     {
       get { return CodigoElementoDimensionBase; }
