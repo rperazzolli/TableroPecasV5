@@ -835,7 +835,7 @@ namespace TableroPecasV5.Client.Logicas
 		}
 
 		private Int32 mAbscisaReferencias = 5;
-		private Int32 mOrdenadaReferencias = 5;
+		private Int32 mOrdenadaReferencias = 28;
 
 		public string EstiloContenedorReferencias
 		{

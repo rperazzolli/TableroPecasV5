@@ -10,30 +10,31 @@ namespace TableroPecasV5.Client.Logicas
 {
 	public class CLogicaPagPinsLL	: ComponentBase
 	{
-		public static List<CColumnaBase> gColumnas { get; set; }
-		public static List<CLineaComprimida> gLineas { get; set; }
-		public static string gColumnaDatos { get; set; }
-		public static string gColumnaLat { get; set; }
-		public static string gColumnaLng { get; set; }
-		public static bool gAgrupados { get; set; }
 
+		[Parameter]
 		public List<CColumnaBase> Columnas { get; set; } = null;
+		[Parameter]
 		public List<CLineaComprimida> Lineas { get; set; } = null;
+		[Parameter]
 		public string ColumnaDatos { get; set; } = "";
+		[Parameter]
 		public string ColumnaLat { get; set; } = "";
+		[Parameter]
 		public string ColumnaLng { get; set; } = "";
+		[Parameter]
 		public bool Agrupados { get; set; }
+
+		[CascadingParameter]
+		public CLogicaIndicador Contenedor { get; set; }
 
 		protected override Task OnInitializedAsync()
 		{
-			Columnas = gColumnas;
-			Lineas = gLineas;
-			ColumnaDatos = gColumnaDatos;
-			ColumnaLat = gColumnaLat;
-			ColumnaLng = gColumnaLng;
-			Agrupados = gAgrupados;
-//			StateHasChanged();
 			return base.OnInitializedAsync();
+		}
+
+		public void Retroceder()
+		{
+			Contenedor.CerrarPinesLL();
 		}
 
 	}

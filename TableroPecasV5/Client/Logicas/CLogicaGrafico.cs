@@ -123,16 +123,21 @@ namespace TableroPecasV5.Client.Logicas
     public long AnchoGraficoApiladoDer { get; set; }
 
     [Parameter]
+    public CLinkGrafico Link { get; set; }
+
+    [Parameter]
     public bool PuedeCrearGraficoDependiente { get; set; } = true;
+
+    private long mAnchoGrafico = -1;
 
     public long AnchoGrafico
     {
-      get { return (long)Ancho; }
+      get { return (long)mAnchoGrafico; }
       set
       {
-        if (value != Ancho)
+        if (value != mAnchoGrafico)
         {
-          Ancho = value;
+          mAnchoGrafico = value;
           AnchoCanvas = value;
           AnchoGraficoApilado = Math.Max(2, 67 * value / 100 - 1);
           AnchoGraficoApiladoDer = Math.Max(2, Math.Min(value - AnchoGraficoApilado - 2, 33 * value / 100));
@@ -364,7 +369,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       get
       {
-        return "width:100%; height: calc(100% - 32px); overflow-x: " + ScrollAbscisas +
+        return "width:100%; height: calc(100% - 32px); overflow-x: " + (AnchoGrafico > Ancho ? "auto" : "hidden") +
           "; overflow-y: " + ScrollOrdenadas + "; position: relative; margin: 30px 0px 0px 0px; background-color: white;";
       }
     }
@@ -911,7 +916,7 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     private double mdSaltoHistograma = double.NaN;
-    private void Proveedor_AlAjustarDependientes(object sender)
+    public void Proveedor_AlAjustarDependientes(object sender)
     {
       switch (Clase)
       {
@@ -1672,6 +1677,9 @@ namespace TableroPecasV5.Client.Logicas
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+
+      bool bRedibujar = false;
+
       while (true)
       {
         lock (OBJ_LOCK)
@@ -1694,10 +1702,20 @@ namespace TableroPecasV5.Client.Logicas
         if (PorcionesTorta.Count == 0 && mDatosApilados == null && mDatosHistograma.Count == 0)
         {
           RefrescarDatosTortaDesdeProveedor();
-          StateHasChanged();
+          bRedibujar = true;
+          return;
         }
         else
         {
+
+          object[] Args = new object[1];
+          Args[0] = "IDGrafico" + CodigoUnico.ToString();
+          string Dimensiones = await JSRuntime.InvokeAsync<string>("FuncionesJS.getRectangulo", Args);
+          List<double> Valores = CRutinas.ListaAReales(Dimensiones);
+          Ancho = Valores[2];
+          Alto = Valores[3];
+          Link.Ancho = (long)Ancho;
+          Link.Alto = (long)Alto;
 
           if (Clase == ClaseGrafico.BarrasH)
           {
@@ -1709,7 +1727,7 @@ namespace TableroPecasV5.Client.Logicas
             {
               if (CanvasGrafico.Height != AltoGrafico)
               {
-                StateHasChanged();
+                bRedibujar = true;
                 return;
               }
               try
@@ -1742,46 +1760,67 @@ namespace TableroPecasV5.Client.Logicas
                       CGraficoBarras GrBarras = new CGraficoBarras();
                       mPorcionesBarras = ExtraerPorcionesBarras();
                       long AnchoCanvasNecesario = await GrBarras.DeterminarAnchoNecesarioAsync(mContexto, mPorcionesBarras, AltoGraficoTotal);
-                      if (AnchoCanvasNecesario != AnchoCanvas && AnchoCanvasNecesario > (Ancho - 4))
+                      if (AnchoCanvasNecesario > AnchoGrafico)
                       {
-                        AnchoCanvas = AnchoCanvasNecesario;
+                        AnchoGrafico = AnchoCanvasNecesario;
+                        bRedibujar = true;
+                        return;
+                      }
+                      AnchoGrafico = Math.Max(AnchoCanvasNecesario, (long)Ancho);
+                      if (AnchoGrafico > (Ancho - 4))
+                      {
+                        AltoGraficoTotal = (long)Alto - 47;
                       }
                       else
                       {
-                        AnchoCanvas = AnchoGrafico;
                         AltoGraficoTotal = (long)Alto - 32;
-                        await GrBarras.HacerGraficoBarrasAsync(mContexto, Ancho, AltoGraficoTotal);
                       }
+                      AnchoCanvas = AnchoGrafico;
+                      await GrBarras.HacerGraficoBarrasAsync(mContexto, Ancho, AltoGraficoTotal);
                       break;
                     case ClaseGrafico.Histograma:
                       CGraficoHistograma GrHisto = new CGraficoHistograma();
                       long AnchoCanvasNecesarioH = await GrHisto.DeterminarAnchoNecesarioAsync(mContexto, mDatosHistograma,
                           AnchoGraficoTotal, AltoGraficoTotal);
-                      if (AnchoCanvasNecesarioH != AnchoCanvas && AnchoCanvasNecesarioH > (Ancho - 4))
+                      if (AnchoCanvasNecesarioH > AnchoGrafico)
+											{
+                        AnchoGrafico = AnchoCanvasNecesarioH;
+                        bRedibujar = true;
+                        return;
+											}
+                      AnchoGrafico = Math.Max(AnchoCanvasNecesarioH, (long)Ancho);
+                      if (AnchoGrafico > (Ancho - 4))
                       {
-                        AnchoCanvas = AnchoCanvasNecesarioH;
+                        AltoGraficoTotal = (long)Alto - 47;
                       }
                       else
                       {
-                        AnchoCanvas = AnchoGrafico;
                         AltoGraficoTotal = (long)Alto - 32;
-                        await GrHisto.HacerGraficoHistogramaAsync(mContexto, Ancho, AltoGraficoTotal);
                       }
+                      AnchoCanvas = AnchoGrafico;
+                      await GrHisto.HacerGraficoHistogramaAsync(mContexto, Ancho, AltoGraficoTotal);
                       break;
                     case ClaseGrafico.Puntos:
                       CGraficoLineas GrLineas = new CGraficoLineas();
                       long AnchoCanvasNecesarioL = await GrLineas.DeterminarAnchoNecesarioAsync(mContexto, mPuntosLineas,
                           AnchoGraficoTotal, AltoGraficoTotal);
-                      if (AnchoCanvasNecesarioL != AnchoCanvas && AnchoCanvasNecesarioL > (Ancho - 4))
+                      if (AnchoCanvasNecesarioL > AnchoGrafico)
                       {
-                        AnchoCanvas = AnchoCanvasNecesarioL;
+                        AnchoGrafico = AnchoCanvasNecesarioL;
+                        bRedibujar = true;
+                        return;
+                      }
+                      AnchoGrafico = Math.Max(AnchoCanvasNecesarioL, (long)Ancho);
+                      if (AnchoGrafico > (Ancho - 4))
+                      {
+                        AltoGraficoTotal = (long)Alto - 47;
                       }
                       else
                       {
-                        AnchoCanvas = AnchoGrafico;
                         AltoGraficoTotal = (long)Alto - 32;
-                        await GrLineas.HacerGraficoLineasAsync(mContexto, Ancho, AltoGraficoTotal);
                       }
+                      AnchoCanvas = AnchoGrafico;
+                      await GrLineas.HacerGraficoLineasAsync(mContexto, Ancho, AltoGraficoTotal);
                       break;
                   }
                 }
@@ -1805,8 +1844,12 @@ namespace TableroPecasV5.Client.Logicas
       }
       finally
       {
-        mbGraficando = false;
         await base.OnAfterRenderAsync(firstRender);
+        mbGraficando = false;
+        if (bRedibujar)
+				{
+          StateHasChanged();
+				}
       }
     }
 

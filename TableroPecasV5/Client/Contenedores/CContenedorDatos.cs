@@ -255,10 +255,7 @@ namespace TableroPecasV5.Client.Contenedores
         RespuestaEnteros RespuestaCodigo = await Respuesta.Content.ReadFromJsonAsync<RespuestaEnteros>();
         if (!RespuestaCodigo.RespuestaOK)
         {
-          // provisorio.
-          return 1;
-          // hasta acá.
-          // throw new Exception(RespuestaCodigo.MsgErr);
+          throw new Exception(RespuestaCodigo.MsgErr);
         }
 
         return RespuestaCodigo.Codigos[0];

@@ -9,7 +9,7 @@ using TableroPecasV5.Shared;
 
 namespace TableroPecasV5.Client.Logicas
 {
-  public class CLogicaGrilla : CBaseGrafico
+  public class CLogicaGrilla : CBaseGrafico, IDisposable
   {
     [Parameter]
     public CDatoIndicador Indicador { get; set; }
@@ -35,6 +35,14 @@ namespace TableroPecasV5.Client.Logicas
         }
       }
     }
+
+    public void Dispose()
+		{
+      if (mProveedor != null)
+			{
+        mProveedor.AlAjustarDependientes -= CorregirDatos;
+			}
+		}
 
     [CascadingParameter]
     Logicas.CLogicaIndicador Pagina { get; set; }
@@ -97,7 +105,7 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private void CorregirDatos(object Aa)
+    public void CorregirDatos(object Aa)
     {
       if (PosicionActual >= CantidadPaginas)
       {

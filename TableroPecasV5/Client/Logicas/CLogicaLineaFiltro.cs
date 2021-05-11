@@ -26,11 +26,11 @@ namespace TableroPecasV5.Client.Logicas
 			return "background-color: " + Linea.ColorBase + ";";
 		}
 
-		public void IniciarDragLinea(LineaFiltro Linea)
+		public void IniciarDragLinea(Microsoft.AspNetCore.Components.Web.DragEventArgs e, LineaFiltro Linea)
 		{
 			if (Pagina != null)
 			{
-				Pagina.IniciarDragLinea(Linea);
+				Pagina.IniciarDragLinea(e.OffsetX, e.OffsetY, Linea);
 			}
 			else
 			{

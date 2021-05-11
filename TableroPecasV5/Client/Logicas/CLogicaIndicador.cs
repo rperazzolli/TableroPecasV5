@@ -104,35 +104,44 @@ namespace TableroPecasV5.Client.Logicas
       L2.mComponenteReloj = L1.mComponenteReloj;
       L2.mComponenteTendencias = L1.mComponenteTendencias;
       L2.mComponenteTendRed = L1.mComponenteTendRed;
-      L2.mComponenteFiltros = L1.mComponenteFiltros;
       L2.mDimensionCaracter = L1.mDimensionCaracter;
       L2.Indicador = L1.Indicador;
       L2.VerDetalleIndicador = L1.VerDetalleIndicador;
       L2.ClaseOrigen = L1.ClaseOrigen;
       L2.CodigoOrigen = L1.CodigoOrigen;
       L2.mColumnasDataset = L1.mColumnasDataset;
-      L2.mProveedor = L1.mProveedor;
       L2.mPeriodoDataset = L1.mPeriodoDataset;
+
+      //L2.mProveedor = new CProveedorComprimido(L1.mProveedor.ClaseOrigen, L1.mProveedor.CodigoOrigen)
+      //{
+      //  Columnas = L1.mProveedor.Columnas,
+      //  Datos = L1.mProveedor.Datos
+      //};
+
+      L2.mProveedor = L1.mProveedor;
+
+      if (L1.ComponenteFiltros != null)
+			{
+        L2.ComponenteFiltros = L1.ComponenteFiltros;
+			}
 		}
 
     private void EliminarRelacionesComponentes(CLogicaIndicador L)
 		{
-      L.mComponenteFiltros.Contenedor = this;
-      if (L.mComponenteFiltros.Grilla != null)
-      {
-        L.mComponenteFiltros.Grilla.Componente = null;
-      }
-      foreach (CLinkFiltros Lnk in L.mComponenteFiltros.Links)
+			L.mComponenteFiltros.Contenedor = this;
+			if (L.mComponenteFiltros.Grilla != null)
 			{
-        Lnk.Componente = null;
+				L.mComponenteFiltros.Grilla.Componente = null;
 			}
-      foreach (CLinkGrafico Lnk in L.mComponenteFiltros.Graficos)
-      {
-        Lnk.Componente = null;
-      }
-    }
-
-    protected static CLogicaIndicador gLogicaIndicadorAnterior = null;
+			foreach (CLinkFiltros Lnk in L.mComponenteFiltros.Links)
+			{
+				Lnk.Componente = null;
+			}
+			foreach (CLinkGrafico Lnk in L.mComponenteFiltros.Graficos)
+			{
+				Lnk.Componente = null;
+			}
+		}
 
 		#region Datos
 
@@ -190,22 +199,6 @@ namespace TableroPecasV5.Client.Logicas
       {
         if (mCodigo != value)
         {
-          if (gLogicaIndicadorAnterior!=null && gLogicaIndicadorAnterior.mCodigo == value)
-					{
-            
-            CopiarDatosEntreLogicaIndicadores(gLogicaIndicadorAnterior, this);
-            EliminarRelacionesComponentes(this);
-            if (HayFiltroDatos)
-						{
-              mbRetrocediendo = true;
-              _ = CrearFiltroDatosAsync();
-						}
-            return;
-					}
-          else
-					{
-            gLogicaIndicadorAnterior = null;
-					}
           mbLeyo = false;
           mCodigo = value;
           try
@@ -267,9 +260,9 @@ namespace TableroPecasV5.Client.Logicas
     private CTendRed mComponenteTendRed = null;
 
     private bool mbAlarmaReducida = false;
-    private CComponenteTendencias mComponenteTendencias = null;
+    private CLogicaTendencias mComponenteTendencias = null;
 
-    private CContenedorFiltros mComponenteFiltros = null;
+    private CLogicaContenedorFiltros mComponenteFiltros = null;
     private CLinkGrafico mGraficoDrag = null;
     private CLinkFiltros mFiltroDrag = null;
     private LineaFiltro mLineaDrag = null;
@@ -1263,11 +1256,6 @@ namespace TableroPecasV5.Client.Logicas
       {
         mComponenteReloj = value;
         AguardandoReloj = false;
-        if (gLogicaIndicadorAnterior != null)
-				{
-          mComponenteReloj.AlarmasLeidas = gLogicaIndicadorAnterior.ComponenteReloj.Alarmas;
-          mComponenteReloj.ImponerAlarmas(gLogicaIndicadorAnterior.ComponenteReloj.Alarmas);
-				}
         ComponenteReloj.ImponerPosicion(10, 5, 260, 200);
       }
     }
@@ -1299,7 +1287,29 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    public CComponenteTendencias ComponenteTendencias
+    private void CopiarComponenteTendencias(CLogicaTendencias C1, CLogicaTendencias C2)
+		{
+      C2.AltoGrafico = C1.AltoGrafico;
+      C2.AltoGraficoTotal = C1.AltoGraficoTotal;
+      C2.AnchoGrafico = C1.AnchoGrafico;
+      C2.Contenedor = this;
+      C2.Curvas = C1.Curvas;
+      C2.DetalleMensaje = C1.DetalleMensaje;
+      C2.EscalaDerecha = C1.EscalaDerecha;
+      C2.FechaDesde = C1.FechaDesde;
+      C2.FechaHasta = C1.FechaHasta;
+      C2.FechaHastaImpuesta = C1.FechaHastaImpuesta;
+      C2.FechaImpuesta = C1.FechaImpuesta;
+      C2.FechaInicialImpuesta = C1.FechaInicialImpuesta;
+      C2.ImponerAbscisa(C1.Abscisa);
+      C2.ImponerAlto(C1.Alto);
+      C2.ImponerAmpliado(C1.Ampliado);
+      C2.ImponerAncho(C1.Ancho);
+      C2.ImponerNivelFlotante(C1.NivelFlotante);
+      C2.IndicadoresAdicionales = C1.IndicadoresAdicionales;
+		}
+
+    public CLogicaTendencias ComponenteTendencias
     {
       get { return mComponenteTendencias; }
       set
@@ -1332,44 +1342,22 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private void CopiarDatosComponenteFiltros()
-		{
-      mComponenteFiltros.Links = gLogicaIndicadorAnterior.ComponenteFiltros.Links;
-			foreach (CLinkFiltros Lnk in mComponenteFiltros.Links)
-			{
-				Lnk.Componente = null;
-			}
-
-			mComponenteFiltros.Graficos = gLogicaIndicadorAnterior.ComponenteFiltros.Graficos;
-			foreach (CLinkGrafico Lnk in mComponenteFiltros.Graficos)
-			{
-				Lnk.Componente = null;
-			}
-
-			if (mComponenteFiltros.Grilla != null)
-			{
-				mComponenteFiltros.Grilla.Componente = null;
-			}
-
-		}
-
-    public CContenedorFiltros ComponenteFiltros
+    public CLogicaContenedorFiltros ComponenteFiltros
     {
       get { return mComponenteFiltros; }
       set
       {
-        mComponenteFiltros = value;
-        ComponenteFiltros.AlAjustarVentanasFlotantes += ComponenteFiltros_AlAjustarVentanasFlotantes;
-        ComponenteFiltros.FncReposicionarArriba = PonerContenedorFiltroArriba;
-        ComponenteFiltros.EvSeleccionarGrafico += FncSeleccionarGrafico;
-        mComponenteFiltros.DimensionCaracter = mDimensionCaracter;
-        mComponenteFiltros.PuntoSeleccionado = (mComponenteTendencias == null ? null : mComponenteTendencias.AlarmaParaDatos);
-        mComponenteFiltros.ImponerPosicion(10, 215, 260, AltoContenedor);
-        mComponenteFiltros.ProveedorImpuesto = ProveedorComprimido();
-        if (gLogicaIndicadorAnterior!=null && gLogicaIndicadorAnterior.ComponenteFiltros != null)
-				{
-          CopiarDatosComponenteFiltros();
-				}
+        if (mComponenteFiltros != value)
+        {
+          mComponenteFiltros = value;
+          ComponenteFiltros.AlAjustarVentanasFlotantes += ComponenteFiltros_AlAjustarVentanasFlotantes;
+          ComponenteFiltros.FncReposicionarArriba = PonerContenedorFiltroArriba;
+          ComponenteFiltros.EvSeleccionarGrafico += FncSeleccionarGrafico;
+          mComponenteFiltros.DimensionCaracter = mDimensionCaracter;
+          mComponenteFiltros.PuntoSeleccionado = (mComponenteTendencias == null ? null : mComponenteTendencias.AlarmaParaDatos);
+          mComponenteFiltros.ImponerPosicion(10, 215, 260, AltoContenedor);
+          mComponenteFiltros.ProveedorImpuesto = ProveedorComprimido();
+        }
       }
     }
 
@@ -1385,16 +1373,88 @@ namespace TableroPecasV5.Client.Logicas
       set { mLineaDrag = value; }
 		}
 
-    public void IniciarDragGrafico(CLinkGrafico Grafico)
+    public bool HayWSS { get; set; } = false;
+
+    public CLogicaBingWSS PaginaWSS { get; set; }
+
+    public List<CColumnaBase> Columnas
+		{
+      get { return mProveedor.Columnas; }
+		}
+
+    public List<CLineaComprimida> LineasVigentes
+		{
+      get { return mProveedor.DatosVigentes; }
+		}
+
+    public void AbrirWSS()
+		{
+      HayWSS = true;
+      StateHasChanged();
+    }
+
+    public void CerrarWSS()
+		{
+      HayWSS = false;
+      StateHasChanged();
+		}
+
+    public CLogicaPagTortasGIS PaginaTortasGIS { get; set; }
+
+    public bool HayTortasGIS { get; set; } = false;
+
+    public CColumnaBase ColumnaDatosTorta { get; set; }
+    public CColumnaBase ColumnaAgrupadoraTorta { get; set; }
+    public CColumnaBase ColumnaPosicionadoraTorta { get; set; }
+    public CColumnaBase ColumnaLatTorta { get; set; }
+    public CColumnaBase ColumnaLngTorta { get; set; }
+    public DatosSolicitados SolicitudTorta { get; set; }
+    public List<CLineaComprimida> LineasTorta { get; set; }
+    public bool PinesAgrupados { get; set; }
+
+
+    public void AbrirTortasGIS()
     {
+      HayTortasGIS = true;
+      StateHasChanged();
+    }
+
+    public void CerrarTortasGIS()
+    {
+      HayTortasGIS = false;
+      StateHasChanged();
+    }
+
+    public bool HayPinesLL { get; set; } = false;
+
+    public CLogicaPagPinsLL PaginaPinsLL { get; set; }
+
+    public void AbrirPinsLL()
+    {
+      HayPinesLL = true;
+      StateHasChanged();
+    }
+
+    public void CerrarPinesLL()
+    {
+      HayPinesLL = false;
+      StateHasChanged();
+    }
+
+    public void IniciarDragGrafico(Microsoft.AspNetCore.Components.Web.DragEventArgs e, CLinkGrafico Grafico)
+    {
+      mOffsetAbsc = e.OffsetX;
+      mOffsetOrd = e.OffsetY;
       mFiltroDrag = null;
       mLineaDrag = null;
       mGrillaDrag = null;
       mGraficoDrag = Grafico;
     }
 
-    public void IniciarDragFiltro(CLinkFiltros Filtro)
+    public void IniciarDragFiltro(Microsoft.AspNetCore.Components.Web.DragEventArgs e, CLinkFiltros Filtro)
     {
+      mOffsetAbsc = e.OffsetX;
+      mOffsetOrd = e.OffsetY;
       CambioMedidas(Filtro);
       mFiltroDrag = Filtro;
       mLineaDrag = null;
@@ -1413,41 +1473,38 @@ namespace TableroPecasV5.Client.Logicas
 
     public async void CambioMedidasGrafico(CLinkGrafico Grafico)
     {
+//      Grafico.Componente.BloquearGrafico();
       object[] Args = new object[1];
       Args[0] = IdGrafico(Grafico.CodigoUnico);
       string Dimensiones = await JSRuntime.InvokeAsync<string>("FuncionesJS.getRectangulo", Args);
       List<double> Valores = CRutinas.ListaAReales(Dimensiones);
       Grafico.Ancho = (Int32)Valores[2];
       Grafico.Alto = (Int32)Valores[3];
-      Grafico.Componente.Redibujar();
+//      Grafico.Componente.Redibujar();
     }
 
-    public void IniciarDragLinea(LineaFiltro Linea)
+    private double mOffsetAbsc;
+    private double mOffsetOrd;
+
+    public void IniciarDragLinea(double OffsetAbsc, double OffsetOrd, LineaFiltro Linea)
     {
+      mOffsetAbsc = OffsetAbsc;
+      mOffsetOrd = OffsetOrd;
       mFiltroDrag = null;
       mLineaDrag = Linea;
       mGrillaDrag = null;
       mGraficoDrag = null;
     }
 
-    public void IniciarDragGrilla(CLinkGrilla Grilla)
+    public void IniciarDragGrilla(Microsoft.AspNetCore.Components.Web.DragEventArgs e, CLinkGrilla Grilla)
 		{
+      mOffsetAbsc = e.OffsetX;
+      mOffsetOrd = e.OffsetY;
       mFiltroDrag = null;
       mLineaDrag = null;
       mGrillaDrag = Grilla;
       mGraficoDrag = null;       
     }
-
-    public void CopiarDatosFiltro(CLogicaFiltroTextos Filtro)
-		{
-      if (gLogicaIndicadorAnterior != null && gLogicaIndicadorAnterior.ComponenteFiltros!=null)
-			{
-        CLinkFiltros LnkAntes = (from L in gLogicaIndicadorAnterior.ComponenteFiltros.Links
-                                           where L.Componente.Filtrador.Columna.Nombre == Filtro.Filtrador.Columna.Nombre
-                                           select L).FirstOrDefault();
-        Filtro.CopiarDatos(LnkAntes.Componente);
-			}
-		}
 
     public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
     {
@@ -1465,10 +1522,10 @@ namespace TableroPecasV5.Client.Logicas
           StateHasChanged();
         }
       }
-      if (mFiltroDrag != null)
+      if (mFiltroDrag != null && mFiltroDrag.Componente != null)
       {
         CLinkFiltros Link = (from G in ComponenteFiltros.Links
-                             where G.Componente.CodigoUnico == mFiltroDrag.Componente.CodigoUnico
+                             where G.Componente != null && G.Componente.CodigoUnico == mFiltroDrag.Componente.CodigoUnico
                              select G).FirstOrDefault();
         if (Link != null)
         {
@@ -1480,12 +1537,12 @@ namespace TableroPecasV5.Client.Logicas
         }
       }
       if (mLineaDrag != null)
-			{
-        ComponenteFiltros.FncSeleccionFila(mLineaDrag.Columna.Orden, (int)e.ClientX,
-            (int)e.ClientY);
+      {
+        ComponenteFiltros.FncSeleccionFila(mLineaDrag.Columna.Orden, (int)e.OffsetX - 40,
+            (int)e.OffsetY - 29);
       }
       if (mGrillaDrag != null)
-			{
+      {
         if (ComponenteFiltros != null && ComponenteFiltros.Grilla != null)
         {
           Int32 Abscisa = ComponenteFiltros.Grilla.Abscisa + (int)e.ScreenX - ComponenteFiltros.Grilla.Componente.AbscisaAbajo;
@@ -1494,7 +1551,7 @@ namespace TableroPecasV5.Client.Logicas
               (int)ComponenteFiltros.Grilla.Componente.Alto);
           StateHasChanged();
         }
-			}
+      }
     }
 
     public static string IdFiltro(CLinkFiltros Lnk)
@@ -1901,21 +1958,6 @@ namespace TableroPecasV5.Client.Logicas
     public void Dispose()
     {
       TableroPecasV5.CEventosJS.OnResize -= FncResizeEvento;
-      if (gLogicaIndicadorAnterior != null) {
-        if (gLogicaIndicadorAnterior.Codigo != Codigo)
-        {
-          gLogicaIndicadorAnterior.Dispose();
-          if (gLogicaIndicadorAnterior.mProveedor != null)
-          {
-            gLogicaIndicadorAnterior.mProveedor = null;
-          }
-        }
-      }
-      else
-      {
-        gLogicaIndicadorAnterior = new CLogicaIndicador();
-      }
-      CopiarDatosEntreLogicaIndicadores(this, gLogicaIndicadorAnterior);
     }
 
   }

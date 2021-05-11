@@ -517,7 +517,7 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private void Proveedor_AlAjustarDependientes(object sender)
+    public void Proveedor_AlAjustarDependientes(object sender)
     {
 
       ArmarFilasPantalla();

@@ -102,12 +102,13 @@ namespace TableroPecasV5.Client.Logicas
 
     public void AbrirGISWSS()
     {
-      CLogicaBingWSS.gColumnas = Proveedor.Columnas;
-      CLogicaBingWSS.gLineas = Proveedor.DatosVigentes;
-      CLogicaBingWSS.gClaseElemento = Pagina.ClaseOrigen;
-      CLogicaBingWSS.gCodigoElemento = Pagina.Codigo;
-      CLogicaBingWSS.gCodigoElementoDimension = Pagina.CodigoElementoDimension;
-      Navegador.NavigateTo("PagBingWSS");
+      Pagina.AbrirWSS();
+      //CLogicaBingWSS.gColumnas = Proveedor.Columnas;
+      //CLogicaBingWSS.gLineas = Proveedor.DatosVigentes;
+      //CLogicaBingWSS.gClaseElemento = Pagina.ClaseOrigen;
+      //CLogicaBingWSS.gCodigoElemento = Pagina.Codigo;
+      //CLogicaBingWSS.gCodigoElementoDimension = Pagina.CodigoElementoDimension;
+      //Navegador.NavigateTo("PagBingWSS");
     }
 
     [Inject]
@@ -188,63 +189,50 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     public void AgregarPinsLL()
-		{
-      if (CapaPins)
+    {
+      Contenedor.ColumnaDatosTorta = Proveedor.Columnas[OrdenValor];
+      Contenedor.ColumnaLatTorta = Proveedor.Columnas[OrdenLat];
+      Contenedor.ColumnaLngTorta = Proveedor.Columnas[OrdenLng];
+      if (mLinks != null && mLinks.Count > 0)
       {
-        CLogicaPagPinsLL.gColumnaDatos = Proveedor.Columnas[OrdenValor].Nombre;
-        CLogicaPagPinsLL.gColumnaLat = Proveedor.Columnas[OrdenLat].Nombre;
-        CLogicaPagPinsLL.gColumnaLng = Proveedor.Columnas[OrdenLng].Nombre;
-        CLogicaPagPinsLL.gColumnas = Proveedor.Columnas;
-        CLogicaPagPinsLL.gAgrupados = Agrupados;
-        if (mLinks != null && mLinks.Count > 0)
-        {
-          CLogicaPagPinsLL.gLineas = mLinks[0].Filtrador.DatosFiltrados;
-        }
-        else
-        {
-          CLogicaPagPinsLL.gLineas = Proveedor.Datos;
-        }
-        Navegador.NavigateTo("PagPinsLL");
+        Contenedor.LineasTorta = mLinks[0].Filtrador.DatosFiltrados;
       }
       else
-			{
-        CLogicaPagTortasGIS.gColumnaDatos = Proveedor.Columnas[OrdenValor];
-        CLogicaPagTortasGIS.gColumnaAgrupadora = Proveedor.Columnas[OrdenAgrupador];
-        CLogicaPagTortasGIS.gColumnaLat = Proveedor.Columnas[OrdenLat];
-        CLogicaPagTortasGIS.gColumnaLng = Proveedor.Columnas[OrdenLng];
-        CLogicaPagTortasGIS.gClaseIndicador = Proveedor.ClaseOrigen;
-        CLogicaPagTortasGIS.gIndicador = Proveedor.CodigoOrigen;
-        CLogicaPagTortasGIS.gSolicitados = DatosSolicitados.TortasLL;
-        if (mLinks != null && mLinks.Count > 0)
-        {
-          CLogicaPagTortasGIS.gLineas = Proveedor.DatosVigentes; ;
-        }
-        else
-        {
-          CLogicaPagTortasGIS.gLineas = Proveedor.Datos;
-        }
-        Navegador.NavigateTo("PagTortasGIS");
+      {
+        Contenedor.LineasTorta = Proveedor.Datos;
       }
+
+      if (CapaPins)
+      {
+        Contenedor.PinesAgrupados = Agrupados;
+        Contenedor.AbrirPinsLL();
+      }
+      else
+      {
+        Contenedor.ColumnaAgrupadoraTorta = Proveedor.Columnas[OrdenAgrupador];
+        Contenedor.SolicitudTorta = DatosSolicitados.TortasLL;
+        Contenedor.AbrirTortasGIS();
+      }
+      CerrarVentanaGrafico();
     }
 
     public void AgregarTortasGIS()
     {
-      CLogicaPagTortasGIS.gColumnaDatos = Proveedor.Columnas[OrdenValor];
-      CLogicaPagTortasGIS.gColumnaAgrupadora = Proveedor.Columnas[OrdenAgrupador];
-      CLogicaPagTortasGIS.gColumnaPosicion = Proveedor.Columnas[OrdenPosicionador];
-      CLogicaPagTortasGIS.gClaseIndicador = Proveedor.ClaseOrigen;
-      CLogicaPagTortasGIS.gIndicador = Proveedor.CodigoOrigen;
-      CLogicaPagTortasGIS.gSolicitados = mSolicitud;
+      CerrarVentanaGrafico();
       if (mLinks != null && mLinks.Count > 0)
-        {
-          CLogicaPagTortasGIS.gLineas = mLinks[0].Filtrador.DatosFiltrados;
-        }
-        else
-        {
-          CLogicaPagTortasGIS.gLineas = Proveedor.Datos;
-        }
-        Navegador.NavigateTo("PagTortasGIS");
+      {
+        Pagina.LineasTorta = mLinks[0].Filtrador.DatosFiltrados;
       }
+      else
+      {
+        Pagina.LineasTorta = Proveedor.Datos;
+      }
+      Pagina.ColumnaDatosTorta = Proveedor.Columnas[OrdenValor];
+      Pagina.ColumnaAgrupadoraTorta = Proveedor.Columnas[OrdenAgrupador];
+      Pagina.ColumnaPosicionadoraTorta = Proveedor.Columnas[OrdenPosicionador];
+      Pagina.SolicitudTorta = mSolicitud;
+      Pagina.AbrirTortasGIS();
+    }
 
     public void Cerrando(Blazorise.ModalClosingEventArgs e)
     {
@@ -781,7 +769,7 @@ namespace TableroPecasV5.Client.Logicas
 
     }
 
-    private void MProveedor_AlAjustarDependientes(object sender)
+    public void MProveedor_AlAjustarDependientes(object sender)
     {
       if (EvAjustarGraficosDependientes != null)
       {
@@ -1026,9 +1014,12 @@ namespace TableroPecasV5.Client.Logicas
       foreach (CLinkGrafico Link in mGraficos)
       {
         Link.Proveedor = Proveedor;
-        Link.Componente.Proveedor = Proveedor;
-        Link.Componente.RefrescarDatosTortaDesdeProveedor();
-        Link.Componente.Redibujar();
+        if (Link.Componente != null)
+        {
+          Link.Componente.Proveedor = Proveedor;
+          Link.Componente.RefrescarDatosTortaDesdeProveedor();
+          Link.Componente.Redibujar();
+        }
       }
 
       if (Grilla != null)
@@ -1047,8 +1038,13 @@ namespace TableroPecasV5.Client.Logicas
 
   {
 
+    [CascadingParameter]
+    public CLogicaIndicador Contenedor { get; set; }
+
     public CLogicaFiltroTextos.FncEventoCrearGrafDependiente FncCrearGraficoDependiente = null;
     public CBaseGrafico.FncSeleccionarGrafico FncSeleccionarGrafico = null;
+
+    //public CLogicaGrafico ComponenteAnterior { get; set; } = null;
 
     private CLogicaGrafico mComponente;
     public CLogicaGrafico Componente
@@ -1110,6 +1106,23 @@ namespace TableroPecasV5.Client.Logicas
                   value.EvSeleccionarGrafico += FncSeleccionarGrafico;
                 }
               }
+       //       else
+							//{
+       //         if (ComponenteAnterior != null)
+							//	{
+       //           if (ComponenteAnterior.Superior != null)
+							//		{
+       //             CLinkGrafico LnkSuperior = (from L in Contenedor.ComponenteFiltros.Graficos
+       //                                            where L.CodigoUnico == ComponenteAnterior.Superior.CodigoUnico
+       //                                            select L).FirstOrDefault();
+       //             if (LnkSuperior != null)
+							//			{
+       //               LnkSuperior.GraficosDependientes.Add(value);
+       //               value.Superior = LnkSuperior.Componente;
+							//			}
+							//		}
+							//	}
+							//}
               value.RefrescarDatosTortaDesdeProveedor(); // Carga inicial de datos.
             }
           }
@@ -1227,14 +1240,14 @@ namespace TableroPecasV5.Client.Logicas
     {
       get
       {
-        return (mAncho > -999998 ? mAncho : mComponente.AnchoGrafico);
+        return (mAncho > -999998 ? mAncho : mComponente.AnchoGrafico + 4);
       }
       set
       {
         mAncho = value;
         if (mComponente != null)
         {
-          mComponente.AnchoGrafico = value;
+          mComponente.AnchoGrafico = Math.Max(mComponente.AnchoGrafico, value - 4);
         }
       }
     }
@@ -1353,6 +1366,7 @@ namespace TableroPecasV5.Client.Logicas
     public CLinkGrafico()
     {
       Componente = null;
+      GraficosDependientes = new List<CLogicaGrafico>();
       //Filtrador = null;
       //CodigoUnico = gCodigoUnico++;
     }
@@ -1391,10 +1405,6 @@ namespace TableroPecasV5.Client.Logicas
           mComponente.AlCambiarAncho += FncRefresco;
           mComponente.AlCerrarFiltro += FncCerrar;
           mComponente.Filtrador.AlImponerFiltrosAsociados += FncAjustarListasValor;
-          if (mComponente.Contenedor != null)
-					{
-            mComponente.Contenedor.CopiarDatosFiltro(mComponente);
-					}
         }
       }
     }

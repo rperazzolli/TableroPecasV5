@@ -1,13 +1,17 @@
-﻿@page "/PagPinsLL"
-@using TableroPecasV5.Client.Componentes
+﻿@using TableroPecasV5.Client.Componentes
 @inherits Logicas.CLogicaPagPinsLL
 
-<div style="width: 100%; height: 100%;">
-   <CPinsLL Agrupar="@Agrupados"
-            ColumnaDatos="@ColumnaDatos"
-            ColumnaLat="@ColumnaLat"
-            ColumnaLng="@ColumnaLng"
-            Columnas="@Columnas"
-            Lineas="@Lineas"/>
+<div style="width: 100%; height: 100%; position: absolute; top: 0px; left: 0px; z-index: 90;">
+  <CPinsLL Agrupar="@Agrupados"
+           ColumnaDatos="@ColumnaDatos"
+           ColumnaLat="@ColumnaLat"
+           ColumnaLng="@ColumnaLng"
+           Columnas="@Columnas"
+           Lineas="@Lineas" />
+  <div style="width: 23px; height: 25px; position: absolute; top: 0px; left: 0px; background-color: white;">
+    <img src="Imagenes/Atras.PNG"
+         style="width: 20px; height: 20px; display: inline-block; margin-left: 0px; margin-top: 0px;"
+         @onclick="@Retroceder" />
+  </div>
 </div>
 

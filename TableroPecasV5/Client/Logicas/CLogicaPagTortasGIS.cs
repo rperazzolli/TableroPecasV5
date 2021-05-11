@@ -19,28 +19,46 @@ namespace TableroPecasV5.Client.Logicas
 		public static DatosSolicitados gSolicitados { get; set; }
 		public static ClaseElemento gClaseIndicador { get; set; }
 		public static Int32 gIndicador { get; set; }
+
+		[Parameter]
 		public List<CLineaComprimida> Lineas { get; set; } = null;
+		[Parameter]
 		public CColumnaBase ColumnaDatos { get; set; } = null;
+		[Parameter]
 		public CColumnaBase ColumnaAgrupadora { get; set; } = null;
+		[Parameter]
 		public CColumnaBase ColumnaPosicion { get; set; } = null;
+		[Parameter]
 		public CColumnaBase ColumnaLat { get; set; } = null;
+		[Parameter]
 		public CColumnaBase ColumnaLng { get; set; } = null;
+		[Parameter]
 		public DatosSolicitados Solicitados { get; set; }
+		[Parameter]
 		public ClaseElemento ClaseIndicador { get; set; }
+		[Parameter]
 		public Int32 Indicador { get; set; }
+
+		[CascadingParameter]
+		public CLogicaIndicador Contenedor { get; set; }
 
 		protected override Task OnInitializedAsync()
 		{
-			ColumnaDatos = gColumnaDatos;
-			ColumnaAgrupadora = gColumnaAgrupadora;
-			ColumnaPosicion = gColumnaPosicion;
-			ColumnaLat = gColumnaLat;
-			ColumnaLng = gColumnaLng;
-			Lineas = gLineas;
-			Solicitados = gSolicitados;
-			ClaseIndicador = gClaseIndicador;
-			Indicador = gIndicador;
+			//ColumnaDatos = gColumnaDatos;
+			//ColumnaAgrupadora = gColumnaAgrupadora;
+			//ColumnaPosicion = gColumnaPosicion;
+			//ColumnaLat = gColumnaLat;
+			//ColumnaLng = gColumnaLng;
+			//Lineas = gLineas;
+			//Solicitados = gSolicitados;
+			//ClaseIndicador = gClaseIndicador;
+			//Indicador = gIndicador;
 			return base.OnInitializedAsync();
+		}
+
+		public void Retroceder()
+		{
+			Contenedor.CerrarTortasGIS();
 		}
 
 	}

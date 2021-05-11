@@ -3,7 +3,7 @@
 @using TableroPecasV5.Client.Logicas;
 @inherits CLogicaVinculadorWFS
 
-<div style="width: 80%; left: 10%; top: 10%; height: 50%; overflow: hidden; background-color: white; position: absolute; border-color: gray; border-width: 1px;">
+<div style="width: 80%; left: 10%; top: 10%; height: 50%; overflow: hidden; background-color: white; position: absolute; border-color: gray; border-width: 1px; z-index: 99;">
   @if (ListaCapas == null || ListaElementos == null || (HayMensaje && !HayBoton))
   {
     <CAguardar />

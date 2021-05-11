@@ -1,8 +1,7 @@
-﻿@page "/PagTortasGIS"
-@using TableroPecasV5.Client.Componentes
+﻿@using TableroPecasV5.Client.Componentes
 @inherits Logicas.CLogicaPagTortasGIS
 
-<div style="width: 100%; height: 100%;">
+<div style="width: 100%; height: 100%; z-index: 90; position: absolute; top: 0px; left: 0px;">
   <CTortasGIS ColumnaDatos="@ColumnaDatos"
               ColumnaAgrupadora="@ColumnaAgrupadora"
               ColumnaPosicion="@ColumnaPosicion"
@@ -12,5 +11,10 @@
               CodigoIndicador="@Indicador"
               Solicitud="@Solicitados"
               Lineas="@Lineas"/>
+  <div style="width: 23px; height: 23px; position: absolute; top: 0px; left: 0px; background-color: white;">
+    <img src="Imagenes/Atras.PNG"
+         style="width: 21px; height: 21px; display: inline-block; margin-left: 1px; margin-top: 1px;"
+         @onclick="@Retroceder" />
+  </div>
 </div>
 

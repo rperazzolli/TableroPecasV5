@@ -176,8 +176,16 @@ namespace TableroPecasV5.Client.Componentes
       }
     }
 
+    public void BloquearGrafico()
+		{
+      mbBloquear = true;
+		}
+
+    protected bool mbBloquear = false;
+
     public void Redibujar()
     {
+      mbBloquear = false;
       StateHasChanged();
     }
 

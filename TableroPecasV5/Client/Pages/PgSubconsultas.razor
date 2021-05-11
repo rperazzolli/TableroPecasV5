@@ -21,7 +21,7 @@
           if (Link.PosicionEnPantalla >= 0)
           {
             <div id="@IdFiltro(Link)" class="ui-widget-content"
-                 style="@EstiloFiltro(Link)" draggable="true" @ondragstart="@(() => IniciarDragFiltro(Link))">
+                 style="@EstiloFiltro(Link)" draggable="true" @ondragstart="@((e) => IniciarDragFiltro(e, Link))">
               <TableroPecasV5.Client.Componentes.FiltroTextos @ref="Link.Componente" NivelFlotante="@Link.NivelFlotante"
                                                               Ancho="@Link.Ancho" Alto="@AltoFiltro" Abscisa="@Link.Abscisa"
                                                               Ordenada="@Link.Ordenada"
@@ -36,7 +36,7 @@
         foreach (Logicas.CLinkGrafico Grafico in ComponenteFiltros.Graficos)
         {
           <div id="@IdGrafico(Grafico.CodigoUnico)" class="ui-widget-content" draggable="true"
-               style="@EstiloGrafico(Grafico)" @ondragstart="@(() => IniciarDragGrafico(Grafico))">
+               style="@EstiloGrafico(Grafico)" @ondragstart="@((e) => IniciarDragGrafico(e, Grafico))">
             @if (Grafico.Clase == ClaseGrafico.BarrasH)
             {
               <TableroPecasV5.Client.Componentes.CGrafico @ref="@Grafico.Componente"
@@ -76,7 +76,7 @@
 
       @if (Grilla != null)
       {
-        <div id="DivGrilla" class="ui-widget-content" draggable="true" @ondragstart="@(() => IniciarDragGrilla(Grilla))"
+        <div id="DivGrilla" class="ui-widget-content" draggable="true" @ondragstart="@((e) => IniciarDragGrilla(e, Grilla))"
              style="@EstiloGrilla">
           <TableroPecasV5.Client.Componentes.CGrillaDatos @ref="Grilla.Componente" NivelFlotante="@Grilla.NivelFlotante"
                                                           Ancho="@Grilla.Ancho" Alto="@Grilla.Alto"

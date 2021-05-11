@@ -17,6 +17,14 @@ namespace TableroPecasV5.Client.Logicas
 
 		public delegate void FncRespondeVinculo(CVinculoIndicadorCompletoCN Vinculo);
 
+		private static Int32 gCodigoCorrelativo = 0;
+		private Int32 mCodigoCorrelativo;
+
+		public CLogicaVinculadorCoordenadas()
+		{
+			mCodigoCorrelativo = gCodigoCorrelativo++;
+		}
+
 		[Parameter]
 		public FncRespondeVinculo AlResponder { get; set; } = null;
 
@@ -29,7 +37,10 @@ namespace TableroPecasV5.Client.Logicas
 		[Parameter]
 		public ClaseElemento ClaseIndicador { get; set; } = ClaseElemento.Indicador;
 
-		public string Direccion { get { return "ContVincCoord"; } }
+		public string Direccion
+		{
+			get { return "ContVincCoord" + mCodigoCorrelativo.ToString(); }
+		}
 
 		public CVinculoIndicadorCompletoCN Vinculador { get; set; } = null;
 		public List<CListaPosicion> ListaElementos { get; set; } = null;
@@ -207,27 +218,6 @@ namespace TableroPecasV5.Client.Logicas
 
 			return CRutinas.UbicarNivelZoom(Ancho, Alto, LngMax - LngMin, LatMax - LatMin);
 
-			//double Relacion1 = (LatMax - LatMin) * 650 / Alto;
-			//double Relacion2 = (LngMax - LngMin) * 1280 / Ancho;
-			//double Salto = Math.Max(Relacion1, Relacion2);
-			//if (Salto == 0)
-			//{
-			//	return 10;
-			//}
-			//else
-			//{
-			//	Salto *= Math.Pow(2, 7);
-			//	for (Int32 i = 15; i > 1; i--)
-			//	{
-			//		if (Salto < 1.5)
-			//		{
-			//			return i;
-			//		}
-			//		Salto /= 2;
-			//	}
-			//	return 1;
-			//}
-
 		}
 
 		private Int32 mNivelZoom;
@@ -326,6 +316,10 @@ namespace TableroPecasV5.Client.Logicas
 		public async void Registrar()
 		{
 			CVinculoIndicadorCompletoCN Vinculo = CrearVinculador();
+			if (Vinculo.Vinculo.Codigo < 0)
+			{
+
+			}
 			Int32 Codigo = (mbDatosSucios ? await CContenedorDatos.RegistrarVinculoAsync(Http, Vinculo) : 1);
 			if (Codigo > 0)
 			{
@@ -350,8 +344,17 @@ namespace TableroPecasV5.Client.Logicas
 				{
 					if (mbReubicar)
 					{
-						mNivelZoom = UbicarCentro(0.8 * Contenedores.CContenedorDatos.AnchoPantalla,
-							0.5 * Contenedores.CContenedorDatos.AltoPantalla, out mLatCentro, out mLngCentro);
+						if (ListaElementos == null || ListaElementos.Count == 0)
+						{
+							mNivelZoom = 4;
+							mLatCentro = -40;
+							mLngCentro = -70;
+						}
+						else
+						{
+							mNivelZoom = UbicarCentro(0.8 * Contenedores.CContenedorDatos.AnchoPantalla,
+								0.5 * Contenedores.CContenedorDatos.AltoPantalla, out mLatCentro, out mLngCentro);
+						}
 						mbReubicar = false;
 						//StateHasChanged();
 						//return;

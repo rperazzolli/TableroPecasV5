@@ -2,7 +2,8 @@
 @using TableroPecasV5.Client.Listas;
 @inherits Logicas.CLogicaVinculadorCoordenadas
 
-<div style="width: 80%; left: 10%; top: 10%; height: 80%; overflow: hidden; background-color: white; position: absolute;">
+<div style="width: 100%; left: 0%; top: 0%; height: 100%; overflow: hidden; background-color: rgba(128,128,128,0.3); position: absolute; z-index: 99;">
+  <div style="width: 80%; left: 10%; top: 10%; height: 60%; position: absolute; background-color: white; border-bottom-color: darkgray; border-width: 2px; border-style: solid;">
   <div style="background: #007DFF; height: 25px; width: calc(100% - 10px); text-align: left; margin: 5px; position: absolute;">
     <div style="width: 100%; height: 100%; position: absolute;">
       <label style="vertical-align: central; margin-left: 5px; font-size: 15px; color: white; position: absolute;">Configuración del reporte</label>
@@ -34,6 +35,7 @@
       <button style="width: 80px; height: 28px; align-content: center; vertical-align: middle;" @onclick="@Registrar">Listo</button>
     </div>
   }
+  </div>
 </div>
 @if (ListaElementos == null)
 {

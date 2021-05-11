@@ -23,10 +23,17 @@ namespace TableroPecasV5.Client.Logicas
 		public static List<CLineaComprimida> gLineas;
 		private static Int32 gCodigoPantalla = 0;
 
+		[Parameter]
 		public ClaseElemento ClaseIndicador { get; set; }
+		[Parameter]
 		public Int32 CodigoIndicador { get; set; }
+
+		[Parameter]
 		public Int32 CodigoElementoDimension { get; set; }
+
+		[Parameter]
 		public List<CColumnaBase> Columnas { get; set; }
+		[Parameter]
 		public List<CLineaComprimida> Lineas { get; set; }
 		public bool Editando { get; set; }
 		public List<CCapaWSSCN> CapasWSS { get; set; }
@@ -58,7 +65,15 @@ namespace TableroPecasV5.Client.Logicas
 			StateHasChanged();
 		}
 
+		[CascadingParameter]
+		public CLogicaIndicador Contenedor { get; set; }
+
 		private CProveedorComprimido mProveedor = null;
+
+		public void Retroceder()
+		{
+			Contenedor.CerrarWSS();
+		}
 
 		public CProveedorComprimido ProveedorDatos
 		{
@@ -133,11 +148,11 @@ namespace TableroPecasV5.Client.Logicas
 		{
 			Editando = false;
 			mCodigoPantalla = gCodigoPantalla++;
-			ClaseIndicador = gClaseElemento;
-			CodigoIndicador = gCodigoElemento;
-			CodigoElementoDimension = gCodigoElementoDimension;
-			Columnas = gColumnas;
-			Lineas = gLineas;
+			//ClaseIndicador = gClaseElemento;
+			//CodigoIndicador = gCodigoElemento;
+			//CodigoElementoDimension = gCodigoElementoDimension;
+			//Columnas = gColumnas;
+			//Lineas = gLineas;
 			return base.OnInitializedAsync();
 		}
 
