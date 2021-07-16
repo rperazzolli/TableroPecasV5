@@ -38,6 +38,36 @@ namespace TableroPecasV5.Client.Logicas
       {
         if (ComponenteTendRed != null)
         {
+          return ComponenteTendRed.PeriodoSeleccionado;
+          //try
+          //{
+          //  List<CInformacionAlarmaCN> Alarmas = (from A in Contenedores.CContenedorDatos.gAlarmasIndicador
+          //                                        where A.CodigoIndicador == mComponenteTendRed.Indicador.Codigo &&
+          //                                          A.ElementoDimension == mComponenteTendRed.CodigoElementoDimension
+          //                                        orderby A.Periodo
+          //                                        select A).ToList();
+          //  if (Alarmas != null && Alarmas.Count > 0)
+          //  {
+          //    return Alarmas.Last().Periodo;
+          //  }
+          //}
+          //catch (Exception)
+          //{
+          //  //
+          //}
+        }
+
+        return -1;
+
+      }
+    }
+
+    public bool HayAlarmaTendRed
+    {
+      get
+      {
+        if (ComponenteTendRed != null)
+        {
           try
           {
             List<CInformacionAlarmaCN> Alarmas = (from A in Contenedores.CContenedorDatos.gAlarmasIndicador
@@ -45,10 +75,7 @@ namespace TableroPecasV5.Client.Logicas
                                                     A.ElementoDimension == mComponenteTendRed.CodigoElementoDimension
                                                   orderby A.Periodo
                                                   select A).ToList();
-            if (Alarmas != null && Alarmas.Count > 0)
-            {
-              return Alarmas.Last().Periodo;
-            }
+            return (Alarmas != null && Alarmas.Count > 0);
           }
           catch (Exception)
           {
@@ -56,7 +83,7 @@ namespace TableroPecasV5.Client.Logicas
           }
         }
 
-        return -1;
+        return false;
 
       }
     }
@@ -79,11 +106,11 @@ namespace TableroPecasV5.Client.Logicas
       L2.mPosicionPuntoTendencia = L1.mPosicionPuntoTendencia;
       L2.AguardandoReloj = L1.AguardandoReloj;
       L2.AguardandoFiltros = L1.AguardandoFiltros;
-      L2.NivelReloj = L1.NivelReloj;
+      L2.RelojEncima = L1.RelojEncima;
       L2.TendenciasAmpliadas = L1.TendenciasAmpliadas;
-      L2.NivelTendencias = L1.NivelTendencias;
-      L2.NivelGrilla = L1.NivelGrilla;
-      L2.NivelFiltros = L1.NivelFiltros;
+      L2.TendenciasEncima = L1.TendenciasEncima;
+      L2.GrillaEncima = L1.GrillaEncima;
+      L2.ComponenteFiltrosEncima = L1.ComponenteFiltrosEncima;
       L2.mAlarmas = L1.mAlarmas;
       L2.mbLeyo = L1.mbLeyo;
       L2.mPosicionPuntoTendencia = L1.mPosicionPuntoTendencia;
@@ -153,14 +180,14 @@ namespace TableroPecasV5.Client.Logicas
     IJSRuntime JSRuntime { get; set; }
 
     [Parameter]
-    public Int32 NivelReloj
+    public bool RelojEncima
     {
-      get { return (ComponenteReloj == null ? 1 : ComponenteReloj.NivelFlotante); }
+      get { return (ComponenteReloj == null ? false : ComponenteReloj.Encima); }
       set
       {
-        if (value != NivelReloj && ComponenteReloj != null)
+        if (value != RelojEncima && ComponenteReloj != null)
         {
-          ComponenteReloj.ImponerNivelFlotante(value);
+          ComponenteReloj.ImponerEncima(value);
         }
       }
     }
@@ -168,22 +195,12 @@ namespace TableroPecasV5.Client.Logicas
     public bool TendenciasAmpliadas { get; set; } = false;
 
     [Parameter]
-    public Int32 NivelTendencias { get; set; }
+    public bool TendenciasEncima { get; set; } = false;
 
-    public Int32 NivelGrilla = 1;
+    public bool GrillaEncima { get; set; } = false;
 
     [Parameter]
-    public Int32 NivelFiltros
-    {
-      get { return (ComponenteFiltros == null || HayGraficoAmpliado ? 1 : ComponenteFiltros.NivelFlotante); }
-      set
-      {
-        if (value != NivelFiltros && ComponenteFiltros != null)
-        {
-          ComponenteFiltros.ImponerNivelFlotante(value);
-        }
-      }
-    }
+    public bool ComponenteFiltrosEncima { get; set; } = false;
 
     private List<CInformacionAlarmaCN> mAlarmas = null;
 
@@ -235,6 +252,11 @@ namespace TableroPecasV5.Client.Logicas
 
     private Int32 mOrdenadaTendencia = 5;
 
+    public bool DatosLeidos
+		{
+      get { return mPeriodoDataset > 0; }
+		}
+
     private Int32 mPeriodoDataset = -1;
     private List<CColumnaBase> mColumnasDataset;
     private CProveedorComprimido mProveedor = null;
@@ -257,7 +279,7 @@ namespace TableroPecasV5.Client.Logicas
     public bool HayFiltroDatos { get; set; } = false;
 
     private CReloj mComponenteReloj = null;
-    private CTendRed mComponenteTendRed = null;
+    private CLogicaTrendRed mComponenteTendRed = null;
 
     private bool mbAlarmaReducida = false;
     private CLogicaTendencias mComponenteTendencias = null;
@@ -320,19 +342,19 @@ namespace TableroPecasV5.Client.Logicas
 
     private void InicializarZIndex()
 		{
-      NivelTendencias = 2;
-      NivelFiltros = 2;
+      TendenciasEncima = false;
+      ComponenteFiltrosEncima = false;
 
       if (ComponenteFiltros != null)
       {
         foreach (CLinkFiltros Link in ComponenteFiltros.Links)
         {
-          Link.NivelFlotante = 2;
+          Link.Encima=false;
         }
 
         foreach (CLinkGrafico Lnk in ComponenteFiltros.Graficos)
         {
-          Lnk.NivelFlotante = 2;
+          Lnk.Encima = false;
           Lnk.Componente.DeSeleccionar();
         }
       }
@@ -341,7 +363,7 @@ namespace TableroPecasV5.Client.Logicas
 
     public void PonerTendenciaArriba()
     {
-      if (NivelTendencias < 8)
+      if (!TendenciasEncima)
       {
         PonerElementoEncima(false, true, false, -1, -1);
         StateHasChanged();
@@ -350,7 +372,7 @@ namespace TableroPecasV5.Client.Logicas
 
     public void PonerContenedorFiltroArriba()
 		{
-      if (NivelFiltros < 8)
+      if (!ComponenteFiltrosEncima)
       {
         PonerElementoEncima(true, false, false, -1, -1);
         StateHasChanged();
@@ -550,7 +572,7 @@ namespace TableroPecasV5.Client.Logicas
         return "width: " + ANCHO_PANTALLA_RELOJ.ToString() + "px; height: " + ALTO_PANTALLA_RELOJ.ToString() +
             "px; margin-left: " + AbscisaReloj.ToString() +
             "px; margin-top: " + OrdenadaReloj.ToString() + "px; position: absolute; text-align: center; z-index: " +
-            NivelReloj.ToString() + ";";
+            RelojEncima.ToString() + ";";
       }
     }
 
@@ -561,7 +583,7 @@ namespace TableroPecasV5.Client.Logicas
       {
         return "width: " + AnchoTendencia.ToString() + "px; height: " +
           AltoTendencia.ToString() +
-          "px; z-index: " + NivelTendencias.ToString() +
+          "px; z-index: " + TendenciasEncima.ToString() +
           "; margin-left: " + AbscisaTendencia.ToString() +
           "px; margin-top: "+OrdenadaTendencia.ToString()+"px; position: absolute; text-align: center; overflow: hidden;";
       }
@@ -605,8 +627,7 @@ namespace TableroPecasV5.Client.Logicas
         return "width: 260px; height: " +
           AltoContenedor.ToString() +
           "px; margin-left: " + AbscisaContenedorFiltros.ToString() + "px; margin-top: " +
-          OrdenadaContenedorFiltros.ToString() + "px; position: absolute; text-align: center; z-index: " +
-          NivelFiltros.ToString() + ";";
+          OrdenadaContenedorFiltros.ToString() + "px; position: absolute; text-align: center;";
       }
     }
 
@@ -640,8 +661,7 @@ namespace TableroPecasV5.Client.Logicas
         AltoFiltro.ToString() +
         "px; margin-left: " + AbscisaFiltro(Lnk).ToString() +
         "px; margin-top: " + OrdenadaFiltro(Lnk).ToString() +
-        "px; position: absolute; text-align: center; z-index: " + Lnk.NivelFlotante.ToString() +
-        "; resize: horizontal; overflow: hidden;";
+        "px; position: absolute; text-align: center; resize: horizontal; overflow: hidden;";
     }
 
     public string EstiloGrafico(CLinkGrafico Lnk)
@@ -651,8 +671,7 @@ namespace TableroPecasV5.Client.Logicas
         "px; margin-left: " + Lnk.Abscisa.ToString() +
         "px; margin-top: " + Lnk.Ordenada.ToString() + "px; position: absolute; text-align: " +
         (Lnk.Clase == ClaseGrafico.BarrasH ? "left" : "center") +
-        "; z-index: " + Lnk.NivelFlotante.ToString() + ";" +
-        (Lnk.Clase == ClaseGrafico.BarrasH ? " overflow: hidden;" : "")+
+        (Lnk.Clase == ClaseGrafico.BarrasH ? "; overflow: hidden;" : ";")+
         " resize: both; overflow: hidden;";
     }
 
@@ -663,8 +682,8 @@ namespace TableroPecasV5.Client.Logicas
         return "width: " + Grilla.Ancho.ToString() + "px; height: " +
           Grilla.Alto.ToString() +
           "px; margin-left: " + Grilla.Abscisa.ToString() +
-          "px; margin-top: " + Grilla.Ordenada.ToString() + "px; position: absolute; text-align: center" +
-          "; z-index: " + NivelGrilla.ToString() + "; overflow: hidden; font-size: 11px;";
+          "px; margin-top: " + Grilla.Ordenada.ToString() + "px; position: absolute; text-align: center;" +
+          " overflow: hidden; font-size: 11px;";
       }
     }
 
@@ -789,12 +808,13 @@ namespace TableroPecasV5.Client.Logicas
       {
         if (ComponenteTendRed != null)
         {
-          Periodo = PeriodoAlarmaTendRed;
+          Periodo = ComponenteTendRed.PeriodoSeleccionado;
         }
       }
 
       if (Periodo > 0)
       {
+
         // intenta procesar datos que ya estan en memoria.
         if (ProcesoDatosYaLeidos(Periodo))
         {
@@ -1131,7 +1151,7 @@ namespace TableroPecasV5.Client.Logicas
           OrdenadaTendencia = Ordenada;
           AnchoTendencia = Ancho;
           AltoTendencia = Alto;
-          NivelTendencias = 8;
+          TendenciasEncima = true;
           PonerElementoEncima(false, true, false, -1, -1);
 				}
         else
@@ -1140,7 +1160,7 @@ namespace TableroPecasV5.Client.Logicas
           OrdenadaTendencia = mOrdenadaTendenciaAnterior;
           AnchoTendencia = mAnchoTendenciaAnterior;
           AltoTendencia = mAltoTendenciaAnterior;
-          NivelTendencias = 1;
+          TendenciasEncima = false;
         }
       }
     }
@@ -1160,20 +1180,22 @@ namespace TableroPecasV5.Client.Logicas
     public void PonerElementoEncima(bool Filtros, bool Tendencia, bool Grilla, Int32 OrdenFiltro,
         Int32 CodigoGrafico)
     {
-      NivelFiltros = (Filtros ? 8 : 1);
-      NivelTendencias = (Tendencia ? 8 : 1);
-      NivelGrilla = (Grilla ? 8 : 1);
+
+      ComponenteFiltrosEncima = Filtros;
+      TendenciasEncima = Tendencia;
+      GrillaEncima = Grilla;
+
       if (ComponenteFiltros != null)
       {
         foreach (CLinkFiltros Link in ComponenteFiltros.Links)
         {
            if (Link.Componente != null)
 					{
-            Link.NivelFlotante = (Link.Componente.Filtrador.Columna.Orden == OrdenFiltro ? 8 : 1);
+            Link.Encima = (Link.Componente.Filtrador.Columna.Orden == OrdenFiltro);
 					}
            else
 					{
-            Link.NivelFlotante = 1;
+            Link.Encima = false;
 					}
         }
 
@@ -1181,11 +1203,11 @@ namespace TableroPecasV5.Client.Logicas
 				{
           if (Graf.Componente != null)
 					{
-            Graf.NivelFlotante = (Graf.Componente.CodigoUnico == CodigoGrafico ? 8 : 1);
+            Graf.Encima = (Graf.Componente.CodigoUnico == CodigoGrafico);
 					}
           else
 					{
-            Graf.NivelFlotante = 1;
+            Graf.Encima = false;
 					}
 				}
       }
@@ -1206,12 +1228,12 @@ namespace TableroPecasV5.Client.Logicas
           }
           else
           {
-            Graf.NivelFlotante = 1;
+            Graf.Encima = false;
           }
           if (Abscisa > -999998)
           {
             Graf.GuardarPosicion();
-            Graf.NivelFlotante = (Encima ? 8 : 1);
+            Graf.Encima = Encima;
             Graf.Abscisa = Abscisa;
             Graf.Ordenada = Ordenada;
             Graf.Ancho = Ancho;
@@ -1271,19 +1293,26 @@ namespace TableroPecasV5.Client.Logicas
         if (value != mbAlarmaReducida)
 				{
           mbAlarmaReducida = value;
-          StateHasChanged();
 				}
 			}
 		}
 
-    public CTendRed ComponenteTendRed
+    public CLogicaTrendRed ComponenteTendRed
     {
       get { return mComponenteTendRed; }
       set
       {
-        mComponenteTendRed = value;
-        ComponenteTendRed.ImponerPosicion(10, 5, 350, 180);
-        HayAlarmaReducida = (PeriodoAlarmaTendRed > -1);
+        if (ComponenteTendRed != value)
+        {
+          if (ComponenteTendRed != null)
+          {
+            ComponenteTendRed.AlCambiarPunto -= ReposicionarDatasetAsync;
+          }
+          mComponenteTendRed = value;
+          ComponenteTendRed.ImponerPosicion(10, 5, 350, 180);
+          ComponenteTendRed.AlCambiarPunto += ReposicionarDatasetAsync;
+          HayAlarmaReducida = HayAlarmaTendRed;
+        }
       }
     }
 
@@ -1305,7 +1334,7 @@ namespace TableroPecasV5.Client.Logicas
       C2.ImponerAlto(C1.Alto);
       C2.ImponerAmpliado(C1.Ampliado);
       C2.ImponerAncho(C1.Ancho);
-      C2.ImponerNivelFlotante(C1.NivelFlotante);
+      C2.ImponerEncima(C1.Encima);
       C2.IndicadoresAdicionales = C1.IndicadoresAdicionales;
 		}
 
@@ -1325,18 +1354,25 @@ namespace TableroPecasV5.Client.Logicas
 
     public void EliminarVariosArriba()
 		{
-      NivelTendencias = 2;
-      NivelFiltros = 2;
+      TendenciasEncima = false;
+      ComponenteFiltrosEncima = false;
 		}
 
     private async Task ReposicionarDatasetAsync()
     {
-      PosicionPuntoTendencia = ComponenteTendencias.PosicionPuntoSeleccionado;
+      if (ComponenteTendencias != null)
+      {
+        PosicionPuntoTendencia = ComponenteTendencias.PosicionPuntoSeleccionado;
+      }
+      else
+      {
+        PosicionPuntoTendencia = ComponenteTendRed.PosicionAlarmaSeleccionada;
+      }
       if (ComponenteFiltros != null)
       {
         await CrearFiltroDatosAsync();
         ComponenteFiltros.Proveedor.RefrescarDependientes();
-//        ComponenteFiltros.Proveedor.FiltrarPorAsociaciones();
+        //        ComponenteFiltros.Proveedor.FiltrarPorAsociaciones();
         ComponenteTendencias.MostrarAguarda = false;
         StateHasChanged();
       }
@@ -1441,25 +1477,32 @@ namespace TableroPecasV5.Client.Logicas
       StateHasChanged();
     }
 
+    public void PonerGraficoArriba(Microsoft.AspNetCore.Components.Web.MouseEventArgs e, CLinkGrafico Grafico)
+    {
+      PonerElementoEncima(false, false, false, -1, Grafico.CodigoUnico);
+    }
+
     public void IniciarDragGrafico(Microsoft.AspNetCore.Components.Web.DragEventArgs e, CLinkGrafico Grafico)
     {
-      mOffsetAbsc = e.OffsetX;
-      mOffsetOrd = e.OffsetY;
+      mOffsetAbsc = (int)e.ScreenX; // e.OffsetX;
+      mOffsetOrd = (int)e.ScreenY; // e.OffsetY;
       mFiltroDrag = null;
       mLineaDrag = null;
       mGrillaDrag = null;
       mGraficoDrag = Grafico;
+      PonerElementoEncima(false, false, false, -1, Grafico.CodigoUnico);
     }
 
     public void IniciarDragFiltro(Microsoft.AspNetCore.Components.Web.DragEventArgs e, CLinkFiltros Filtro)
     {
-      mOffsetAbsc = e.OffsetX;
-      mOffsetOrd = e.OffsetY;
+      mOffsetAbsc = (int)e.ScreenX; // e.OffsetX;
+      mOffsetOrd = (int)e.ScreenY; // e.OffsetY;
       CambioMedidas(Filtro);
       mFiltroDrag = Filtro;
       mLineaDrag = null;
       mGrillaDrag = null;
       mGraficoDrag = null;
+      PonerElementoEncima(false, false, false, Filtro.Filtrador.Columna.Orden, -1);
     }
 
     public async void CambioMedidas(CLinkFiltros Filtro)
@@ -1483,10 +1526,10 @@ namespace TableroPecasV5.Client.Logicas
 //      Grafico.Componente.Redibujar();
     }
 
-    private double mOffsetAbsc;
-    private double mOffsetOrd;
+    private int mOffsetAbsc;
+    private int mOffsetOrd;
 
-    public void IniciarDragLinea(double OffsetAbsc, double OffsetOrd, LineaFiltro Linea)
+    public void IniciarDragLinea(int OffsetAbsc, int OffsetOrd, LineaFiltro Linea)
     {
       mOffsetAbsc = OffsetAbsc;
       mOffsetOrd = OffsetOrd;
@@ -1494,16 +1537,18 @@ namespace TableroPecasV5.Client.Logicas
       mLineaDrag = Linea;
       mGrillaDrag = null;
       mGraficoDrag = null;
+      PonerElementoEncima(true, false, false, -1, -1);
     }
 
     public void IniciarDragGrilla(Microsoft.AspNetCore.Components.Web.DragEventArgs e, CLinkGrilla Grilla)
 		{
-      mOffsetAbsc = e.OffsetX;
-      mOffsetOrd = e.OffsetY;
+      mOffsetAbsc = (int)e.ScreenX;
+      mOffsetOrd = (int)e.ScreenY;
       mFiltroDrag = null;
       mLineaDrag = null;
       mGrillaDrag = Grilla;
-      mGraficoDrag = null;       
+      mGraficoDrag = null;
+      PonerElementoEncima(false, false, true, -1, -1);
     }
 
     public void RecibirDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
@@ -1515,10 +1560,11 @@ namespace TableroPecasV5.Client.Logicas
                              select G).FirstOrDefault();
         if (Link != null)
         {
-          Int32 Diferencia = (int)e.ScreenX - mGraficoDrag.Componente.AbscisaAbajo;
+          Int32 Diferencia = (int)e.ScreenX - (int)mOffsetAbsc;
           Link.Abscisa += Diferencia;
-          Diferencia = (int)e.ScreenY - mGraficoDrag.Componente.OrdenadaAbajo;
+          Diferencia = (int)e.ScreenY - (int)mOffsetOrd;
           Link.Ordenada += Diferencia;
+          mGraficoDrag = null;
           StateHasChanged();
         }
       }
@@ -1529,10 +1575,11 @@ namespace TableroPecasV5.Client.Logicas
                              select G).FirstOrDefault();
         if (Link != null)
         {
-          Int32 Diferencia = (int)e.ScreenX - mFiltroDrag.Componente.AbscisaAbajo;
+          Int32 Diferencia = (int)e.ScreenX - (int)mOffsetAbsc;
           Link.Abscisa += Diferencia;
-          Diferencia = (int)e.ScreenY - mFiltroDrag.Componente.OrdenadaAbajo;
+          Diferencia = (int)e.ScreenY - (int)mOffsetOrd;
           Link.Ordenada += Diferencia;
+          mFiltroDrag = null;
           StateHasChanged();
         }
       }
@@ -1540,17 +1587,19 @@ namespace TableroPecasV5.Client.Logicas
       {
         ComponenteFiltros.FncSeleccionFila(mLineaDrag.Columna.Orden, (int)e.OffsetX - 40,
             (int)e.OffsetY - 29);
+        mLineaDrag = null;
       }
       if (mGrillaDrag != null)
       {
         if (ComponenteFiltros != null && ComponenteFiltros.Grilla != null)
         {
-          Int32 Abscisa = ComponenteFiltros.Grilla.Abscisa + (int)e.ScreenX - ComponenteFiltros.Grilla.Componente.AbscisaAbajo;
-          Int32 Ordenada = ComponenteFiltros.Grilla.Ordenada + (int)e.ScreenY - ComponenteFiltros.Grilla.Componente.OrdenadaAbajo;
+          Int32 Abscisa = ComponenteFiltros.Grilla.Abscisa + (int)e.ScreenX - (int)mOffsetAbsc;
+          Int32 Ordenada = ComponenteFiltros.Grilla.Ordenada + (int)e.ScreenY - (int)mOffsetOrd;
           ReposicionarGrilla(Abscisa, Ordenada, (int)ComponenteFiltros.Grilla.Componente.Ancho,
               (int)ComponenteFiltros.Grilla.Componente.Alto);
           StateHasChanged();
         }
+        mGrillaDrag = null;
       }
     }
 

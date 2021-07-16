@@ -74,7 +74,7 @@ namespace TableroPecasV5.Client.Logicas
       {
         Ampliado = true;
         Seleccionado = true;
-        NivelFlotante = NIVEL_SELECCIONADO;
+        Pagina.PonerElementoEncima(false, false, true, -1, -1);
         mAbscisaPropia = Abscisa;
         mOrdenadaPropia = Ordenada;
         mAnchoPropio = Ancho;
@@ -94,7 +94,7 @@ namespace TableroPecasV5.Client.Logicas
       if (Ampliado)
       {
         Seleccionado = false;
-        NivelFlotante = 1;
+        Pagina.PonerElementoEncima(false, false, false, -1, -1);
         Abscisa = mAbscisaPropia;
         Ordenada = mOrdenadaPropia;
         Ancho = mAnchoPropio;
@@ -112,11 +112,6 @@ namespace TableroPecasV5.Client.Logicas
         PosicionActual = CantidadPaginas - 1;
       }
       StateHasChanged();
-    }
-
-    public void ImponerNivelZ(Int32 Valor)
-    {
-      NivelFlotante = Valor;
     }
 
     public List<CLineaComprimida> LineasPagina

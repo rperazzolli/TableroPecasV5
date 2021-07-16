@@ -20,8 +20,7 @@ namespace TableroPecasV5.Client.Logicas
       get
       {
         return "width: " + ANCHO_RELOJ_COMPLETO.ToString() + "px; height: " + ALTO_RELOJ_COMPLETO.ToString() +
-            "px; left: 0px; top: 0px; position: absolute; text-align: center; z-index: " +
-            NivelFlotante.ToString() + ";";
+            "px; left: 0px; top: 0px; position: absolute; text-align: center;";
       }
     }
 

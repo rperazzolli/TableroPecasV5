@@ -1,8 +1,12 @@
 ﻿@using TableroPecasV5.Shared
 @inherits Logicas.CLogicaGrafico
 
-<div class="dropdown" style="width: 100%; height: 100%; text-align: left; display: block; overflow: hidden; position: absolute; margin: 0px; z-index: 2;"
-     @onload="@AlCompletar" @onmousedown="@EventoMouseAbajo" ondragover="event.preventDefault();" @ondrop="RecibirDrop">
+<div class="dropdown"
+     style="width: 100%; height: 100%; text-align: left; display: block; overflow: hidden; position: absolute; margin: 0px;"
+     @onload="@AlCompletar" @onmousedown="@EventoMouseAbajo" ondragover="event.preventDefault();"
+     @ondrop="RecibirDrop">
+  <div style="width: 100%; height: 25px; text-align: left; display: block; position: absolute; margin: 0px; background-color: whitesmoke;"
+       />
   @if (PuedeCrearGraficoDependiente || (Clase == ClaseGrafico.BarrasH || Clase == ClaseGrafico.Histograma))
   {
   <Dropdown Style="font-size: 9px; padding: 2px 4px; cursor: pointer;">
@@ -42,7 +46,7 @@
   </Dropdown>
   }
 
-  <div class="ContenedorComandosFiltro" style="margin-top: 0px;">
+  <div class="ContenedorComandosFiltro" style="margin-top: 0px; background-color: whitesmoke; height: 25px;">
     <div class="BarraComandosFiltro" style="font-size: 16px; padding: 0px;">
       @if (Ampliado)
       {
@@ -66,7 +70,7 @@
   {
     <div style="width: 100%; height: calc(100% - 32px); overflow: hidden; display: inline-block; float: left; background-color: white; position: relative; margin: 30px 0px 0px 0px; background-color: white;">
       <div id="@NombreElemento" style="@EstiloCanvasApiladas"
-           @onclick="@EventoMouseUp" @onscroll="@FncScroll">
+           @onscroll="@FncScroll">
         <Blazor.Extensions.Canvas.BECanvas Width="@AnchoGraficoApilado" Height="@AltoCanvas" @ref="@CanvasGrafico" />
       </div>
       <div style="@EstiloCanvasApiladasDer"
@@ -77,7 +81,7 @@
   }
   else
   {
-    <div id="@NombreElemento" style="@Estilo"
+    <div id="@NombreElemento" style="@Estilo" @onmouseup="@EventoMouseUp"
          @onclick="@EventoMouseUp" @onscroll="@FncScroll">
       @if (Ampliado)
       {

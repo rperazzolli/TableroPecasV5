@@ -29,6 +29,7 @@ namespace TableroPecasV5.Client.Logicas
       NoDefinido
     }
 
+    public event CLogicaTendencias.FncCambiarPunto AlCambiarPunto;
     public const double ANCHO_TREND_RED = 350;
     public const double ALTO_TREND_RED = 180;
 
@@ -280,24 +281,24 @@ namespace TableroPecasV5.Client.Logicas
       if (Indicador.Frecuencia == CRutinas.FREC_ANUAL)
       {
         if (mMesInicial == 1) return string.Format("{0:yyyy}", Fecha);
-        else return string.Format("{0:MM/yy}", Fecha);
+        else return string.Format("{0:MM / yy}", Fecha);
       }
       else
       {
         if (Indicador.Frecuencia == CRutinas.FREC_SEMANAL)
         {
-          return string.Format("{0:dd/MM}", Fecha);
+          return string.Format("{0:dd / MM}", Fecha);
         }
         switch (mPaso)
         {
           case PasoEscalaH.Minutos:
-            return string.Format("{0:dd/MM/yy hh:mm}", Fecha);
+            return string.Format("{0:dd / MM / yy hh:mm}", Fecha);
           case PasoEscalaH.Horas:
-            return string.Format("{0:dd/MM/yy hh}", Fecha);
+            return string.Format("{0:dd / MM / yy hh}", Fecha);
           case PasoEscalaH.Dias:
-            return string.Format("{0:dd/MM/yy}", Fecha);
+            return string.Format("{0:dd / MM / yy}", Fecha);
           case PasoEscalaH.Meses:
-            return string.Format("{0:MM/yy}", Fecha);
+            return string.Format("{0:MM / yy}", Fecha);
           default:
             if (Fecha.Month == 12 && Fecha.Day == 31)
             {
@@ -305,7 +306,7 @@ namespace TableroPecasV5.Client.Logicas
             }
             return (mMesInicial == 1 ?
               string.Format("{0:yyyy}", Fecha) :
-              string.Format("{0:MM/yy}", Fecha));
+              string.Format("{0:MM / yy}", Fecha));
         }
       }
     }
@@ -315,26 +316,26 @@ namespace TableroPecasV5.Client.Logicas
       if (Indicador.Frecuencia == CRutinas.FREC_ANUAL)
       {
         if (mMesInicial == 1) return "HHHH";
-        else return "HH/HH";
+        else return "HH / HH";
       }
       else
       {
         if (Indicador.Frecuencia == CRutinas.FREC_SEMANAL)
         {
-          return "HH/HH";
+          return "HH / HH";
         }
         switch (mPaso)
         {
           case PasoEscalaH.Minutos:
-            return "HH/HH/HH HH:HH";
+            return "HH / HH / HH HH:HH";
           case PasoEscalaH.Horas:
-            return "HH/HH/HH HH";
+            return "HH / HH / HH HH";
           case PasoEscalaH.Dias:
-            return "HH/HH/HH";
+            return "HH / HH / HH";
           case PasoEscalaH.Meses:
-            return "HH/HH";
+            return "HH / HH";
           default:
-            return (mMesInicial == 1 ? "HHHH" : "HH/HH");
+            return (mMesInicial == 1 ? "HHHH" : "HH / HH");
         }
       }
     }
@@ -382,8 +383,8 @@ namespace TableroPecasV5.Client.Logicas
 
     public double OrdenadaValor(double Valor)
     {
-        return mOrdenadaGrafico + mAltoGrafico *
-          (mbEscalaCreciente ? (mMaximo - Valor) : (Valor - mMinimo)) / (mMaximo - mMinimo);
+      return mOrdenadaGrafico + mAltoGrafico *
+        (mbEscalaCreciente ? (mMaximo - Valor) : (Valor - mMinimo)) / (mMaximo - mMinimo);
     }
 
     public double OrdenadaBanda(CInformacionAlarmaCN Punto, Int32 Banda)
@@ -518,13 +519,13 @@ namespace TableroPecasV5.Client.Logicas
     private double mOrdenadaGrafico;
     private double mAltoGrafico;
     private async Task DeterminarDimensionesEscalasAsync(double AltoCaracter)
-		{
+    {
       await DeterminarAnchoEscalaVAsync();
       await DeterminarAltoEscalaHAsync(AltoCaracter);
       mAltoGrafico = Alto - mOrdenadaGrafico - mAltoEscalaH;
       mAltoEscalaV = Alto - mAltoEscalaH;
-      mAnchoGrafico = Ancho - mAnchoEscalaV - AltoCaracter/2 - 2;
-		}
+      mAnchoGrafico = Ancho - mAnchoEscalaV - AltoCaracter / 2 - 2;
+    }
 
     private bool mbHayBandas;
     private bool mbEscalaCreciente;
@@ -569,6 +570,7 @@ namespace TableroPecasV5.Client.Logicas
 
     private async Task DibujarGrillaAsync(Canvas2DContext Contexto)
     {
+      await Contexto.SaveAsync();
       await Contexto.BeginPathAsync();
       await Contexto.SetLineWidthAsync(1);
       await Contexto.SetStrokeStyleAsync("black");
@@ -596,46 +598,163 @@ namespace TableroPecasV5.Client.Logicas
 
       await Contexto.ClosePathAsync();
 
+      await Contexto.RestoreAsync();
+
+    }
+
+    private List<CPunto> PuntosTendencia = null;
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
+    private Int32 PosicionPuntoSeleccionado = -1;
+
+    public Int32 PosicionAlarmaSeleccionada
+    {
+      get
+      {
+        if (PosicionPuntoSeleccionado >= 0)
+        {
+          return PosicionPuntoSeleccionado;
+        }
+        else
+        {
+          return (Alarmas == null || Alarmas.Count == 0 ? -1 : Alarmas.Count - 1);
+        }
+      }
+    }
+
+    public Int32 PeriodoSeleccionado
+    {
+      get
+      {
+        if (Alarmas == null || Alarmas.Count == 0)
+        {
+          return -1;
+        }
+        else
+        {
+          return (PosicionPuntoSeleccionado < 0 ? Alarmas.Last().Periodo : Alarmas[PosicionPuntoSeleccionado].Periodo);
+        }
+      }
+    }
+
+    public void ClickSobreTendencia(Microsoft.AspNetCore.Components.Web.MouseEventArgs e)
+    {
+      if (e != null && Pagina != null)
+      {
+        //        PosicionPuntoSeleccionado = -1;
+        if (PuntosTendencia != null)
+        {
+          object[] Args = new object[1];
+          Args[0] = "ContenedorTend";
+          Int32 Pos = 0;
+          foreach (CPunto Punto in PuntosTendencia)
+          {
+            if ((Punto.Abscisa - e.OffsetX) * (Punto.Abscisa - e.OffsetX) +
+                (Punto.Ordenada - e.OffsetY) * (Punto.Ordenada - e.OffsetY) <=
+                  CTendencias.SEMIDIAMETRO2)
+            {
+              PosicionPuntoSeleccionado = Pos;
+              if (AlCambiarPunto != null)
+              {
+                _ = AlCambiarPunto?.Invoke();
+              }
+              return;
+            }
+            Pos++;
+          }
+        }
+      }
     }
 
     private async Task DibujarCurvaAsync(Canvas2DContext Contexto, double AltoCaracter)
     {
+      PuntosTendencia = new List<CPunto>();
       if (Alarmas.Count > 0)
       {
 
-        await Contexto.BeginPathAsync();
-
-        bool bPrimerPunto = true;
-
         foreach (CInformacionAlarmaCN Dato in Alarmas)
         {
-          if (bPrimerPunto)
-          {
-            await Contexto.MoveToAsync(AbscisaFecha(Dato.FechaInicial), OrdenadaValor(Dato.Valor));
-            bPrimerPunto = false;
-          }
-          else
-          {
-            await Contexto.LineToAsync(AbscisaFecha(Dato.FechaInicial), OrdenadaValor(Dato.Valor));
-          }
+          PuntosTendencia.Add(new CPunto(AbscisaFecha(Dato.FechaInicial), OrdenadaValor(Dato.Valor)));
         }
 
-        await Contexto.SetStrokeStyleAsync("#000000");
+        if (Contenedores.CContenedorDatos.DesciendeEnRojo)
+        {
+          for (Int32 iCiclo = 0; iCiclo < 2; iCiclo++)
+          {
+            bool bRojo = (iCiclo == 1);
+            bool bHay = false;
+            for (Int32 i = 1; i < PuntosTendencia.Count; i++)
+            {
+              if (!bHay)
+              {
+                await Contexto.BeginPathAsync();
+                bHay = true;
+              }
 
-        await Contexto.StrokeAsync();
+              if ((PuntosTendencia[i].Ordenada >= PuntosTendencia[i - 1].Ordenada) == bRojo)
+              {
+                await Contexto.MoveToAsync(PuntosTendencia[i - 1].Abscisa, PuntosTendencia[i - 1].Ordenada);
+                await Contexto.LineToAsync(PuntosTendencia[i].Abscisa, PuntosTendencia[i].Ordenada);
+              }
 
-        await Contexto.ClosePathAsync();
+            }
+
+            if (bHay)
+            {
+              await Contexto.SetStrokeStyleAsync(bRojo ? "#ff0000" : "#000000");
+
+              await Contexto.SetLineWidthAsync(2);
+
+              await Contexto.StrokeAsync();
+
+              await Contexto.ClosePathAsync();
+            }
+
+          }
+        }
+        else
+        {
+
+          bool bPrimerPunto = true;
+
+          await Contexto.BeginPathAsync();
+
+          foreach (CPunto Punto in PuntosTendencia)
+          {
+            if (bPrimerPunto)
+            {
+              await Contexto.MoveToAsync(Punto.Abscisa, Punto.Ordenada);
+              bPrimerPunto = false;
+            }
+            else
+            {
+              await Contexto.LineToAsync(Punto.Abscisa, Punto.Ordenada);
+            }
+          }
+
+          await Contexto.SetStrokeStyleAsync("#000000");
+
+          await Contexto.StrokeAsync();
+
+          await Contexto.ClosePathAsync();
+
+        }
 
       }
 
       Int32 Pos = 0;
-      foreach (CInformacionAlarmaCN Dato in Alarmas)
+      if (PosicionPuntoSeleccionado < 0 && PuntosTendencia != null)
+      {
+        PosicionPuntoSeleccionado = PuntosTendencia.Count - 1;
+      }
+      foreach (CPunto Punto in PuntosTendencia)
       {
         await Contexto.BeginPathAsync();
         await Contexto.SetStrokeStyleAsync("#000000");
         await Contexto.SetLineWidthAsync(1);
-        CPunto Punto = new CPunto(AbscisaFecha(Dato.FechaInicial), OrdenadaValor(Dato.Valor));
-        await Contexto.SetFillStyleAsync("#c0c0c0");
+        await Contexto.SetFillStyleAsync(Pos == PosicionPuntoSeleccionado ? "#ff0000" : "#c0c0c0");
         await Contexto.ArcAsync(Punto.Abscisa, Punto.Ordenada, CTendencias.SEMIDIAMETRO, 0, 2 * Math.PI);
         await Contexto.FillAsync();
         await Contexto.StrokeAsync();
@@ -673,17 +792,21 @@ namespace TableroPecasV5.Client.Logicas
     public HttpClient Http { get; set; }
 
     private async Task LeerAlarmasAsync()
-		{
+    {
       Alarmas = await Contenedores.CContenedorDatos.ObtenerAlarmasIndicadorAsync(Http, Indicador,
           CodigoElementoDimension, true);
       mbLeyo = true;
-      StateHasChanged();
+      mbLeyendo = false;
       if (Pagina != null)
-			{
+      {
         Pagina.HayAlarmaReducida = true;
         Pagina.Refrescar();
+      }
+      else
+			{
+        StateHasChanged();
 			}
-		}
+    }
 
     private bool mbLeyo = false;
     private bool mbLeyendo = false;
@@ -692,55 +815,54 @@ namespace TableroPecasV5.Client.Logicas
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
-      if (CanvasReloj == null || mbCerrado)
+      if (CanvasReloj == null || mbCerrado || mbBloquear)
       {
         return;
       }
 
-      try
+      if (!mbDibujando)
       {
-        mContexto = await Blazor.Extensions.CanvasContextExtensions.CreateCanvas2DAsync(CanvasReloj);
-
-        if (Alarmas!=null && Alarmas.Count > 1)
-				{
-          mbLeyo = true;
-				}
-        //
-        await mContexto.BeginBatchAsync();
-
         try
         {
-
-          await mContexto.ClearRectAsync(0, 0, AnchoCanvas, AltoCanvas);
-          await mContexto.SetFillStyleAsync("white");
-          await mContexto.FillRectAsync(0, 0, AnchoCanvas, AltoCanvas);
-
-          double AltoCaracter;
-
-          if (!mbLeyo)
+          mbDibujando = true;
+          try
           {
-
-            await mContexto.SetFontAsync("11px serif");
-            string Msg = "Aguarde por favor";
-            TextMetrics Medida = await mContexto.MeasureTextAsync("H");
-            AltoCaracter = Medida.Width;
-            mAltoEscalaH = AltoCaracter + 4;
-            Medida = await mContexto.MeasureTextAsync(Msg);
-            await mContexto.SetFillStyleAsync("black");
-            await mContexto.FillTextAsync(Msg, (Ancho - Medida.Width) / 2, (Alto + AltoCaracter) / 2);
-          }
-          else
-          {
-            if (!mbDibujando)
+            mContexto = await Blazor.Extensions.CanvasContextExtensions.CreateCanvas2DAsync(CanvasReloj);
+            try
             {
-              mbDibujando = true;
-              try
+
+              if (Alarmas != null && Alarmas.Count > 1)
+              {
+                mbLeyo = true;
+              }
+              //
+              await mContexto.BeginBatchAsync();
+
+              await mContexto.ClearRectAsync(0, 0, AnchoCanvas, AltoCanvas);
+              await mContexto.SetFillStyleAsync("white");
+              await mContexto.FillRectAsync(0, 0, AnchoCanvas, AltoCanvas);
+
+              double AltoCaracter;
+
+              if (!mbLeyo)
+              {
+
+                await mContexto.SetFontAsync("11px serif");
+                string Msg = "Aguarde por favor";
+                TextMetrics Medida = await mContexto.MeasureTextAsync("H");
+                AltoCaracter = Medida.Width;
+                mAltoEscalaH = AltoCaracter + 4;
+                Medida = await mContexto.MeasureTextAsync(Msg);
+                await mContexto.SetFillStyleAsync("black");
+                await mContexto.FillTextAsync(Msg, (Ancho - Medida.Width) / 2, (Alto + AltoCaracter) / 2);
+              }
+              else
               {
                 //            await PonerNombreAsync();
                 await mContexto.SetFillStyleAsync("#000000");
                 await mContexto.SetFontAsync("11px serif");
 
-                if (Alarmas.Count > 0)
+                if (Alarmas != null && Alarmas.Count > 0)
                 {
                   TextMetrics Medida = await mContexto.MeasureTextAsync("H");
                   AltoCaracter = Medida.Width;
@@ -761,29 +883,33 @@ namespace TableroPecasV5.Client.Logicas
 
                 }
               }
-              finally
-              {
-                mbDibujando = false;
-              }
             }
+            finally
+            {
+              await mContexto.EndBatchAsync();
 
+            }
           }
-
+          catch (Exception ex)
+          {
+            if (!mbBloquear)
+            {
+              Rutinas.CRutinas.DesplegarMsg(ex);
+            }
+          }
         }
         finally
         {
-          await mContexto.EndBatchAsync();
-          if (!mbLeyo && !mbLeyendo)
-					{
-            mbLeyendo = true;
-            await LeerAlarmasAsync();
-          }
+          mbDibujando = false;
         }
 
       }
-      catch (Exception ex)
+
+
+      if (!mbLeyo && !mbLeyendo)
       {
-        Rutinas.CRutinas.DesplegarMsg(ex);
+        mbLeyendo = true;
+        await LeerAlarmasAsync();
       }
     }
 

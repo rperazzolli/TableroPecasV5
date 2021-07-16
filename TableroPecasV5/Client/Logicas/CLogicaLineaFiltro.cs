@@ -30,7 +30,7 @@ namespace TableroPecasV5.Client.Logicas
 		{
 			if (Pagina != null)
 			{
-				Pagina.IniciarDragLinea(e.OffsetX, e.OffsetY, Linea);
+				Pagina.IniciarDragLinea((int)e.ScreenX, (int)e.ScreenY, Linea);
 			}
 			else
 			{

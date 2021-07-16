@@ -3,10 +3,13 @@
 
 @if (Mimico == null)
 {
+  @if (!FalloAlLeer)
+  {
   <CAguardar/>
+  }
 }
-else
-{
+  else
+  {
   <div style="position: absolute; width: 100%; height: 100%;">
     <CascadingValue Value="this">
     @if (Contenedores.CContenedorDatos.EsAdministrador)
@@ -47,15 +50,16 @@ else
       <div style="@EstiloContenido" transform="@Escala">
         @if (HayImagen)
         {
-          <img style="@EstiloImagen" src="@ContenidoImagen">
+          @*<img style="@EstiloImagen" src="@ContenidoImagen">*@
+          <img src="@ContenidoImagen">
         }
         @if (HayProceso)
         {
-          <div style="width: 100%; height: 100%; position: absolute; overflow: auto; margin-left: 0px; margin-top: 0px;" >
+          <div style="width: 100%; height: 100%; position: absolute; overflow: auto; margin-left: 0px; margin-top: 0px;">
             <div style="position: absolute; margin-left: 0px; margin-top: 0px;">
-              <Blazor.Extensions.Canvas.BECanvas Width="@AnchoCanvas" Height="@AltoCanvas" @ref="@CanvasGrafico"/>
+              <Blazor.Extensions.Canvas.BECanvas Width="@AnchoCanvas" Height="@AltoCanvas" @ref="@CanvasGrafico" />
             </div>
-            <div style="@EstiloDivCanvas" @onmouseup="@UbicarElemento"/>
+            <div style="@EstiloDivCanvas" @onmouseup="@UbicarElemento" />
           </div>
         }
         @if (Mimico != null)
@@ -64,16 +68,16 @@ else
           {
             <div style="@Estilo(Pregunta)">
               <TableroPecasV5.Client.Componentes.CRectMimico AlHacerClick="@ClickEnArea"
-                                                           Configurando="@Configurando"
-                                                           Abscisa="Pregunta.Abscisa"
-                                                           Ordenada="Pregunta.Ordenada"
-                                                           Ancho="Pregunta.Ancho"
-                                                           Alto="Pregunta.Alto"
-                                                           Texto="@Pregunta.Nombre"
-                                                           Factor="@FactorEscala"
-                                                           CodigoPropio="Pregunta.Codigo"
-                                                           EsProceso="@HayProceso"/>
-              </div>
+                                                             Configurando="@Configurando"
+                                                             Abscisa="Pregunta.Abscisa"
+                                                             Ordenada="Pregunta.Ordenada"
+                                                             Ancho="Pregunta.Ancho"
+                                                             Alto="Pregunta.Alto"
+                                                             Texto="@Pregunta.Nombre"
+                                                             Factor="@FactorEscala"
+                                                             CodigoPropio="Pregunta.Codigo"
+                                                             EsProceso="@HayProceso" />
+            </div>
           }
         }
       </div>

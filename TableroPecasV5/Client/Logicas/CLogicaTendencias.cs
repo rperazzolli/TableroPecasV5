@@ -813,16 +813,11 @@ namespace TableroPecasV5.Client.Logicas
       {
         if (PuntosTendencia != null && MesesTendencia < 0)
         {
-          object[] Args = new object[1];
-          Args[0] = "ContenedorTend";
-          var Abscisa = await JSRuntime.InvokeAsync<double>("FuncionesJS.getAbscisa", Args);
-          var Ordenada = await JSRuntime.InvokeAsync<double>("FuncionesJS.getOrdenada", Args);
-          e.ClientX -= Abscisa;
-          e.ClientY -= Ordenada;
           Int32 Pos = 0;
           foreach (CPunto Punto in PuntosTendencia)
           {
-            if ((Punto.Abscisa - e.ClientX) * (Punto.Abscisa - e.ClientX) + (Punto.Ordenada - e.ClientY) * (Punto.Ordenada - e.ClientY) <=
+            if ((Punto.Abscisa - e.OffsetX) * (Punto.Abscisa - e.OffsetX) +
+                (Punto.Ordenada - e.OffsetY) * (Punto.Ordenada - e.OffsetY) <=
                   CTendencias.SEMIDIAMETRO2)
             {
               PosicionPuntoSeleccionado = Pos;

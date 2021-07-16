@@ -44,18 +44,6 @@ namespace TableroPecasV5.Client.Plantillas
       }
     }
 
-    public Int32 NivelFlotante
-    {
-      get { return (mComponente == null ? 1 : mComponente.NivelFlotante); }
-      set
-      {
-        if (value != NivelFlotante && mComponente != null)
-        {
-          mComponente.ImponerNivelFlotante(value);
-        }
-      }
-    }
-
     private double mAlto = 250;
     public double Alto
     {

@@ -659,7 +659,7 @@ namespace TableroPecasV5.Client.Logicas
           return "height: " + Escalar(mAltoImg).ToString() +
             "px; width: " + Escalar(mAnchoImg).ToString() +
             "px; margin-top: " + AltoMenu.ToString() +
-            "px; text-align: left; margin-left: 0px; margin-top: 0px; overflow: hidden; position: absolute;";
+            "px; text-align: left; margin-left: 0px; margin-top: 0px; overflow: hidden; position: absolute; background: red;";
         }
         else
         {
@@ -818,10 +818,13 @@ namespace TableroPecasV5.Client.Logicas
     [Inject]
     public HttpClient Http { get; set; }
 
+    public bool FalloAlLeer { get; set; } = false;
+
     private async Task LeerDatosMimicoAsync()
     {
       try
       {
+        FalloAlLeer = false;
         RespuestaMimico Respuesta = await Http.GetFromJsonAsync<RespuestaMimico>(
             "api/Mimicos/LeerMimico?URL=" + Contenedores.CContenedorDatos.UrlBPI +
             "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
@@ -854,6 +857,8 @@ namespace TableroPecasV5.Client.Logicas
       }
       catch (Exception ex)
       {
+        FalloAlLeer = true;
+        StateHasChanged();
         CRutinas.DesplegarMsg(ex);
       }
     }
@@ -1438,13 +1443,13 @@ namespace TableroPecasV5.Client.Logicas
     {
       if (Mimico == null || mCodigoLeido != CodigoUnico)
       {
-        mCodigoLeido = CodigoUnico;
-        if (CodigoUnico > 0)
+        if (CodigoUnico > 0 && mCodigoLeido != CodigoUnico)
         {
+          mCodigoLeido = CodigoUnico;
           await LeerDatosMimicoAsync();
         }
         else
-				{
+        {
           Mimico = new CMimicoCN();
           Mimico.MimicoPropio.Codigo = -1;
           mProceso = null;

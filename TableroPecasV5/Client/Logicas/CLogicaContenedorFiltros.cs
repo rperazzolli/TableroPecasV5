@@ -204,6 +204,7 @@ namespace TableroPecasV5.Client.Logicas
 
       if (CapaPins)
       {
+        Contenedor.ColumnaAgrupadoraTorta = (OrdenAgrupador >= 0 ? Proveedor.Columnas[OrdenAgrupador] : null);
         Contenedor.PinesAgrupados = Agrupados;
         Contenedor.AbrirPinsLL();
       }
@@ -1166,7 +1167,7 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    public Int32 NivelFlotante { get; set; }
+    public bool Encima { get; set; }
 
     private bool mbDetallado = false;
     public bool Detallado
@@ -1409,7 +1410,7 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    public Int32 NivelFlotante { get; set; }
+    public bool Encima { get; set; }
     public Int32 PosicionEnPantalla { get; set; }
     public Int32 PosicionUnica { get; set; }
     public Int32 Ancho { get; set; } = 185;
@@ -1495,14 +1496,14 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    public Int32 NivelFlotante
+    public bool Encima
     {
-      get { return (mComponente == null ? 1 : mComponente.NivelFlotante); }
+      get { return (mComponente == null ? false : mComponente.Encima); }
       set
       {
-        if (value != NivelFlotante && mComponente != null)
+        if (value != Encima && mComponente != null)
         {
-          mComponente.ImponerNivelFlotante(value);
+          mComponente.ImponerEncima(value);
         }
       }
     }

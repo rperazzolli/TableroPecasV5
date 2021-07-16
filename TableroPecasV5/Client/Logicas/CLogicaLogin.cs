@@ -111,9 +111,9 @@ namespace TableroPecasV5.Client.Logicas
             Contenedores.CContenedorDatos.Usuario = Usuario;
             Contenedores.CContenedorDatos.Clave = Clave;
             Contenedores.CContenedorDatos.CodigoUsuario = Datos.CodigoUsuario;
-            Contenedores.CContenedorDatos.TendenciasEnTarjeta = Datos.TendenciasEnTarjeta;
-            Contenedores.CContenedorDatos.DesciendeEnRojo = Datos.DesciendeEnRojo;
-            Contenedores.CContenedorDatos.SiempreTendencia = false; // Datos.SiempreTendencia;
+            Contenedores.CContenedorDatos.TendenciasEnTarjeta = false; // true; // Datos.TendenciasEnTarjeta;
+            Contenedores.CContenedorDatos.DesciendeEnRojo = true; // Datos.DesciendeEnRojo;
+            Contenedores.CContenedorDatos.SiempreTendencia = false; // true; // Datos.SiempreTendencia;
             Contenedores.CContenedorDatos.PoneEtiquetas = Datos.PoneEtiquetas;
             Contenedores.CContenedorDatos.RespetaSentido = Datos.RespetaSentido;
             Contenedores.CContenedorDatos.ImprimirPDF = Datos.ImprimirPDF;

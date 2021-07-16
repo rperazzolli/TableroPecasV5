@@ -27,8 +27,8 @@
           {
             <TableroPecasV5.Client.Componentes.CRelojCompleto Abscisa="@Reloj.Abscisa" Ordenada="@Reloj.Ordenada"
                                                               Indicador="@Reloj.Indicador" @ref="@Reloj.ComponentePropio"
-                                                              CodigoElementoDimension="@Reloj.CodigoElemento" CodigoUnico="@Reloj.CodigoUnico"
-                                                              NivelFlotante="@Reloj.NivelFlotante" />
+                                                              CodigoElementoDimension="@Reloj.CodigoElemento"
+                                                              CodigoUnico="@Reloj.CodigoUnico"/>
           }
         </div>
       }
@@ -44,7 +44,7 @@
     @foreach (CLinkTendencia Tendencia in Tendencias)
     {
       <div style="@EstiloLinkBase(@Tendencia)">
-        <TableroPecasV5.Client.Componentes.CComponenteTendencias @ref="@Tendencia.ComponentePropio" NivelFlotante="@Tendencia.NivelFlotante"
+        <TableroPecasV5.Client.Componentes.CComponenteTendencias @ref="@Tendencia.ComponentePropio"
                                                                  Ancho="@Tendencia.Ancho" Alto="@Tendencia.Alto"
                                                                  CodigoElementoDimension="@Tendencia.CodigoElementoDimension"
                                                                  PosicionPuntoSeleccionado="@Tendencia.PosicionPuntoSeleccionado"
@@ -58,7 +58,7 @@
     @foreach (CLinkOtro Grilla in Grillas)
     {
       <div style="@EstiloGrilla(@Grilla)" class="ui-widget-content">
-        <TableroPecasV5.Client.Componentes.CGrillaDatos @ref="@Grilla.ComponenteGrilla" NivelFlotante="@Grilla.NivelFlotante"
+        <TableroPecasV5.Client.Componentes.CGrillaDatos @ref="@Grilla.ComponenteGrilla"
                                                         Ancho="@Grilla.Ancho" Alto="@Grilla.Alto"
                                                         Abscisa="@Grilla.Abscisa" Ordenada="@Grilla.Ordenada"
                                                         Ampliado="@Grilla.Ampliado"
@@ -91,8 +91,7 @@
                                                         AgrupamientoDependiente="@Grafico.AgrupamientoDependiente"
                                                         AgrupamientoIndependiente="@Grafico.AgrupamientoIndependiente"
                                                         Detallado="@Grafico.Detallado"
-                                                        PuedeCrearGraficoDependiente="false"
-                                                        NivelFlotante="@Grafico.NivelFlotante" />
+                                                        PuedeCrearGraficoDependiente="false" />
           }
           else
           {
@@ -110,8 +109,7 @@
                                                         AgrupamientoDependiente="@Grafico.AgrupamientoDependiente"
                                                         AgrupamientoIndependiente="@Grafico.AgrupamientoIndependiente"
                                                         Detallado="@Grafico.Detallado"
-                                                        PuedeCrearGraficoDependiente="false"
-                                                        NivelFlotante="@Grafico.NivelFlotante" />
+                                                        PuedeCrearGraficoDependiente="false" />
           }
         </div>
       </div>
@@ -149,8 +147,7 @@
                                                            Abscisa="@Mapa.Datos.Posicion.X"
                                                            Ordenada="@Mapa.Datos.Posicion.Y"
                                                            Ancho="@Mapa.Datos.Ancho" Alto="@Mapa.Datos.AltoNeto"
-                                                           Codigo="@Mapa.Datos.CodigoPropio"
-                                                           NivelFlotante="@Mapa.NivelFlotante" />
+                                                           Codigo="@Mapa.Datos.CodigoPropio"/>
               break;
             case CGrafV2DatosContenedorBlock.ClaseBlock.MapaGradientes:
               <TableroPecasV5.Client.Componentes.CMapaGradiente @ref="@Mapa.ComponenteGradiente"
@@ -163,8 +160,7 @@
                                                                 Abscisa="@Mapa.Datos.Posicion.X"
                                                                 Ordenada="@Mapa.Datos.Posicion.Y"
                                                                 Ancho="@Mapa.Datos.Ancho"
-                                                                Alto="@Mapa.Datos.Alto"
-                                                                NivelFlotante="@Mapa.NivelFlotante" />
+                                                                Alto="@Mapa.Datos.Alto"/>
               break;
             case CGrafV2DatosContenedorBlock.ClaseBlock.Pines:
             case CGrafV2DatosContenedorBlock.ClaseBlock.MapaCalor:
@@ -184,8 +180,7 @@
                                                             ColumnaLng="@Mapa.Datos.ColumnaLng"
                                                             ColumnaValor="@Mapa.Datos.ColumnaDatos"
                                                             Ancho="@Mapa.Datos.Ancho"
-                                                            Alto="@Mapa.Datos.Alto"
-                                                            NivelFlotante="@Mapa.NivelFlotante" />
+                                                            Alto="@Mapa.Datos.Alto"/>
               break;
           }
         </div>
@@ -253,7 +248,6 @@
                          style="@EstiloFiltro(Link, Otro.ComponenteFiltros)" draggable="true"
                          @ondragstart="@(() => IniciarDragFiltro(Link))">
                 <TableroPecasV5.Client.Componentes.FiltroTextos @ref="Link.Componente"
-                                                                NivelFlotante="@Otro.NivelFlotante"
                                                                 Ancho="@Link.Ancho"
                                                                 Alto="@Logicas.CLogicaIndicador.AltoFiltro"
                                                                 Abscisa="@Link.Abscisa"

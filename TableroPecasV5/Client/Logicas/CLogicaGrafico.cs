@@ -76,7 +76,7 @@ namespace TableroPecasV5.Client.Logicas
     public List<CLogicaGrafico> GraficosDependientes { get; set; } = new List<CLogicaGrafico>();
 
     private CFiltradorPasos mFiltroPasos = null;
-    private List<CPorcionTorta> mPorciones = new List<CPorcionTorta>();
+    private List<CPorcionTorta> mPorciones = null;
     private List<CPorcionTorta> PorcionesTorta
     {
       get { return mPorciones; }
@@ -271,11 +271,6 @@ namespace TableroPecasV5.Client.Logicas
       Clase = Clase0;
     }
 
-    public void ImponerNivelZ(Int32 Nivel)
-    {
-      NivelFlotante = Nivel;
-    }
-
     public void ImponerModoAgrupar(ModoAgruparDependiente Modo)
     {
       if (Modo != AgrupamientoDependiente)
@@ -418,6 +413,7 @@ namespace TableroPecasV5.Client.Logicas
       if (AlCerrarGrafico != null && !Ampliado)
       {
         mAnchoLabelsIzq = -1;
+        Pagina.PonerElementoEncima(false, false, false, -1, this.CodigoUnico);
         Pagina.ReposicionarGrafico(this.CodigoUnico, 2, 2,
             Contenedores.CContenedorDatos.AnchoPantallaAmpliada - 4,
             Contenedores.CContenedorDatos.AltoPantallaAmpliada - 4, true);
@@ -430,7 +426,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       if (AlCerrarGrafico != null && Ampliado)
       {
-        NivelFlotante = 1;
+        Pagina.PonerElementoEncima(false, false, false, -1, -1);
         Ampliado = false;
         mAnchoLabelsIzq = -1;
         Pagina.ReposicionarGrafico(this.CodigoUnico, -999999, -999999, -999999, -999999, true);
@@ -543,6 +539,10 @@ namespace TableroPecasV5.Client.Logicas
     public int AbscisaAbajo { get; set; }
     public int OrdenadaAbajo { get; set; }
 
+    public void PonerArriba(Microsoft.AspNetCore.Components.Web.MouseEventArgs e)
+    {
+    }
+
     public void EventoMouseAbajo(Microsoft.AspNetCore.Components.Web.MouseEventArgs e)
     {
       Pagina.PonerElementoEncima(false, false, false, -1, CodigoUnico);
@@ -551,7 +551,7 @@ namespace TableroPecasV5.Client.Logicas
       Pagina.Refrescar();
     }
 
-    public async void EventoMouseUp(Microsoft.AspNetCore.Components.Web.MouseEventArgs e)
+    public void EventoMouseUp(Microsoft.AspNetCore.Components.Web.MouseEventArgs e)
     {
       lock (OBJ_LOCK)
       {
@@ -571,20 +571,20 @@ namespace TableroPecasV5.Client.Logicas
         {
           if (Clase == ClaseGrafico.Barras)
           {
-            await BuscarPorcionAbajoAsync(mPorcionesBarras, e);
+            BuscarPorcionAbajo(mPorcionesBarras, e);
           }
           else
           {
             if (Clase == ClaseGrafico.Histograma)
             {
-              await BuscarPorcionAbajoAsync((from D in mDatosHistograma
+              BuscarPorcionAbajo((from D in mDatosHistograma
                                              select D.Datos).ToList(), e);
             }
             else
             {
               if (mPorcionesDibujadas != null)
               {
-                await BuscarPorcionAbajoAsync(mPorcionesDibujadas, e);
+                BuscarPorcionAbajo(mPorcionesDibujadas, e);
               }
             }
           }
@@ -596,16 +596,16 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    private async Task BuscarPorcionAbajoAsync(List<CPorcionTorta> Porciones, Microsoft.AspNetCore.Components.Web.MouseEventArgs e) {
+    private void BuscarPorcionAbajo(List<CPorcionTorta> Porciones, Microsoft.AspNetCore.Components.Web.MouseEventArgs e) {
       if (PorcionesTorta != null)
       {
-        Rectangulo Rect0 = await ObtenerRectanguloAsync();
-        e.ClientX -= Rect0.left;
-        e.ClientY -= Rect0.top;
+        //Rectangulo Rect0 = await ObtenerRectanguloAsync();
+        //e.ClientX -= Rect0.left;
+        //e.ClientY -= Rect0.top;
         Int32 Pos = 0;
         foreach (CPorcionTorta Porcion in Porciones)
         {
-          if (Porcion.PuntoEncima(e.ClientX, e.ClientY))
+          if (Porcion.PuntoEncima(e.OffsetX, e.OffsetY))
           {
             Porcion.Seleccionado = !Porcion.Seleccionado;
             if (Porcion == mPorcion20 || Porcion.Datos == null)
@@ -625,7 +625,7 @@ namespace TableroPecasV5.Client.Logicas
                                where P.Seleccionado
                                select P.Datos).ToList();
 
-            AjustarGraficosDependientes();
+            AjustarGraficosDependientes(); acá hay que buscar por qué se limpia el proveedor.
 
             StateHasChanged();
             break;
@@ -1005,7 +1005,7 @@ namespace TableroPecasV5.Client.Logicas
     private void ArmarDatosHistograma(List<CDatosTorta> Originales)
     {
 
-      mDatosHistograma.Clear();
+      mDatosHistograma = new List<DatosTortaColor>();
 
       if (Originales.Count == 0)
       {
@@ -1093,7 +1093,7 @@ namespace TableroPecasV5.Client.Logicas
 
       if (Originales.Count == 0)
       {
-        mDatosHistograma.Clear();
+        mDatosHistograma = new List<DatosTortaColor>();
       }
       else
       {
@@ -1165,14 +1165,7 @@ namespace TableroPecasV5.Client.Logicas
                 break;
             }
 
-            if (PorcionesTorta == null)
-            {
-              PorcionesTorta = new List<CPorcionTorta>();
-            }
-            else
-            {
-              PorcionesTorta.Clear();
-            }
+            PorcionesTorta = new List<CPorcionTorta>();
 
             int i = 0;
             double Parcial = 0;
@@ -1699,7 +1692,7 @@ namespace TableroPecasV5.Client.Logicas
       try
       {
 
-        if (PorcionesTorta.Count == 0 && mDatosApilados == null && mDatosHistograma.Count == 0)
+        if (PorcionesTorta == null && mDatosApilados == null && mDatosHistograma == null)
         {
           RefrescarDatosTortaDesdeProveedor();
           bRedibujar = true;
@@ -1844,7 +1837,7 @@ namespace TableroPecasV5.Client.Logicas
       }
       finally
       {
-        await base.OnAfterRenderAsync(firstRender);
+//        await base.OnAfterRenderAsync(firstRender);
         mbGraficando = false;
         if (bRedibujar)
 				{

@@ -97,7 +97,7 @@ namespace TableroPecasV5.Client.Logicas
       {
         if (Mimico != null && Mimico.HayImagen)
         {
-          return "width: " + Mimico.AnchoPantallaCompleta.ToString() + "; top: 0px; left: 0px; height: " +
+          return "width: " + Mimico.AnchoPantallaCompleta.ToString() + "px; top: 0px; left: 0px; height: " +
               Mimico.AltoPantallaCompleta.ToString() +
               "px; overflow-x: visible; overflow-y: hidden; text-align: left; position: absolute;";
         }

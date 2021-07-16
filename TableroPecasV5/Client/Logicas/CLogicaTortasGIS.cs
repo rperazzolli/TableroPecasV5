@@ -683,9 +683,10 @@ namespace TableroPecasV5.Client.Logicas
 		private void ArmarTortasDesdeCoordenadas()
 		{
 			// determinar el rango de coordenadas.
+			mTortas = new List<CTortaBing>();
 			if (Lineas.Count == 0)
 			{
-				Navegador.NavigateTo("Indicadores");
+				return;
 			}
 			else
 			{
@@ -707,7 +708,7 @@ namespace TableroPecasV5.Client.Logicas
 
 							LngMin = Math.Min(LngMin, Lng);
 							LngMax = Math.Max(LngMax, Lng);
-							Acumulado += Math.Abs(ColumnaDatos.ValorReal(Linea.Codigos[ColumnaDatos.Orden]));
+							Acumulado += Math.Abs(ColumnaDatos.ValorReal(Linea.Codigos[ColumnaDatos.Orden], true));
 						}
 					}
 
@@ -724,29 +725,31 @@ namespace TableroPecasV5.Client.Logicas
 					}
 
 					// determina los grupos de datos.
-					mTortas = new List<CTortaBing>();
 					double Rango2 = Rango * Rango;
 					foreach (CLineaComprimida Linea in Lineas)
 					{
 						double Lat = ColumnaLat.ValorReal(Linea.Codigos[ColumnaLat.Orden]);
 						double Lng = ColumnaLng.ValorReal(Linea.Codigos[ColumnaLng.Orden]);
-						CTortaBing Torta = TortaEnPosicion(Lat, Lng, Rango2);
-						if (Torta == null)
+						if (Math.Abs(Lat) <= 180 && Math.Abs(Lng) <= 180)
 						{
-							Torta = new CTortaBing()
+							CTortaBing Torta = TortaEnPosicion(Lat, Lng, Rango2);
+							if (Torta == null)
 							{
-								Gajos = new List<CGajoTorta>(),
-								Centro = new CPosicionWFSCN()
+								Torta = new CTortaBing()
 								{
-									X = Lng,
-									Y = Lat
-								}
-							};
-						  mTortas.Add(Torta);
+									Gajos = new List<CGajoTorta>(),
+									Centro = new CPosicionWFSCN()
+									{
+										X = Lng,
+										Y = Lat
+									}
+								};
+								mTortas.Add(Torta);
+							}
+							Torta.SumarValor(ColumnaAgrupadora.ListaValores[Linea.Codigos[ColumnaAgrupadora.Orden]],
+										ColumnaAgrupadora.Valores[Linea.Codigos[ColumnaAgrupadora.Orden]].ToString(),
+										(TodosCeros ? 1 : ColumnaDatos.ValorReal(Linea.Codigos[ColumnaDatos.Orden], true)));
 						}
-						Torta.SumarValor(ColumnaAgrupadora.ListaValores[Linea.Codigos[ColumnaAgrupadora.Orden]],
-									ColumnaAgrupadora.Valores[Linea.Codigos[ColumnaAgrupadora.Orden]].ToString(),
-									(TodosCeros ? 1 : ColumnaDatos.ValorReal(Linea.Codigos[ColumnaDatos.Orden])));
 					}
 
 					foreach (CTortaBing Torta in mTortas)

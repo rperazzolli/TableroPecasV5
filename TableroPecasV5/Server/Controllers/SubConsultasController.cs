@@ -231,6 +231,10 @@ namespace TableroPecasV5.Server.Controllers
 
     private static List<WCFBPI.CParametroExt> ExtraerPrms(string Contenido)
     {
+      if (string.IsNullOrEmpty(Contenido))
+			{
+        return new List<WCFBPI.CParametroExt>();
+			}
       List<WCFBPI.CParametroExt> Respuesta = new List<WCFBPI.CParametroExt>();
       string[] Datos = Contenido.Split(new char[] { '$', '$' }, StringSplitOptions.RemoveEmptyEntries);
       Int32 Cantidad = Int32.Parse(LimpiarParentesis(Datos[0]));

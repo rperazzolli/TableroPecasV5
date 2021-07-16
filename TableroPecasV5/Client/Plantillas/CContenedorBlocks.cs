@@ -252,7 +252,7 @@ namespace TableroPecasV5.Client.Plantillas
         Math.Floor(Grilla.Alto).ToString() +
         "px; margin-left: " + Grilla.Abscisa.ToString() +
         "px; margin-top: " + Grilla.Ordenada.ToString() + "px; position: absolute; text-align: center;" +
-        " z-index: " + Grilla.NivelFlotante.ToString() + "; background-color: white; overflow: hidden; font-size: 11px;";
+        " background-color: white; overflow: hidden; font-size: 11px;";
     }
 
     public static string EstiloTarjetaLink(CLinkFicha Pregunta)
@@ -274,8 +274,7 @@ namespace TableroPecasV5.Client.Plantillas
         "px; margin-left: " + Lnk.Abscisa.ToString() +
         "px; margin-top: " + Lnk.Ordenada.ToString() + "px; position: absolute; text-align: " +
         (Lnk.Clase == ClaseGrafico.BarrasH ? "left" : "center") +
-        "; z-index: " + Lnk.NivelFlotante.ToString() + ";" +
-        (Lnk.Clase == ClaseGrafico.BarrasH ? " overflow: hidden;" : "");
+        (Lnk.Clase == ClaseGrafico.BarrasH ? "; overflow: hidden;" : "");
     }
 
     public string EstiloGraficoSuperior(CLinkGraficoCnt Lnk)
@@ -294,8 +293,9 @@ namespace TableroPecasV5.Client.Plantillas
       return "width: " + Math.Floor(Lnk.Datos.Ancho).ToString() + "px; height: " +
         Math.Floor(Lnk.Datos.Alto).ToString() +
         "px; margin-left: " + Math.Floor(Lnk.Datos.Posicion.X).ToString() +
-        "px; margin-top: " + Math.Floor(Lnk.Datos.Posicion.Y).ToString() + "px; position: absolute; text-align: center" +
-        "; z-index: " + Lnk.NivelFlotantePropio.ToString() + "; overflow: hidden;";
+        "px; margin-top: " + Math.Floor(Lnk.Datos.Posicion.Y).ToString() +
+        "px; position: absolute; text-align: center" +
+        "; overflow: hidden;";
     }
 
     public string EstiloOtroSuperior(CLinkOtro Lnk)
@@ -334,8 +334,8 @@ namespace TableroPecasV5.Client.Plantillas
       return "width: " + Math.Floor(Lnk.Datos.Ancho).ToString() + "px; height: " +
         Math.Floor(Lnk.Datos.Alto).ToString() +
         "px; margin-left: " + Math.Floor(Lnk.Datos.Posicion.X).ToString() +
-        "px; margin-top: " + Math.Floor(Lnk.Datos.Posicion.Y).ToString() + "px; position: absolute; text-align: center; z-index: " +
-        Lnk.NivelFlotantePropio.ToString() + "; overflow: hidden; background-color: white;";
+        "px; margin-top: " + Math.Floor(Lnk.Datos.Posicion.Y).ToString() +
+        "px; position: absolute; text-align: center; overflow: hidden; background-color: white;";
     }
 
     public string EstiloMapaSuperior(CLinkMapa Lnk)

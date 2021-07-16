@@ -179,8 +179,17 @@ namespace TableroPecasV5.Client.Logicas
 				  ClaseIndicador, Indicador, ColumnaVinculo.Nombre);
 			if (Vinculador != null)
 			{
-				CrearListaElementos();
-				StateHasChanged();
+				if (CrearListaElementos())
+				{
+					if (AlResponder != null)
+					{
+						AlResponder(CrearVinculador());
+					}
+				}
+				else
+				{
+					StateHasChanged();
+				}
 			}
 		}
 
@@ -224,8 +233,9 @@ namespace TableroPecasV5.Client.Logicas
 		private double mLatCentro;
 		private double mLngCentro;
 
-		private void CrearListaElementos()
+		private bool CrearListaElementos()
 		{
+			bool bRetorno = true;
 			ListaElementos = new List<CListaPosicion>();
 			foreach (string Valor in ColumnaVinculo.ListaValores)
 			{
@@ -249,8 +259,13 @@ namespace TableroPecasV5.Client.Logicas
 					Elemento.Lng = Lng;
 					Elemento.Color = "white";
 				}
+				else
+				{
+					bRetorno = false;
+				}
 				ListaElementos.Add(Elemento);
 			}
+			return bRetorno;
 		}
 
 		private async Task DibujarPushpinsAsync()
@@ -262,6 +277,13 @@ namespace TableroPecasV5.Client.Logicas
 					await AgregarPushpinAsync(Elemento);
 				}
 			}
+		}
+
+		private bool PosicionCorrecta(string Valor)
+		{
+			double Lat, Lng;
+			CRutinas.ExtraerCoordenadasPosicion(Valor, out Lng, out Lat);
+			return Lat > -999;
 		}
 
 		private CVinculoIndicadorCompletoCN CrearVinculador()
@@ -286,7 +308,8 @@ namespace TableroPecasV5.Client.Logicas
 				if (Elemento.Lat > -999)
 				{
 					CVinculoDetalleCN Vinculo = (from D in Vinculador.Detalles
-																			 where D.ValorAsociado == Elemento.Referencia
+																			 where D.ValorAsociado == Elemento.Referencia &&
+																			     PosicionCorrecta(D.Posicion)
 																			 select D).FirstOrDefault();
 					if (Vinculo == null)
 					{
@@ -316,10 +339,6 @@ namespace TableroPecasV5.Client.Logicas
 		public async void Registrar()
 		{
 			CVinculoIndicadorCompletoCN Vinculo = CrearVinculador();
-			if (Vinculo.Vinculo.Codigo < 0)
-			{
-
-			}
 			Int32 Codigo = (mbDatosSucios ? await CContenedorDatos.RegistrarVinculoAsync(Http, Vinculo) : 1);
 			if (Codigo > 0)
 			{

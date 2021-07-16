@@ -88,6 +88,10 @@ namespace TableroPecasV5.Client.Logicas
 
 		public void MoverseAIndicador(CPreguntaIndicadorCN Pregunta)
 		{
+			foreach (CPreguntaIndicadorConAlarmas Indicador in PreguntasIndicadores)
+			{
+				Indicador.Reloj.BloquearGrafico();
+			}
 			NavigationManager.NavigateTo("DetalleIndicador/" + Pregunta.Indicador.ToString(), false);
 		}
 

@@ -50,12 +50,12 @@ namespace TableroPecasV5.Client.Componentes
     public bool Seleccionado { get; set; } = false;
 
     [Parameter]
-    public Int32 NivelFlotante
+    public bool Encima
     {
-      get { return (Seleccionado || Ampliado ? NIVEL_SELECCIONADO : NivelPropio); }
+      get { return (Seleccionado || Ampliado ? true: false); }
       set
       {
-        Seleccionado = (value == NIVEL_SELECCIONADO);
+        Seleccionado = value;
       }
     }
 
@@ -123,9 +123,9 @@ namespace TableroPecasV5.Client.Componentes
       AlRefrescarHaciaSuperior?.Invoke();
     }
 
-    public void ImponerNivelFlotante(Int32 Nivel)
+    public void ImponerEncima(bool bEncima)
     {
-      NivelFlotante = Nivel;
+      Encima = bEncima;
     }
 
     public string Nombre_SVG

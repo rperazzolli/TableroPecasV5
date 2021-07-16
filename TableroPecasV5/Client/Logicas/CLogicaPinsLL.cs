@@ -227,8 +227,33 @@ namespace TableroPecasV5.Client.Logicas
 
     private bool CoordenadasIguales(IconoPush I1, IconoPush I2)
 		{
-      return I1.Lat == I2.Lat && I1.Lng == I2.Lng;
+      return (Math.Abs(I1.Lat - I2.Lat) < mDifMinima) && (Math.Abs(I1.Lng - I2.Lng) < mDifMinima);
 		}
+
+    private double DeterminarDiferenciaMinima()
+		{
+      if (Iconos.Count < 10)
+			{
+        return 0;
+			}
+
+      double LtMin = double.MaxValue;
+      double LtMax = double.MinValue;
+      double LnMin = double.MaxValue;
+      double LnMax = double.MinValue;
+      foreach (IconoPush Punto in Iconos)
+			{
+        LtMin = Math.Min(Punto.Lat, LtMin);
+        LtMax = Math.Max(Punto.Lat, LtMax);
+        LnMin = Math.Min(Punto.Lng, LnMin);
+        LnMax = Math.Max(Punto.Lng, LnMax);
+      }
+
+      return Math.Max(LtMax - LtMin, LnMax - LnMin) / 100;
+
+    }
+
+    double mDifMinima;
 
     private void CargarValores()
     {
@@ -257,6 +282,16 @@ namespace TableroPecasV5.Client.Logicas
         }
 
         Iconos.Sort(CompararPuntos);
+
+        if (Agrupar || Iconos.Count > 500)
+				{
+          mDifMinima = DeterminarDiferenciaMinima();
+				}
+        else
+				{
+          mDifMinima = 0.00001;
+				}
+
 
         for (i = Iconos.Count - 1; i > 0; i--)
 				{
@@ -415,11 +450,11 @@ namespace TableroPecasV5.Client.Logicas
             }
           }
         }
-        //foreach (CPuntoTextoColor Punto in mPuntos)
-        //{
-        //	await AgregarPushPinAsync(Punto);
-        //}
-      }
+				foreach (IconoPush Punto in Iconos)
+				{
+					await AgregarPushPinAsync(Punto);
+				}
+			}
       catch (Exception ex)
       {
         CRutinas.DesplegarMsg(ex);
