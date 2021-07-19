@@ -754,62 +754,72 @@ namespace TableroPecasV5.Client.Logicas
 
     public void Filtrar()
     {
-      if (ColumnaReal)
+      IndicadorContenedor.Procesando = true;
+      IndicadorContenedor.Refrescar();
+      try
       {
-        try
+        if (ColumnaReal)
         {
-          Filtrador.ValorMinimo = Rutinas.CRutinas.FloatVStr(MinimoRango);
-          Filtrador.ValorMaximo = Rutinas.CRutinas.FloatVStr(MaximoRango);
-        }
-        catch (Exception ex)
-        {
-          Rutinas.CRutinas.InformarUsuario("Al extraer rango", ex);
-          return;
-        }
-      }
-      else
-      {
-        if (ColumnaFecha)
-        {
-          List<string> ValSelecc = new List<string>();
-          ObtenerValoresSeleccinadosFecha(ref ValSelecc);
-          Filtrador.ValoresSeleccionados = ValSelecc;
+          try
+          {
+            Filtrador.ValorMinimo = Rutinas.CRutinas.FloatVStr(MinimoRango);
+            Filtrador.ValorMaximo = Rutinas.CRutinas.FloatVStr(MaximoRango);
+          }
+          catch (Exception ex)
+          {
+            Rutinas.CRutinas.InformarUsuario("Al extraer rango", ex);
+            return;
+          }
         }
         else
         {
-          Filtrador.CodigosSeleccionados = DeterminarCodigosSeleccionados();
-//          Filtrador.Proveedor.FiltrarPorAsociaciones();
-          //      Filtrador.FiltrarDataset();
-
-
-          if (mFiltrador.ColumnaValor != null)
+          if (ColumnaFecha)
           {
-            CFiltrador FiltroValor = mFiltrador.Proveedor.FiltroParaColumna(mFiltrador.ColumnaValor.Nombre);
-            if (FiltroValor != null)
+            List<string> ValSelecc = new List<string>();
+            ObtenerValoresSeleccinadosFecha(ref ValSelecc);
+            Filtrador.ValoresSeleccionados = ValSelecc;
+          }
+          else
+          {
+            Filtrador.CodigosSeleccionados = DeterminarCodigosSeleccionados();
+            //          Filtrador.Proveedor.FiltrarPorAsociaciones();
+            //      Filtrador.FiltrarDataset();
+
+
+            if (mFiltrador.ColumnaValor != null)
             {
-              List<CElementoFilaAsociativa> Filas = new List<CElementoFilaAsociativa>();
-              Filas.AddRange(mFilasPantalla);
-              foreach (CElementoFilaAsociativa Fila in Filas)
+              CFiltrador FiltroValor = mFiltrador.Proveedor.FiltroParaColumna(mFiltrador.ColumnaValor.Nombre);
+              if (FiltroValor != null)
               {
-                if (Fila.UsadoParaFiltrarAsociaciones)
+                List<CElementoFilaAsociativa> Filas = new List<CElementoFilaAsociativa>();
+                Filas.AddRange(mFilasPantalla);
+                foreach (CElementoFilaAsociativa Fila in Filas)
                 {
-                  Fila.UsadoParaFiltrarAsociaciones = false;
-                  LimpiarFiltrosAsociados();
-                  if (FiltroValor != null)
+                  if (Fila.UsadoParaFiltrarAsociaciones)
                   {
-                    // marca en el otro los elementos asociados y desmarca los usads para filtrar.
-                    FiltroValor.AjustarFiltrosAsociados(mFiltrador.CodigosFiltroAsociados());
-                    //                FiltroValor.Filtro.ImponerFiltrosAsociados(mFiltrador.CodigosFiltroAsociados());
+                    Fila.UsadoParaFiltrarAsociaciones = false;
+                    LimpiarFiltrosAsociados();
+                    if (FiltroValor != null)
+                    {
+                      // marca en el otro los elementos asociados y desmarca los usads para filtrar.
+                      FiltroValor.AjustarFiltrosAsociados(mFiltrador.CodigosFiltroAsociados());
+                      //                FiltroValor.Filtro.ImponerFiltrosAsociados(mFiltrador.CodigosFiltroAsociados());
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
 
-      mFiltrador.Proveedor.FiltrarPorAsociaciones();
-//      Filtrador.FiltrarDataset();
+        mFiltrador.Proveedor.FiltrarPorAsociaciones();
+        //      Filtrador.FiltrarDataset();
+      }
+      finally
+			{
+        IndicadorContenedor.Procesando = false;
+        IndicadorContenedor.Refrescar();
+      }
 
     }
 

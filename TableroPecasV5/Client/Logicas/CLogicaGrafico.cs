@@ -625,7 +625,7 @@ namespace TableroPecasV5.Client.Logicas
                                where P.Seleccionado
                                select P.Datos).ToList();
 
-            AjustarGraficosDependientes(); acá hay que buscar por qué se limpia el proveedor.
+            AjustarGraficosDependientes();
 
             StateHasChanged();
             break;
@@ -834,7 +834,7 @@ namespace TableroPecasV5.Client.Logicas
       {
         List<CDatosTorta> SeleccionAnterior = CopiarListaSeleccionados(mListaSeleccion);
         Filtrador.Proveedor.Columnas = Proveedor.Columnas;
-        Filtrador.Proveedor.Datos = Datos;
+//        Filtrador.Proveedor.Datos = Datos;
         Filtrador.AjustarDatosIniciales();
         //        RefrescarDatosDesdeProveedorLineas();
         RefrescarDatosTortaDesdeProveedor();

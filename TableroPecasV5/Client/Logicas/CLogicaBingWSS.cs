@@ -44,6 +44,20 @@ namespace TableroPecasV5.Client.Logicas
 
 		public bool VerLabels { get; set; } = true;
 
+		private bool mbVerMapaCalor = false;
+		public bool VerComoMapaCalor
+		{
+			get { return mbVerMapaCalor; }
+			set
+			{
+				if (mbVerMapaCalor != value)
+				{
+					mbVerMapaCalor = value;
+					StateHasChanged();
+				}
+			}
+		}
+
 		public CColumnaBase ColumnaGeoreferencia { get; set; }
 		public CVinculoIndicadorCompletoCN Vinculador { get; set; }
 		public bool MostrarDialogoVinculador { get; set; } = false;
@@ -107,9 +121,35 @@ namespace TableroPecasV5.Client.Logicas
 		private Int32 mCodigoCapaElegida = -1;
 		private CCapaWSSCN mCapa = null;
 
+		public CMapaCalor MapaCalor { get; set; }
+
 		public CCapaWSSCN CapaWSS
 		{
 			get { return mCapa; }
+		}
+
+		public string NombreColumnaLat
+		{
+			get
+			{
+				return (mCapa == null ? "" : mCapa.ColumnaLatitud);
+			}
+		}
+
+		public string NombreColumnaLng
+		{
+			get
+			{
+				return (mCapa == null ? "" : mCapa.ColumnaLongitud);
+			}
+		}
+
+		public string NombreColumnaValor
+		{
+			get
+			{
+				return (mCapa == null ? "" : mCapa.ColumnaValor);
+			}
 		}
 
 		public bool HayCapa { get; set; } = false;
@@ -144,16 +184,20 @@ namespace TableroPecasV5.Client.Logicas
 			StateHasChanged();
 		}
 
-		protected override Task OnInitializedAsync()
+		[Inject]
+		public HttpClient Http { get; set; }
+
+		protected override async Task OnInitializedAsync()
 		{
 			Editando = false;
 			mCodigoPantalla = gCodigoPantalla++;
+			CapasWSS = await CContenedorDatos.ListarCapasWSSAsync(Http, ClaseElemento.Indicador, Indicador.Codigo);
 			//ClaseIndicador = gClaseElemento;
 			//CodigoIndicador = gCodigoElemento;
 			//CodigoElementoDimension = gCodigoElementoDimension;
 			//Columnas = gColumnas;
 			//Lineas = gLineas;
-			return base.OnInitializedAsync();
+			await base.OnInitializedAsync();
 		}
 
 		protected override async Task OnAfterRenderAsync(bool firstRender)

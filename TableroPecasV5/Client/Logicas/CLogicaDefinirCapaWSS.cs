@@ -115,7 +115,7 @@ namespace TableroPecasV5.Client.Logicas
 		public List<CListaTexto> ListaCalculo { get; set; } = new List<CListaTexto>();
 		public List<CListaTexto> ListaIntervalos { get; set; } = new List<CListaTexto>();
 		public List<CListaTexto> ListaVinculos { get; set; } = null;
-		public List<CCapaWFSCN> ListaCapasWFS { get; set; } = null;
+		public static List<CCapaWFSCN> gListaCapasWFS { get; set; } = null;
 
 		private void CrearLineasCalculo()
 		{
@@ -293,10 +293,6 @@ namespace TableroPecasV5.Client.Logicas
 
 		private async Task HacerCargaInicialAsync()
 		{
-			if (CodigoCapa > 0)
-			{
-
-			}
 			RespuestaCapasGIS Respuesta = await CContenedorDatos.LeerCapasWFSAsync(Http, true, true);
 			if (!Respuesta.RespuestaOK)
 			{
@@ -304,8 +300,8 @@ namespace TableroPecasV5.Client.Logicas
 			}
 			else
 			{
-				ListaCapasWFS = Respuesta.CapasWFS;
-				ListaCapasWFS.Insert(0, new CCapaWFSCN()
+				gListaCapasWFS = Respuesta.CapasWFS;
+				gListaCapasWFS.Insert(0, new CCapaWFSCN()
 				{
 					Codigo = -1,
 					Descripcion = CRutinas.NO_DEFINIDA
@@ -349,7 +345,6 @@ namespace TableroPecasV5.Client.Logicas
 
 		private async Task CargarListaCapasAsync()
 		{
-			CRutinas.DesplegarMsg("Prueba del mensaje");
 			ListaCapas = await CContenedorDatos.ListarCapasWSSAsync(Http, ClaseIndicador, Indicador);
 			OrdenarListaCapas();
 			StateHasChanged();
@@ -375,16 +370,16 @@ namespace TableroPecasV5.Client.Logicas
 			return base.OnInitializedAsync();
 		}
 
-		protected override Task OnAfterRenderAsync(bool firstRender)
+		protected override async Task OnAfterRenderAsync(bool firstRender)
 		{
 			if (ListaCapas != null)
 			{
-				if (ListaCapasWFS == null)
+				if (gListaCapasWFS == null)
 				{
-					_ = HacerCargaInicialAsync();
+					await HacerCargaInicialAsync();
 				}
 			}
-			return base.OnAfterRenderAsync(firstRender);
+			await base.OnAfterRenderAsync(firstRender);
 		}
 
 		public bool NoSeleccionado { get; set; } = true;
@@ -452,7 +447,11 @@ namespace TableroPecasV5.Client.Logicas
 
 				if (mCapaSeleccionada == null)
 				{
-					mCapaSeleccionada = new CCapaWSSCN();
+					mCapaSeleccionada = new CCapaWSSCN()
+					{
+						Clase = ClaseIndicador,
+						CodigoElemento = Indicador
+					};
 				}
 
 				mCapaSeleccionada.Modo = (UsaVinculo ? ModoGeoreferenciar.Vinculo : ModoGeoreferenciar.Coordenadas);

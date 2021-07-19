@@ -17,6 +17,8 @@ namespace TableroPecasV5.Server.Controllers
 		[HttpGet("ListarCapasWSS")]
 		public RespuestaCapasWSS ListarCapasWSS(string URL, string Ticket, Int32 ClaseElemento, Int32 CodigoElemento)
 		{
+			Ticket = "PericoElHermoso";
+			URL = "http://192.168.0.101/wcfbpi/wcfbpi.svc";
 			RespuestaCapasWSS Retorno = new RespuestaCapasWSS();
 			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
 			try
@@ -816,10 +818,14 @@ namespace TableroPecasV5.Server.Controllers
 		[HttpPost("InsertarCapaWSS")]
 		public RespuestaEnteros InsertarCapaWSS(string URL, string Ticket, [FromBody] CCapaWSSCN Capa)
 		{
+			Ticket = "PericoElHermoso";
+			URL = "http://192.168.0.101/wcfbpi/wcfbpi.svc";
 			RespuestaEnteros Retorno = new RespuestaEnteros();
 			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
 			try
 			{
+			 // Task<WCFBPI.CRespuesta> RespAct =	Cliente.VerificarBaseDatosAsync(Ticket);
+				//RespAct.Wait();
 				WCFBPI.CCapaWSSCN CapaBPI = CopiarCapaWSSBPI(Capa);
 				Task<WCFBPI.CRespuestaCodigo> Tarea = Cliente.RegistrarCapaWSSAsync(Ticket, CapaBPI);
 				Cliente.VerificarBaseDatosAsync(Ticket);

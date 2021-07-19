@@ -1621,12 +1621,26 @@ namespace TableroPecasV5.Client.Datos
       return Respuesta;
     }
 
+    private bool VerificarQueHayaLineas()
+    {
+      if (mLineas.Count == 0)
+      {
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
+
     public void FiltrarPorAsociaciones()
     {
       if (mbBlockeado || Contenedores.CContenedorDatos.EventosBloqueados)
       {
         return;
       }
+
+      VerificarQueHayaLineas();
 
       mbBlockeado = true;
 
@@ -1635,26 +1649,33 @@ namespace TableroPecasV5.Client.Datos
         // Refrescar la seleccion de los filtros.
         RefrescarSelecciones();
 
+        VerificarQueHayaLineas();
         // Inicializar selecciones.
         InicializarSeleccionesFiltros();
 
+        VerificarQueHayaLineas();
         // Antes de iniciar el proceso, agrega los filtros que pueden requerirse para condiciones AND.
         AgregarFiltrosAND();
 
+        VerificarQueHayaLineas();
         // primer paso: poner todo vigente.
         PonerLineasVigentes();
         //      PonerFiltrosVigentes();
 
+        VerificarQueHayaLineas();
         // Ordenar para poner primero los OR y despues los AND y dejar las filas con menos valores al principio.
         OptimizarOrdenFiltros();
 
+        VerificarQueHayaLineas();
         // Ahora ajusta la vigencia de las filas desde los filtros.
         AjustarVigenciaLineasDesdeFiltros();
 
         // cuando los filtros tengan columnas de valor, refrescan las relaciones.
+        VerificarQueHayaLineas();
         AjustarSumasRelaciones();
 
         // Ajusta los acumulados de los filtros con acumulador.
+        VerificarQueHayaLineas();
         AjustarValoresFiltros();
 
         // Ajusta la representacion de los filtros.
@@ -1671,12 +1692,12 @@ namespace TableroPecasV5.Client.Datos
         // grillas y graficos.
         mbSucio = true;
 
+        VerificarQueHayaLineas();
         // Cuando se ajusta el contenido del dataset, ajustar los elementos dependientes (tortas, etc.).
         ForzarAjustarDependientes();
-        //if (mFncAjustarDependientes != null)
-        //{
-        //  mFncAjustarDependientes(this);
-        //}
+
+        VerificarQueHayaLineas();
+
       }
       finally
       {

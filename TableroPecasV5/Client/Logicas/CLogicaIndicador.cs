@@ -176,6 +176,8 @@ namespace TableroPecasV5.Client.Logicas
 
     public bool AguardandoFiltros { get; set; } = true;
 
+    public bool Procesando { get; set; } = false;
+
     [Inject]
     IJSRuntime JSRuntime { get; set; }
 

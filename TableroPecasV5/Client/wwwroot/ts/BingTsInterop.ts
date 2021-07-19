@@ -121,7 +121,7 @@ function loadMapRetPos(Posicion: number, Direccion: string, LatCentro: number, L
             //       });
             if (Eventos) {
                 if (EventoViewChange) {
-                    Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchange', function () {
+                    Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchangeend', function () {
                         window['FuncionesJS'].ReposicionarMapa(Posicion, bingMap[Posicion].map.getZoom());
                     });
                 }
@@ -142,7 +142,25 @@ function loadMapRetPos(Posicion: number, Direccion: string, LatCentro: number, L
     return Posicion.toString();
 }
 
+function ObtenerBordes(Posicion: number): string {
+    if (Posicion >= 0 && Posicion <= bingMap.length && bingMap[Posicion] != null) {
+        let Rect0: Microsoft.Maps.LocationRect = bingMap[Posicion].map.getBounds();
+        return Rect0.getWest().toString() + ";" + Rect0.getNorth().toString() + ";" +
+            Rect0.getEast().toString() + ";" + Rect0.getSouth().toString();
+    }
+    else {
+        return "-1;-1;-1;-1";
+    }
+}
 
+function ObtenerZoom(Posicion: number): string {
+    if (Posicion >= 0 && Posicion <= bingMap.length && bingMap[Posicion] != null) {
+        return bingMap[Posicion].map.getZoom().toString();
+    }
+    else {
+        return "-1";
+    }
+}
 
 function AgregarLayerWMS(Posicion: number, UrlWMS: string, LatNorte: number, LngOeste: number, LatSur: number, LngEste: number): void {
 //    uriConstructor: 'http://idpgis.ncep.noaa.gov/arcgis/services/NWS_Observations/radar_base_reflectivity/MapServer/WmsServer?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=1&STYLES=default&FORMAT=image/png&TRANSPARENT=TRUE&CRS=CRS:84&BBOX={bbox}&WIDTH=256&HEIGHT=256',

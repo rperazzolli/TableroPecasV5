@@ -244,9 +244,23 @@ namespace TableroPecasV5.Server.Rutinas
       };
     }
 
+    private static string LimpiarTextoRespuesta(string Texto)
+		{
+      Texto = Texto.Replace("'", "");
+      Texto = Texto.Replace('\\', ' ');
+      if (Texto.Length > 80)
+			{
+        return Texto.Substring(0, 80);
+			}
+      else
+			{
+        return Texto;
+			}
+		}
+
     public static string TextoMsg(Exception ex)
     {
-      return (ex.InnerException == null ? ex.Message : ex.InnerException.ToString());
+      return LimpiarTextoRespuesta(ex.InnerException == null ? ex.Message : ex.InnerException.ToString());
     }
 
     public static void CargarDatosDataset(CRespuestaDatasetBin Respuesta,

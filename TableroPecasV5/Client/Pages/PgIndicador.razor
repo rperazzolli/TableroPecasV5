@@ -217,7 +217,7 @@
           </div>
         }
       </div>
-      }
+    }
 
 
     @if (HayTendencias && TendenciasEncima)
@@ -235,109 +235,120 @@
     }
 
     @*FILTROS que están encima*@
-      @if (ComponenteFiltros != null && ComponenteFiltros.Links != null)
+    @if (ComponenteFiltros != null && ComponenteFiltros.Links != null)
+    {
+      foreach (Logicas.CLinkFiltros Link in ComponenteFiltros.Links)
       {
-        foreach (Logicas.CLinkFiltros Link in ComponenteFiltros.Links)
+        if (Link.PosicionEnPantalla >= 0 && Link.Encima)
         {
-          if (Link.PosicionEnPantalla >= 0 && Link.Encima)
-          {
-            <div id="@IdFiltro(Link)" class="ui-widget-content"
-                 style="@EstiloFiltro(Link)" draggable="true" @ondragstart="@((e) => IniciarDragFiltro(e, Link))"
-                 @onmouseup="@(() => CambioMedidas(Link))">
-              <TableroPecasV5.Client.Componentes.FiltroTextos @ref="Link.Componente"
-                                                              Ancho="@Link.Ancho" Alto="@AltoFiltro" Abscisa="@Link.Abscisa"
-                                                              Ordenada="@Link.Ordenada"
-                                                              CodigoUnico="@Link.PosicionUnica"
-                                                              Link="@Link" />
-            </div>
-          }
+          <div id="@IdFiltro(Link)" class="ui-widget-content"
+               style="@EstiloFiltro(Link)" draggable="true" @ondragstart="@((e) => IniciarDragFiltro(e, Link))"
+               @onmouseup="@(() => CambioMedidas(Link))">
+            <TableroPecasV5.Client.Componentes.FiltroTextos @ref="Link.Componente"
+                                                            Ancho="@Link.Ancho" Alto="@AltoFiltro"
+                                                            Abscisa="@Link.Abscisa"
+                                                            Ordenada="@Link.Ordenada"
+                                                            CodigoUnico="@Link.PosicionUnica"
+                                                            Link="@Link" />
+          </div>
         }
       }
+    }
 
-      @*GRAFICOS que están encima*@
-      @if (ComponenteFiltros != null && ComponenteFiltros.Graficos != null)
+    @*GRAFICOS que están encima*@
+    @if (ComponenteFiltros != null && ComponenteFiltros.Graficos != null)
+    {
+      foreach (Logicas.CLinkGrafico Grafico in ComponenteFiltros.Graficos)
       {
-        foreach (Logicas.CLinkGrafico Grafico in ComponenteFiltros.Graficos)
+        if (Grafico.Encima)
         {
-          if (Grafico.Encima)
-          {
-            <div id="@IdGrafico(Grafico.CodigoUnico)" class="ui-widget-content" draggable="true"
-                 style="@EstiloGrafico(Grafico)" @ondragstart="@((e) => IniciarDragGrafico(e, Grafico))"
-                 @onmouseup="@(() => CambioMedidasGrafico(Grafico))">
-              @if (Grafico.Clase == ClaseGrafico.BarrasH)
-              {
-                <TableroPecasV5.Client.Componentes.CGrafico @ref="@Grafico.Componente"
-                                                            @key="@Grafico.CodigoUnico"
-                                                            Abscisa="@Grafico.Abscisa"
-                                                            Ordenada="@Grafico.Ordenada"
-                                                            Ancho="@Grafico.Ancho" Alto="@Grafico.Alto"
-                                                            CodigoUnico="@Grafico.CodigoUnico"
-                                                            Clase="@Grafico.Clase"
-                                                            ColumnaAbscisas="@Grafico.ColumnaAbscisas"
-                                                            ColumnaOrdenadas="@Grafico.ColumnaOrdenadas"
-                                                            ColumnaSexo="@Grafico.ColumnaSexo"
-                                                            ValoresSeleccionados="@Grafico.ValoresSeleccionados"
-                                                            GraficosDependientes="@Grafico.GraficosDependientes"
-                                                            Detallado="@Grafico.Detallado"
-                                                            Ampliado="@Grafico.Ampliado"
-                                                            Link="@Grafico" />
-              }
-              else
-              {
-                <TableroPecasV5.Client.Componentes.CGrafico @ref="@Grafico.Componente"
-                                                            @key="@Grafico.CodigoUnico"
-                                                            Abscisa="@Grafico.Abscisa"
-                                                            Ordenada="@Grafico.Ordenada"
-                                                            Ancho="@Grafico.Ancho" Alto="@Grafico.Alto"
-                                                            CodigoUnico="@Grafico.CodigoUnico"
-                                                            Clase="@Grafico.Clase"
-                                                            ColumnaAbscisas="@Grafico.ColumnaAbscisas"
-                                                            ColumnaOrdenadas="@Grafico.ColumnaOrdenadas"
-                                                            Ampliado="@Grafico.Ampliado"
-                                                            ValoresSeleccionados="@Grafico.ValoresSeleccionados"
-                                                            GraficosDependientes="@Grafico.GraficosDependientes"
-                                                            Link="@Grafico" />
-              }
-            </div>
-          }
+          <div id="@IdGrafico(Grafico.CodigoUnico)" class="ui-widget-content" draggable="true"
+               style="@EstiloGrafico(Grafico)" @ondragstart="@((e) => IniciarDragGrafico(e, Grafico))"
+               @onmouseup="@(() => CambioMedidasGrafico(Grafico))">
+            @if (Grafico.Clase == ClaseGrafico.BarrasH)
+            {
+              <TableroPecasV5.Client.Componentes.CGrafico @ref="@Grafico.Componente"
+                                                          @key="@Grafico.CodigoUnico"
+                                                          Abscisa="@Grafico.Abscisa"
+                                                          Ordenada="@Grafico.Ordenada"
+                                                          Ancho="@Grafico.Ancho" Alto="@Grafico.Alto"
+                                                          CodigoUnico="@Grafico.CodigoUnico"
+                                                          Clase="@Grafico.Clase"
+                                                          ColumnaAbscisas="@Grafico.ColumnaAbscisas"
+                                                          ColumnaOrdenadas="@Grafico.ColumnaOrdenadas"
+                                                          ColumnaSexo="@Grafico.ColumnaSexo"
+                                                          ValoresSeleccionados="@Grafico.ValoresSeleccionados"
+                                                          GraficosDependientes="@Grafico.GraficosDependientes"
+                                                          Detallado="@Grafico.Detallado"
+                                                          Ampliado="@Grafico.Ampliado"
+                                                          Link="@Grafico" />
+            }
+            else
+            {
+              <TableroPecasV5.Client.Componentes.CGrafico @ref="@Grafico.Componente"
+                                                          @key="@Grafico.CodigoUnico"
+                                                          Abscisa="@Grafico.Abscisa"
+                                                          Ordenada="@Grafico.Ordenada"
+                                                          Ancho="@Grafico.Ancho" Alto="@Grafico.Alto"
+                                                          CodigoUnico="@Grafico.CodigoUnico"
+                                                          Clase="@Grafico.Clase"
+                                                          ColumnaAbscisas="@Grafico.ColumnaAbscisas"
+                                                          ColumnaOrdenadas="@Grafico.ColumnaOrdenadas"
+                                                          Ampliado="@Grafico.Ampliado"
+                                                          ValoresSeleccionados="@Grafico.ValoresSeleccionados"
+                                                          GraficosDependientes="@Grafico.GraficosDependientes"
+                                                          Link="@Grafico" />
+            }
+          </div>
         }
       }
+    }
 
-      @if (HayWSS)
-      {
-        <PgBingWSS @ref="PaginaWSS"
-                   ClaseIndicador="@ClaseOrigen"
-                   CodigoIndicador="@Indicador.Codigo"
-                   CodigoElementoDimension="@CodigoElementoDimension"
-                   Columnas="@Columnas"
-                   Lineas="@LineasVigentes" />
-      }
+    @if (HayWSS)
+    {
+      <PgBingWSS @ref="PaginaWSS"
+                 ClaseIndicador="@ClaseOrigen"
+                 CodigoIndicador="@Indicador.Codigo"
+                 CodigoElementoDimension="@CodigoElementoDimension"
+                 Columnas="@Columnas"
+                 Lineas="@LineasVigentes" />
+    }
 
-      @if (HayTortasGIS)
-      {
-        <CPagTortasGIS @ref="PaginaTortasGIS"
-                       ClaseIndicador="@ClaseOrigen"
-                       Indicador="@Indicador.Codigo"
-                       ColumnaAgrupadora="@ColumnaAgrupadoraTorta"
-                       ColumnaDatos="@ColumnaDatosTorta"
-                       ColumnaPosicion="@ColumnaPosicionadoraTorta"
-                       ColumnaLat="@ColumnaLatTorta"
-                       ColumnaLng="@ColumnaLngTorta"
-                       Solicitados="@SolicitudTorta"
-                       Lineas="@LineasTorta" />
-      }
+    @if (HayTortasGIS)
+    {
+      <CPagTortasGIS @ref="PaginaTortasGIS"
+                     ClaseIndicador="@ClaseOrigen"
+                     Indicador="@Indicador.Codigo"
+                     ColumnaAgrupadora="@ColumnaAgrupadoraTorta"
+                     ColumnaDatos="@ColumnaDatosTorta"
+                     ColumnaPosicion="@ColumnaPosicionadoraTorta"
+                     ColumnaLat="@ColumnaLatTorta"
+                     ColumnaLng="@ColumnaLngTorta"
+                     Solicitados="@SolicitudTorta"
+                     Lineas="@LineasTorta" />
+    }
 
-      @if (HayPinesLL)
-      {
-        <CPagPinsLL @ref="PaginaPinsLL"
-                    ColumnaDatos="@ColumnaDatosTorta.Nombre"
-                    ColumnaLat="@ColumnaLatTorta.Nombre"
-                    ColumnaLng="@ColumnaLngTorta.Nombre"
-                    Columnas="@Columnas"
-                    Lineas="@LineasTorta" />
-      }
+    @if (HayPinesLL)
+    {
+      <CPagPinsLL @ref="PaginaPinsLL"
+                  ColumnaDatos="@ColumnaDatosTorta.Nombre"
+                  ColumnaLat="@ColumnaLatTorta.Nombre"
+                  ColumnaLng="@ColumnaLngTorta.Nombre"
+                  Columnas="@Columnas"
+                  Lineas="@LineasTorta" />
+    }
 
-    </CascadingValue>
+    @if (Procesando)
+    {
+      <div style="@EstiloAguardando">
+      </div>
+      <div style="@EstiloDetalleAguardando">
+        <i class="fa fa-spinner fa-pulse"></i>
+        <p>Procesando....</p>
+      </div>
+    }
+
+  </CascadingValue>
 
 </div>
 

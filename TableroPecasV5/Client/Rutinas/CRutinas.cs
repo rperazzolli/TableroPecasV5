@@ -109,7 +109,7 @@ namespace TableroPecasV5.Client.Rutinas
       }
     }
 
-      public static double TamanioLetraMedia(string Fuente, Int32 Alto)
+    public static double TamanioLetraMedia(string Fuente, Int32 Alto)
     {
       string Texto = Fuente + " " + Alto.ToString();
       double Valor;
@@ -118,16 +118,16 @@ namespace TableroPecasV5.Client.Rutinas
         return Valor;
       }
       else
-			{
+      {
         return 8;
-			}
+      }
 
     }
 
     public static double DistanciaEntrePuntos2(CPosicionWFSCN P1, CPosicionWFSCN P2)
-		{
+    {
       return (P1.X - P2.X) * (P1.X - P2.X) + (P1.Y - P2.Y) * (P1.Y - P2.Y);
-		}
+    }
 
     public async static Task LiberarMapaAsync(Microsoft.JSInterop.IJSRuntime JSRuntime, Int32 Posicion)
     {
@@ -217,19 +217,19 @@ namespace TableroPecasV5.Client.Rutinas
     }
 
     public static string ColorAlarma(CInformacionAlarmaCN Datos)
-		{
+    {
       if (Datos == null)
-			{
+      {
         return COLOR_GRIS;
-			}
+      }
       else
-			{
+      {
         if (Datos.Minimo == Datos.Sobresaliente)
-				{
+        {
           return COLOR_GRIS;
-				}
+        }
         else
-				{
+        {
           if (Datos.Sobresaliente > Datos.Minimo)
           {
             if (Datos.Valor < Datos.Minimo)
@@ -267,8 +267,8 @@ namespace TableroPecasV5.Client.Rutinas
             }
           }
         }
-			}
-		}
+      }
+    }
 
     public static string FechaATexto(DateTime Fecha)
     {
@@ -276,31 +276,31 @@ namespace TableroPecasV5.Client.Rutinas
     }
 
     public static bool ContenidoImagenEsProceso(byte[] Bytes)
-		{
-      if (Bytes==null || Bytes.Length < 25)
-			{
+    {
+      if (Bytes == null || Bytes.Length < 25)
+      {
         return false;
-			}
+      }
 
       string Texto = System.Text.Encoding.UTF8.GetString(Bytes, 0, 25).Trim().ToLower();
-      if (!Texto.Substring(0,2).Contains("<"))
-			{
+      if (!Texto.Substring(0, 2).Contains("<"))
+      {
         return false;
-			}
+      }
 
       while (!Texto.StartsWith("<"))
-			{
+      {
         Texto = Texto.Substring(1);
-			}
+      }
 
       if (Texto.StartsWith("<?xml"))
-			{
+      {
         return true;
-			}
+      }
 
       return Texto.Contains("package");
 
-		}
+    }
 
     public static string ColorMasCritico(string Color1, string Color2)
     {
@@ -724,7 +724,7 @@ namespace TableroPecasV5.Client.Rutinas
     }
 
     public static async Task<ColorBandera> ObtenerColorBanderaPreguntaPreguntaAsync(HttpClient Http, CPreguntaPreguntaWISCN Pregunta)
-		{
+    {
       ColorBandera RespuestaLocal = ColorBandera.SinDatos;
       List<CEntradaIndicador> IndicadoresMenu = await IndicadoresEnContenidoAsync(Http, Pregunta);
       foreach (CEntradaIndicador Elemento in IndicadoresMenu)
@@ -819,7 +819,7 @@ namespace TableroPecasV5.Client.Rutinas
       ColorBandera Respuesta = ColorBandera.SinDatos;
 
       foreach (CDetallePreguntaCN Detalle in Contenidos)
-			{
+      {
         if (Detalle.Color == ColorBandera.NoCorresponde)
         {
           List<CEntradaIndicador> IndicadoresMenu = await IndicadoresEnContenidoAsync(Http, Detalle);
@@ -840,18 +840,18 @@ namespace TableroPecasV5.Client.Rutinas
     private const string SEPARADOR_CON_PAR = "]$$[";
 
     public static string ListaPrmsATexto(List<CParametroExt> Prms)
-		{
-      string Respuesta = "["+Prms.Count.ToString() + "]"+SEPARADOR;
+    {
+      string Respuesta = "[" + Prms.Count.ToString() + "]" + SEPARADOR;
       foreach (CParametroExt Prm in Prms)
-			{
+      {
         Respuesta += "[" + Prm.CodigoSubconsulta.ToString() + SEPARADOR_CON_PAR +
             Prm.Nombre + SEPARADOR_CON_PAR + (Prm.TieneQuery ? "Y" : "N") + SEPARADOR_CON_PAR +
             Prm.Tipo + SEPARADOR_CON_PAR + FechaATexto(Prm.ValorDateTime) + SEPARADOR_CON_PAR +
             FloatVStr(Prm.ValorFloat) + SEPARADOR_CON_PAR + Prm.ValorInteger.ToString() + SEPARADOR_CON_PAR +
             Prm.ValorString + "]" + SEPARADOR;
-			}
+      }
       return Respuesta;
-		}
+    }
 
     public static Int32 UbicarNivelZoom(double Ancho, double Alto, double RangoLng, double RangoLat)
     {
@@ -904,9 +904,9 @@ namespace TableroPecasV5.Client.Rutinas
       string[] Datos = Lista.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
       List<double> Valores = new List<double>();
       foreach (string Valor in Datos)
-			{
+      {
         Valores.Add(StrVFloat(Valor));
-			}
+      }
       return Valores;
     }
 
@@ -925,242 +925,242 @@ namespace TableroPecasV5.Client.Rutinas
     }
 
     public static string TextoMsg(Exception ex)
-		{
+    {
       return (ex.InnerException == null ? ex.Message : ex.InnerException.ToString());
-		}
+    }
 
     public static void UbicarCentro(double AnchoPixels, double AltoPixels, double LatMin, double LatMax,
         double LngMin, double LngMax, out double LatCentro, out double LngCentro, out Int32 NivelZoom)
     {
-        LatCentro = (LatMin + LatMax) / 2;
-        LngCentro = (LngMin + LngMax) / 2;
+      LatCentro = (LatMin + LatMax) / 2;
+      LngCentro = (LngMin + LngMax) / 2;
 
-        double Relacion1 = (LatMax - LatMin) * 650 / AltoPixels;
-        double Relacion2 = (LngMax - LngMin) * 1280 / AnchoPixels;
-        double Salto = Math.Max(Relacion1, Relacion2);
-        if (Salto == 0)
+      double Relacion1 = (LatMax - LatMin) * 650 / AltoPixels;
+      double Relacion2 = (LngMax - LngMin) * 1280 / AnchoPixels;
+      double Salto = Math.Max(Relacion1, Relacion2);
+      if (Salto == 0)
+      {
+        NivelZoom = 10;
+      }
+      else
+      {
+        Salto *= Math.Pow(2, 7);
+        for (Int32 i = 15; i > 1; i--)
         {
-          NivelZoom = 10;
-        }
-        else
-        {
-          Salto *= Math.Pow(2, 7);
-          for (Int32 i = 15; i > 1; i--)
+          if (Salto < 1.5)
           {
-            if (Salto < 1.5)
-            {
-              NivelZoom = i;
-              return;
-            }
-            Salto /= 2;
+            NivelZoom = i;
+            return;
           }
-          NivelZoom = 1;
+          Salto /= 2;
         }
-
+        NivelZoom = 1;
       }
 
+    }
 
 
-		//public static Point PuntoIncorrecto()
-		//{
-		//  return new Point(-1000, -1000);
-		//}
 
-		//private static Point PuntoDesdeCoordenadas(string Valor)
-		//{
-		//  if (Valor.Contains(" "))
-		//  {
-		//    try
-		//    {
-		//      string[] Valores = Valor.Trim().Split(' ');
-		//      return new Point(CRutinas.StrVFloat(Valores[0]), CRutinas.StrVFloat(Valores[1]));
-		//    }
-		//    catch (Exception)
-		//    {
-		//      //
-		//    }
-		//  }
-		//  return null;
+    //public static Point PuntoIncorrecto()
+    //{
+    //  return new Point(-1000, -1000);
+    //}
 
-		//}
+    //private static Point PuntoDesdeCoordenadas(string Valor)
+    //{
+    //  if (Valor.Contains(" "))
+    //  {
+    //    try
+    //    {
+    //      string[] Valores = Valor.Trim().Split(' ');
+    //      return new Point(CRutinas.StrVFloat(Valores[0]), CRutinas.StrVFloat(Valores[1]));
+    //    }
+    //    catch (Exception)
+    //    {
+    //      //
+    //    }
+    //  }
+    //  return null;
 
-		//public static Point PosicionValor(string Valor, CCapaWFSCN Capa)
-		//{
-		//  Point PuntoCoordenadas = PuntoDesdeCoordenadas(Valor);
-		//  if (PuntoCoordenadas != null && !double.IsNaN(PuntoCoordenadas.X) && !double.IsNaN(PuntoCoordenadas.Y))
-		//  {
-		//    return PuntoCoordenadas;
-		//  }
-		//  else
-		//  {
-		//    foreach CAreaWFSCN Area in Capa.Areas)
-		//    {
-		//      if (Area.Codigo.Equals(Valor, StringComparison.OrdinalIgnoreCase))
-		//      {
-		//        return new Point(Area.Centro.X, Area.Centro.Y);
-		//      }
-		//    }
+    //}
 
-		//    foreach CPuntoWFSCN Punto in Capa.Puntos)
-		//    {
-		//      if (Punto.Codigo.Equals(Valor, StringComparison.OrdinalIgnoreCase))
-		//      {
-		//        return new Plantillas.Point(Punto.Punto.X, Punto.Punto.Y);
-		//      }
-		//    }
-		//  }
+    //public static Point PosicionValor(string Valor, CCapaWFSCN Capa)
+    //{
+    //  Point PuntoCoordenadas = PuntoDesdeCoordenadas(Valor);
+    //  if (PuntoCoordenadas != null && !double.IsNaN(PuntoCoordenadas.X) && !double.IsNaN(PuntoCoordenadas.Y))
+    //  {
+    //    return PuntoCoordenadas;
+    //  }
+    //  else
+    //  {
+    //    foreach CAreaWFSCN Area in Capa.Areas)
+    //    {
+    //      if (Area.Codigo.Equals(Valor, StringComparison.OrdinalIgnoreCase))
+    //      {
+    //        return new Point(Area.Centro.X, Area.Centro.Y);
+    //      }
+    //    }
 
-		//  return PuntoIncorrecto();
+    //    foreach CPuntoWFSCN Punto in Capa.Puntos)
+    //    {
+    //      if (Punto.Codigo.Equals(Valor, StringComparison.OrdinalIgnoreCase))
+    //      {
+    //        return new Plantillas.Point(Punto.Punto.X, Punto.Punto.Y);
+    //      }
+    //    }
+    //  }
 
-		//}
+    //  return PuntoIncorrecto();
 
-		//private static bool TramoIntersectaPorIzq(CPosicionWFSCN P1, CPosicionWFSCN P2, Point Punto)
-		//{
-		//	if (P1.X > Punto.X && P2.X >= Punto.X)
-		//	{
-		//		return false;
-		//	}
-		//	else
-		//	{
-		//		if ((P1.Y > Punto.Y && P2.Y >= Punto.Y) || (P1.Y < Punto.Y && P2.Y <= Punto.Y))
-		//		{
-		//			return false;
-		//		}
-		//	}
-		//	if (P1.Y == P2.Y)
-		//	{
-		//		return (Punto.Y == P1.Y && P1.X <= Punto.X);
-		//	}
-		//	else
-		//	{
-		//		double AbscRefe = P1.X + (P2.X - P1.X) * (Punto.Y - P1.Y) / (P2.Y - P1.Y);
-		//		return (AbscRefe <= Punto.X);
-		//	}
-		//}
+    //}
 
-		//public static bool AreaContienePunto(CAreaWFSCN Area, Point Punto)
-		//{
-		//	// el criterio es hacer una linea horizontal desde el infinito y verificar cuantas veces corta
-		//	// al contorno.
-		//	Int32 Cantidad = 0;
-		//	for (Int32 i = 1; i < Area.Contorno.Count; i++)
-		//	{
-		//		if (TramoIntersectaPorIzq(Area.Contorno[i - 1], Area.Contorno[i], Punto))
-		//		{
-		//			Cantidad++;
-		//		}
-		//	}
-		//	return ((Cantidad % 2) != 0);
-		//}
+    //private static bool TramoIntersectaPorIzq(CPosicionWFSCN P1, CPosicionWFSCN P2, Point Punto)
+    //{
+    //	if (P1.X > Punto.X && P2.X >= Punto.X)
+    //	{
+    //		return false;
+    //	}
+    //	else
+    //	{
+    //		if ((P1.Y > Punto.Y && P2.Y >= Punto.Y) || (P1.Y < Punto.Y && P2.Y <= Punto.Y))
+    //		{
+    //			return false;
+    //		}
+    //	}
+    //	if (P1.Y == P2.Y)
+    //	{
+    //		return (Punto.Y == P1.Y && P1.X <= Punto.X);
+    //	}
+    //	else
+    //	{
+    //		double AbscRefe = P1.X + (P2.X - P1.X) * (Punto.Y - P1.Y) / (P2.Y - P1.Y);
+    //		return (AbscRefe <= Punto.X);
+    //	}
+    //}
 
-		//public static bool PoligonoContienePunto(List<CPosicionWFSCN> Contorno, Point Punto)
-		//{
-		//  // el criterio es hacer una linea horizontal desde el infinito y verificar cuantas veces corta
-		//  // al contorno.
-		//  Int32 Cantidad = 0;
-		//  for (Int32 i = 1; i < Contorno.Count; i++)
-		//  {
-		//    if (TramoIntersectaPorIzq(Contorno[i - 1], Contorno[i], Punto))
-		//    {
-		//      Cantidad++;
-		//    }
-		//  }
-		//  return ((Cantidad % 2) != 0);
-		//}
+    //public static bool AreaContienePunto(CAreaWFSCN Area, Point Punto)
+    //{
+    //	// el criterio es hacer una linea horizontal desde el infinito y verificar cuantas veces corta
+    //	// al contorno.
+    //	Int32 Cantidad = 0;
+    //	for (Int32 i = 1; i < Area.Contorno.Count; i++)
+    //	{
+    //		if (TramoIntersectaPorIzq(Area.Contorno[i - 1], Area.Contorno[i], Punto))
+    //		{
+    //			Cantidad++;
+    //		}
+    //	}
+    //	return ((Cantidad % 2) != 0);
+    //}
 
-		//public static CAreaWFSCN AreaCentroPunto(CCapaWFSCN Capa, Point Punto)
-		//{
-		//  double DistMin = double.MaxValue;
-		//  CAreaWFSCN Respuesta = null;
-		//  foreach (CAreaWFSCN Area in Capa.Areas)
-		//  {
-		//    double DistArea = (Area.Centro.X - Punto.X) * (Area.Centro.X - Punto.X) +
-		//        (Area.Centro.Y - Punto.Y) * (Area.Centro.Y - Punto.Y);
-		//    if (DistArea < DistMin)
-		//    {
-		//      DistMin = DistArea;
-		//      Respuesta = Area;
-		//    }
-		//  }
-		//  return (DistMin < 0.000001 ? Respuesta : null);
-		//}
+    //public static bool PoligonoContienePunto(List<CPosicionWFSCN> Contorno, Point Punto)
+    //{
+    //  // el criterio es hacer una linea horizontal desde el infinito y verificar cuantas veces corta
+    //  // al contorno.
+    //  Int32 Cantidad = 0;
+    //  for (Int32 i = 1; i < Contorno.Count; i++)
+    //  {
+    //    if (TramoIntersectaPorIzq(Contorno[i - 1], Contorno[i], Punto))
+    //    {
+    //      Cantidad++;
+    //    }
+    //  }
+    //  return ((Cantidad % 2) != 0);
+    //}
 
-		//public static CAreaWFSCN AreaContenedoraPunto(CCapaWFSCN Capa, Point Punto)
-		//{
-		//  foreach (CAreaWFSCN Area in Capa.Areas)
-		//  {
-		//    if (AreaContienePunto(Area, Punto))
-		//    {
-		//      return Area;
-		//    }
-		//  }
-		//  return null;
-		//}
+    //public static CAreaWFSCN AreaCentroPunto(CCapaWFSCN Capa, Point Punto)
+    //{
+    //  double DistMin = double.MaxValue;
+    //  CAreaWFSCN Respuesta = null;
+    //  foreach (CAreaWFSCN Area in Capa.Areas)
+    //  {
+    //    double DistArea = (Area.Centro.X - Punto.X) * (Area.Centro.X - Punto.X) +
+    //        (Area.Centro.Y - Punto.Y) * (Area.Centro.Y - Punto.Y);
+    //    if (DistArea < DistMin)
+    //    {
+    //      DistMin = DistArea;
+    //      Respuesta = Area;
+    //    }
+    //  }
+    //  return (DistMin < 0.000001 ? Respuesta : null);
+    //}
 
-		//public static double DistanciaCuadradaEntrePuntos(CPosicionWFSCN P1, Point P2)
-		//{
-		//  return (P1.X - P2.X) * (P1.X - P2.X) + (P1.Y - P2.Y) * (P1.Y - P2.Y);
-		//}
+    //public static CAreaWFSCN AreaContenedoraPunto(CCapaWFSCN Capa, Point Punto)
+    //{
+    //  foreach (CAreaWFSCN Area in Capa.Areas)
+    //  {
+    //    if (AreaContienePunto(Area, Punto))
+    //    {
+    //      return Area;
+    //    }
+    //  }
+    //  return null;
+    //}
 
-		//public static string DeterminarAreaContenedora(Point Punto, CCapaWFSCN CapaWFS, string ValorResto,
-		//    bool PorCodigo = false, bool UsaCentro = false)
-		//{
-		//  CAreaWFSCN Area = (UsaCentro ? AreaCentroPunto(CapaWFS, Punto) :
-		//      AreaContenedoraPunto(CapaWFS, Punto));
-		//  if (Area == null && UsaCentro)
-		//  {
-		//    Area = AreaContenedoraPunto(CapaWFS, Punto);
-		//  }
-		//  return (Area == null ? ValorResto : (PorCodigo ? Area.Codigo : Area.Nombre));
-		//}
+    //public static double DistanciaCuadradaEntrePuntos(CPosicionWFSCN P1, Point P2)
+    //{
+    //  return (P1.X - P2.X) * (P1.X - P2.X) + (P1.Y - P2.Y) * (P1.Y - P2.Y);
+    //}
 
-		//public static CPuntoWFSCN PuntoMasCercano(CCapaWFSCN Capa, Point Punto, double Rango)
-		//{
-		//  double RangoRefe = Rango * 180 / (6378137.0 * Math.PI);
-		//  RangoRefe = RangoRefe * RangoRefe;
-		//  double DistMinima = 1000000000;
-		//  CPuntoWFSCN PuntoMasCercano = null;
-		//  foreach (CPuntoWFSCN PuntoWFS in Capa.Puntos)
-		//  {
-		//    double DistPunto = DistanciaCuadradaEntrePuntos(PuntoWFS.Punto, Punto);
-		//    if (DistPunto < DistMinima)
-		//    {
-		//      DistMinima = DistPunto;
-		//      PuntoMasCercano = PuntoWFS;
-		//    }
-		//  }
-		//  if (DistMinima <= RangoRefe)
-		//  {
-		//    return PuntoMasCercano;
-		//  }
-		//  else
-		//  {
-		//    return null;
-		//  }
-		//}
+    //public static string DeterminarAreaContenedora(Point Punto, CCapaWFSCN CapaWFS, string ValorResto,
+    //    bool PorCodigo = false, bool UsaCentro = false)
+    //{
+    //  CAreaWFSCN Area = (UsaCentro ? AreaCentroPunto(CapaWFS, Punto) :
+    //      AreaContenedoraPunto(CapaWFS, Punto));
+    //  if (Area == null && UsaCentro)
+    //  {
+    //    Area = AreaContenedoraPunto(CapaWFS, Punto);
+    //  }
+    //  return (Area == null ? ValorResto : (PorCodigo ? Area.Codigo : Area.Nombre));
+    //}
 
-		//public static string DeterminarPuntoMasCercano(Point Punto, CCapaWFSCN CapaWFS,
-		//    double Rango, string ValorResto, bool PorCodigo = false)
-		//{
-		//  CPuntoWFSCN PuntoWFS = PuntoMasCercano(CapaWFS, Punto, Rango);
-		//  return (PuntoWFS == null ? ValorResto : (PorCodigo ? PuntoWFS.Codigo : PuntoWFS.Nombre));
-		//}
+    //public static CPuntoWFSCN PuntoMasCercano(CCapaWFSCN Capa, Point Punto, double Rango)
+    //{
+    //  double RangoRefe = Rango * 180 / (6378137.0 * Math.PI);
+    //  RangoRefe = RangoRefe * RangoRefe;
+    //  double DistMinima = 1000000000;
+    //  CPuntoWFSCN PuntoMasCercano = null;
+    //  foreach (CPuntoWFSCN PuntoWFS in Capa.Puntos)
+    //  {
+    //    double DistPunto = DistanciaCuadradaEntrePuntos(PuntoWFS.Punto, Punto);
+    //    if (DistPunto < DistMinima)
+    //    {
+    //      DistMinima = DistPunto;
+    //      PuntoMasCercano = PuntoWFS;
+    //    }
+    //  }
+    //  if (DistMinima <= RangoRefe)
+    //  {
+    //    return PuntoMasCercano;
+    //  }
+    //  else
+    //  {
+    //    return null;
+    //  }
+    //}
 
-		//public static string TextoPunto(Point Punto, CCapaWFSCN CapaWFS, double Rango,
-		//    string ValorResto, bool PorCodigo = false, bool UsaCentro = false)
-		//{
-		//  switch (CapaWFS.Elemento)
-		//  {
-		//    case ElementoWFS.Superficie:
-		//      return DeterminarAreaContenedora(Punto, CapaWFS, ValorResto, PorCodigo, UsaCentro);
-		//    case ElementoWFS.Punto:
-		//      return DeterminarPuntoMasCercano(Punto, CapaWFS, Rango, ValorResto, PorCodigo);
-		//    default:
-		//      return ValorResto;
-		//  }
-		//}
+    //public static string DeterminarPuntoMasCercano(Point Punto, CCapaWFSCN CapaWFS,
+    //    double Rango, string ValorResto, bool PorCodigo = false)
+    //{
+    //  CPuntoWFSCN PuntoWFS = PuntoMasCercano(CapaWFS, Punto, Rango);
+    //  return (PuntoWFS == null ? ValorResto : (PorCodigo ? PuntoWFS.Codigo : PuntoWFS.Nombre));
+    //}
 
-		public const string ADENTRO = "SI";
+    //public static string TextoPunto(Point Punto, CCapaWFSCN CapaWFS, double Rango,
+    //    string ValorResto, bool PorCodigo = false, bool UsaCentro = false)
+    //{
+    //  switch (CapaWFS.Elemento)
+    //  {
+    //    case ElementoWFS.Superficie:
+    //      return DeterminarAreaContenedora(Punto, CapaWFS, ValorResto, PorCodigo, UsaCentro);
+    //    case ElementoWFS.Punto:
+    //      return DeterminarPuntoMasCercano(Punto, CapaWFS, Rango, ValorResto, PorCodigo);
+    //    default:
+    //      return ValorResto;
+    //  }
+    //}
+
+    public const string ADENTRO = "SI";
     public const string AFUERA = "NO";
 
     //public static List<string> ExtraerListaElementosWFS(CCapaWFSCN CapaWFS, bool PorCodigo = false)
@@ -1204,119 +1204,119 @@ namespace TableroPecasV5.Client.Rutinas
     //  return false;
     //}
 
-//    public static async Task<byte[]> LeerDetalleIndicadorAsync(Int32 Indicador, Int32 Dimension, Int32 CodigoElemento)
-//    {
-//      WCFBPIClient Cliente = ObtenerClienteBPI();
-//      try
-//      {
-//        CRespuestaInformacionAlarmaVarias RespTend = await Cliente.HistoriaAlarmaConDimensionAsync(Contenedores.CContenedorDatos.Ticket,
-//              Indicador, Dimension, CodigoElemento, DateTime.Now);
-//        if (!RespTend.RespuestaOK)
-//        {
-//          throw new Exception(RespTend.MensajeError);
-//        }
-//        if (RespTend.Instancias.Count == 0)
-//        {
-//          return new byte[0];
-//        }
+    //    public static async Task<byte[]> LeerDetalleIndicadorAsync(Int32 Indicador, Int32 Dimension, Int32 CodigoElemento)
+    //    {
+    //      WCFBPIClient Cliente = ObtenerClienteBPI();
+    //      try
+    //      {
+    //        CRespuestaInformacionAlarmaVarias RespTend = await Cliente.HistoriaAlarmaConDimensionAsync(Contenedores.CContenedorDatos.Ticket,
+    //              Indicador, Dimension, CodigoElemento, DateTime.Now);
+    //        if (!RespTend.RespuestaOK)
+    //        {
+    //          throw new Exception(RespTend.MensajeError);
+    //        }
+    //        if (RespTend.Instancias.Count == 0)
+    //        {
+    //          return new byte[0];
+    //        }
 
-//        string szGUID = new Guid().ToString();
-//        CRespuestaDatasetBin Respuesta = await Cliente.ObtenerDetalleIndicadorBinAsync(Contenedores.CContenedorDatos.Ticket,
-//            szGUID, Indicador, RespTend.Instancias.Last().Periodo, Dimension, CodigoElemento, false);
-//        bool bContinuar = true;
-//        while (bContinuar)
-//        {
-//          if (!Respuesta.RespuestaOK)
-//          {
-//            throw new Exception("Al obtener detalle SC " + Respuesta.MensajeError);
-//          }
-//          switch (Respuesta.Situacion)
-//          {
-//            case SituacionPedido.EnMarcha:
-//              Respuesta = await Cliente.RefrescarPedidoDetalleIndicadorBinAsync(Contenedores.CContenedorDatos.Ticket,
-//                  szGUID, true);
-//              break;
-//            default:
-//              // hay datos.
-//              bContinuar = false;
-//              break;
+    //        string szGUID = new Guid().ToString();
+    //        CRespuestaDatasetBin Respuesta = await Cliente.ObtenerDetalleIndicadorBinAsync(Contenedores.CContenedorDatos.Ticket,
+    //            szGUID, Indicador, RespTend.Instancias.Last().Periodo, Dimension, CodigoElemento, false);
+    //        bool bContinuar = true;
+    //        while (bContinuar)
+    //        {
+    //          if (!Respuesta.RespuestaOK)
+    //          {
+    //            throw new Exception("Al obtener detalle SC " + Respuesta.MensajeError);
+    //          }
+    //          switch (Respuesta.Situacion)
+    //          {
+    //            case SituacionPedido.EnMarcha:
+    //              Respuesta = await Cliente.RefrescarPedidoDetalleIndicadorBinAsync(Contenedores.CContenedorDatos.Ticket,
+    //                  szGUID, true);
+    //              break;
+    //            default:
+    //              // hay datos.
+    //              bContinuar = false;
+    //              break;
 
-//          }
-//        }
-//        // Si hay datos arma un dataset y lo retorna.
-//        if (Respuesta.Situacion == SituacionPedido.Completado)
-//        {
-//          return Respuesta.Datos;
-//        }
-//        else
-//        {
-//          return new byte[0];
-//        }
+    //          }
+    //        }
+    //        // Si hay datos arma un dataset y lo retorna.
+    //        if (Respuesta.Situacion == SituacionPedido.Completado)
+    //        {
+    //          return Respuesta.Datos;
+    //        }
+    //        else
+    //        {
+    //          return new byte[0];
+    //        }
 
-//      }
-//      catch (Exception ex)
-//      {
-//        DesplegarMsg(ex);
-//        return new byte[0];
-//      }
-//      finally
-//      {
-//        await Cliente.CloseAsync();
-//      }
-//    }
+    //      }
+    //      catch (Exception ex)
+    //      {
+    //        DesplegarMsg(ex);
+    //        return new byte[0];
+    //      }
+    //      finally
+    //      {
+    //        await Cliente.CloseAsync();
+    //      }
+    //    }
 
-//    public static object OBJ_GLOBAL = new object();
-////    private static bool gbHabilitado = true;
+    //    public static object OBJ_GLOBAL = new object();
+    ////    private static bool gbHabilitado = true;
 
-//    public static async Task<byte[]> LeerSubconsultaAsync(Int32 Codigo, List<CParametroExt> Prms)
-//    {
-//      WCFBPIClient Cliente = ObtenerClienteBPI();
-//      try
-//      {
-//        string szGUID = new Guid().ToString();
-//        CRespuestaDatasetBinSC Respuesta = await Cliente.DetalleSubconsultaAsync(Contenedores.CContenedorDatos.Ticket,
-//            Codigo, Prms, "", -1, szGUID, false);
-//        bool bContinuar = true;
-//        while (bContinuar)
-//        {
-//          if (!Respuesta.RespuestaOK)
-//          {
-//            throw new Exception("Al obtener detalle SC " + Respuesta.MensajeError);
-//          }
-//          switch (Respuesta.Situacion)
-//          {
-//            case SituacionPedido.EnMarcha:
-//              Respuesta = await Cliente.RefrescarPedidoDetalleSubconsultaBinAsync(Contenedores.CContenedorDatos.Ticket,
-//                  szGUID, true);
-//              break;
-//            default:
-//              // hay datos.
-//              bContinuar = false;
-//              break;
+    //    public static async Task<byte[]> LeerSubconsultaAsync(Int32 Codigo, List<CParametroExt> Prms)
+    //    {
+    //      WCFBPIClient Cliente = ObtenerClienteBPI();
+    //      try
+    //      {
+    //        string szGUID = new Guid().ToString();
+    //        CRespuestaDatasetBinSC Respuesta = await Cliente.DetalleSubconsultaAsync(Contenedores.CContenedorDatos.Ticket,
+    //            Codigo, Prms, "", -1, szGUID, false);
+    //        bool bContinuar = true;
+    //        while (bContinuar)
+    //        {
+    //          if (!Respuesta.RespuestaOK)
+    //          {
+    //            throw new Exception("Al obtener detalle SC " + Respuesta.MensajeError);
+    //          }
+    //          switch (Respuesta.Situacion)
+    //          {
+    //            case SituacionPedido.EnMarcha:
+    //              Respuesta = await Cliente.RefrescarPedidoDetalleSubconsultaBinAsync(Contenedores.CContenedorDatos.Ticket,
+    //                  szGUID, true);
+    //              break;
+    //            default:
+    //              // hay datos.
+    //              bContinuar = false;
+    //              break;
 
-//          }
-//        }
-//        // Si hay datos arma un dataset y lo retorna.
-//        if (Respuesta.Situacion == SituacionPedido.Completado)
-//        {
-//          return Respuesta.Datos;
-//        }
-//        else
-//        {
-//          return new byte[0];
-//        }
+    //          }
+    //        }
+    //        // Si hay datos arma un dataset y lo retorna.
+    //        if (Respuesta.Situacion == SituacionPedido.Completado)
+    //        {
+    //          return Respuesta.Datos;
+    //        }
+    //        else
+    //        {
+    //          return new byte[0];
+    //        }
 
-//      }
-//      catch (Exception ex)
-//      {
-//        DesplegarMsg(ex);
-//        return new byte[0];
-//      }
-//      finally
-//      {
-//        await Cliente.CloseAsync();
-//      }
-//    }
+    //      }
+    //      catch (Exception ex)
+    //      {
+    //        DesplegarMsg(ex);
+    //        return new byte[0];
+    //      }
+    //      finally
+    //      {
+    //        await Cliente.CloseAsync();
+    //      }
+    //    }
 
     private static async Task<List<string>> ObtenerLineasEnBlockAsync(Canvas2DContext Contexto, string Texto, double Ancho, double Alto)
     {
@@ -1651,7 +1651,7 @@ namespace TableroPecasV5.Client.Rutinas
     public static List<string> ArmarListaColores(Int32 Cantidad)
     {
       List<string> Respuesta = new List<string>();
-//      Random Semilla = new Random(0); //DateTime.Now.Millisecond);
+      //      Random Semilla = new Random(0); //DateTime.Now.Millisecond);
       for (Int32 i = 0; i < Cantidad; i++)
       {
         Respuesta.Add(ColorSecuencia(i));
@@ -1779,14 +1779,14 @@ namespace TableroPecasV5.Client.Rutinas
     }
 
     public static string BoolToStr(bool B)
-		{
+    {
       return (B ? "Y" : "N");
-		}
+    }
 
     public static bool StrToBool(String A)
-		{
+    {
       return (A == "Y");
-		}
+    }
 
     public static double BuscarValorEscala(double Valor)
     {
@@ -2137,6 +2137,17 @@ namespace TableroPecasV5.Client.Rutinas
       }
     }
 
+    public static List<double> TextoAListaReales(string Texto)
+    {
+      string[] Elementos = Texto.Split(new char[] { ';' });
+      List<double> Respuesta = new List<double>();
+      foreach (string Elemento in Elementos)
+			{
+        Respuesta.Add(StrVFloat(Elemento));
+			}
+      return Respuesta;
+    }
+
     public static DateTime DecodificarFecha(string Valor)
     {
       bool bHayDatos = true;
@@ -2360,22 +2371,114 @@ namespace TableroPecasV5.Client.Rutinas
       }
     }
 
-    public static string DeterminarPuntoMasCercano(Point Punto, CCapaWFSCN CapaWFS,
-        double Rango, string ValorResto, bool PorCodigo = false)
+    private static bool EstaEnRango(double Lng, double LngMin, double LngMax)
     {
-      CPuntoWFSCN PuntoWFS = PuntoMasCercano(CapaWFS, Punto, Rango);
+      return (Lng >= LngMin && Lng <= LngMax);
+    }
+
+    private static List<CPuntoWFSCN> ListaPuntosPotenciales(Point Punto, double Rango,
+          List<CPuntoWFSCN> PuntosOrdenados)
+    {
+      Int32 i0 = 0;
+      Int32 i2 = PuntosOrdenados.Count - 1;
+      Int32 iRefe = -1;
+      while (i2 >= i0)
+      {
+        iRefe = (i0 + i2) / 2;
+        if (PuntosOrdenados[iRefe].Punto.X == Punto.X)
+        {
+          break;
+        }
+        else
+        {
+          if (PuntosOrdenados[iRefe].Punto.X > Punto.X)
+          {
+            i2 = iRefe - 1;
+          }
+          else
+          {
+            i0 = iRefe + 1;
+          }
+        }
+      }
+      List<CPuntoWFSCN> Respuesta = new List<CPuntoWFSCN>();
+      i0 = iRefe;
+      while (i0 >= 0 && EstaEnRango(PuntosOrdenados[i0].Punto.X, Punto.X - Rango, Punto.X + Rango))
+
+      {
+        Respuesta.Add(PuntosOrdenados[i0]);
+        i0--;
+      }
+      i0 = iRefe + 1;
+      while (i0 < PuntosOrdenados.Count &&
+          EstaEnRango(PuntosOrdenados[i0].Punto.X, Punto.X - Rango, Punto.X + Rango))
+      {
+        Respuesta.Add(PuntosOrdenados[i0]);
+        i0++;
+      }
+
+      return Respuesta;
+
+    }
+
+    public static CPuntoWFSCN PuntoMasCercano(CCapaWFSCN Capa, Point Punto, double Rango,
+          List<CPuntoWFSCN> PuntosOrdenados)
+    {
+      if (PuntosOrdenados == null)
+			{
+        return PuntoMasCercano(Capa, Punto, Rango);
+			}
+      double RangoRefe = Rango * 180 / (6378137.0 * Math.PI);
+      RangoRefe = RangoRefe * RangoRefe;
+      double DistMinima = 1000000000;
+      CPuntoWFSCN PuntoCercano = null;
+      foreach (CPuntoWFSCN PuntoLoc in ListaPuntosPotenciales(Punto,Rango,PuntosOrdenados))
+      {
+        if (EstaEnRango(PuntoLoc.Punto.Y, Punto.Y - Rango, Punto.Y + Rango))
+        {
+          double DistPunto = DistanciaCuadradaEntrePuntos(PuntoLoc.Punto, Punto);
+          if (DistPunto < DistMinima)
+          {
+            DistMinima = DistPunto;
+            PuntoCercano = PuntoLoc;
+          }
+        }
+      }
+      if (DistMinima <= RangoRefe)
+      {
+        return PuntoCercano;
+      }
+      else
+      {
+        return null;
+      }
+    }
+
+		public static string DeterminarPuntoMasCercano(Point Punto, CCapaWFSCN CapaWFS,
+				double Rango, string ValorResto, bool PorCodigo = false)
+		{
+			CPuntoWFSCN PuntoWFS = PuntoMasCercano(CapaWFS, Punto, Rango);
+			return (PuntoWFS == null ? ValorResto : (PorCodigo ? PuntoWFS.Codigo : PuntoWFS.Nombre));
+		}
+
+    public static string DeterminarPuntoMasCercano(Point Punto, CCapaWFSCN CapaWFS,
+        double Rango, string ValorResto, bool PorCodigo = false, List<CPuntoWFSCN> PuntosOrdenados = null)
+    {
+      CPuntoWFSCN PuntoWFS = (PuntosOrdenados == null ? PuntoMasCercano(CapaWFS, Punto, Rango) :
+            PuntoMasCercano(CapaWFS, Punto, Rango, PuntosOrdenados));
       return (PuntoWFS == null ? ValorResto : (PorCodigo ? PuntoWFS.Codigo : PuntoWFS.Nombre));
     }
 
     public static string TextoPunto(Point Punto, CCapaWFSCN CapaWFS, double Rango,
-        string ValorResto, bool PorCodigo = false, bool UsaCentro = false)
+        string ValorResto, bool PorCodigo = false, bool UsaCentro = false,
+        List<CPuntoWFSCN> PuntosOrdenados = null)
     {
       switch (CapaWFS.Elemento)
       {
         case ElementoWFS.Superficie:
           return DeterminarAreaContenedora(Punto, CapaWFS, ValorResto, PorCodigo, UsaCentro);
         case ElementoWFS.Punto:
-          return DeterminarPuntoMasCercano(Punto, CapaWFS, Rango, ValorResto, PorCodigo);
+          return DeterminarPuntoMasCercano(Punto, CapaWFS, Rango, ValorResto, PorCodigo, PuntosOrdenados);
         default:
           return ValorResto;
       }
@@ -2457,6 +2560,30 @@ namespace TableroPecasV5.Client.Rutinas
         if (AreaContienePunto(Area, Punto))
         {
           return Area;
+        }
+      }
+      return null;
+    }
+
+    public static CAreaWFSCN AreaContenedoraPunto(CCapaWFSCN Capa, List<System.Drawing.Rectangle> Rectangulos,
+          Point Punto)
+    {
+      for (Int32 i = 0; i < Capa.Areas.Count; i++)
+      {
+        if (Rectangulos != null && Rectangulos.Count > i)
+        {
+          System.Drawing.Rectangle Rect0 = Rectangulos[i];
+          if (Punto.X >= Rect0.X && Punto.X < (Rect0.X + Rect0.Width) &&
+              Punto.Y >= Rect0.Y && Punto.Y < (Rect0.Y + Rect0.Height))
+          {
+            if (AreaContienePunto(Capa.Areas[i], Punto))
+            {
+              if ( AreaContienePunto(Capa.Areas[i], Punto))
+							{
+                return Capa.Areas[i];
+							}
+            }
+          }
         }
       }
       return null;

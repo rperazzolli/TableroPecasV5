@@ -97,7 +97,7 @@ function loadMapRetPos(Posicion, Direccion, LatCentro, LngCentro, NivelZoom, Eve
             //       });
             if (Eventos) {
                 if (EventoViewChange) {
-                    Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchange', function () {
+                    Microsoft.Maps.Events.addHandler(bingMap[Posicion].map, 'viewchangeend', function () {
                         window['FuncionesJS'].ReposicionarMapa(Posicion, bingMap[Posicion].map.getZoom());
                     });
                 }
@@ -116,6 +116,24 @@ function loadMapRetPos(Posicion, Direccion, LatCentro, LngCentro, NivelZoom, Eve
         }
     }
     return Posicion.toString();
+}
+function ObtenerBordes(Posicion) {
+    if (Posicion >= 0 && Posicion <= bingMap.length && bingMap[Posicion] != null) {
+        var Rect0 = bingMap[Posicion].map.getBounds();
+        return Rect0.getWest().toString() + ";" + Rect0.getNorth().toString() + ";" +
+            Rect0.getEast().toString() + ";" + Rect0.getSouth().toString();
+    }
+    else {
+        return "-1;-1;-1;-1";
+    }
+}
+function ObtenerZoom(Posicion) {
+    if (Posicion >= 0 && Posicion <= bingMap.length && bingMap[Posicion] != null) {
+        return bingMap[Posicion].map.getZoom().toString();
+    }
+    else {
+        return "-1";
+    }
 }
 function AgregarLayerWMS(Posicion, UrlWMS, LatNorte, LngOeste, LatSur, LngEste) {
     //    uriConstructor: 'http://idpgis.ncep.noaa.gov/arcgis/services/NWS_Observations/radar_base_reflectivity/MapServer/WmsServer?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=1&STYLES=default&FORMAT=image/png&TRANSPARENT=TRUE&CRS=CRS:84&BBOX={bbox}&WIDTH=256&HEIGHT=256',

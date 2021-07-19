@@ -1044,11 +1044,24 @@ namespace TableroPecasV5.Client.Logicas
         throw new Exception(Respuesta.ReasonPhrase);
       }
 
-      RespuestaCodigos RespuestaCodigo = await Respuesta.Content.ReadFromJsonAsync<RespuestaCodigos>();
-      if (!RespuestaCodigo.RespuestaOK)
+
+      string Msg = "";
+      RespuestaCodigos RespuestaCodigo = null;
+
+      try
       {
-        throw new Exception(RespuestaCodigo.MsgErr);
+        Msg = await Respuesta.Content.ReadAsStringAsync();
+        RespuestaCodigo = System.Text.Json.JsonSerializer.Deserialize<RespuestaCodigos>(Msg);
+//        RespuestaCodigos RespuestaCodigo = await Respuesta.Content.ReadFromJsonAsync<RespuestaCodigos>();
+        if (!RespuestaCodigo.RespuestaOK)
+        {
+          throw new Exception(RespuestaCodigo.MsgErr);
+        }
       }
+      catch (Exception ex)
+			{
+        CRutinas.DesplegarMsg(CRutinas.TextoMsg(ex) + Environment.NewLine + Msg);
+			}
 
       CodigoUnico = (Mimico.MimicoPropio.Codigo > 0 ? Mimico.MimicoPropio.Codigo :
           CRutinas.TraducirCodigo(Mimico.MimicoPropio.Codigo, RespuestaCodigo.ParesDeCodigosMimicos));

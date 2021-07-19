@@ -144,6 +144,7 @@ namespace TableroPecasV5.Client.Logicas
 
     protected CCapaWSSCN mCapa = null;
     protected CCapaWFSCN mCapaWFS = null;
+    protected static CCapaWFSCN mCapaWFSLeida = null;
     protected CVinculoIndicadorCompletoCN mVinculo = null;
     protected CCapaWFSCN mCapaVinculo; // cuando el vinculo es por una capa, leer la capa.
 
@@ -320,20 +321,28 @@ namespace TableroPecasV5.Client.Logicas
 
         if (mCapaWFS == null || mCapaWFS.Codigo != mCapa.CapaWFS)
         {
-          // lee capa WFS.
-          RespuestaCapaWFS RespWFS = await Http.GetFromJsonAsync<RespuestaCapaWFS>(
-            "api/Capas/LeerCapaWFS?URL=" + Contenedores.CContenedorDatos.UrlBPI +
-            "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
-            "&Codigo=" + mCapa.CapaWFS.ToString() +
-            "&ForzarWeb=N");
-          if (!RespWFS.RespuestaOK)
+          if (mCapaWFSLeida != null && mCapaWFSLeida.Codigo == mCapa.CapaWFS)
           {
-            throw new Exception(RespWFS.MsgErr);
+            mCapaWFS = mCapaWFSLeida;
           }
-          mCapaWFS = RespWFS.Capa;
-          if (mCapaWFS == null)
+          else
           {
-            throw new Exception("No encuentra capa WFS");
+            // lee capa WFS.
+            RespuestaCapaWFS RespWFS = await Http.GetFromJsonAsync<RespuestaCapaWFS>(
+              "api/Capas/LeerCapaWFS?URL=" + Contenedores.CContenedorDatos.UrlBPI +
+              "&Ticket=" + Contenedores.CContenedorDatos.Ticket +
+              "&Codigo=" + mCapa.CapaWFS.ToString() +
+              "&ForzarWeb=N");
+            if (!RespWFS.RespuestaOK)
+            {
+              throw new Exception(RespWFS.MsgErr);
+            }
+            mCapaWFS = RespWFS.Capa;
+            if (mCapaWFS == null)
+            {
+              throw new Exception("No encuentra capa WFS");
+            }
+            mCapaWFSLeida = mCapaWFS;
           }
         }
 
@@ -426,26 +435,25 @@ namespace TableroPecasV5.Client.Logicas
       StateHasChanged();
     }
 
-    protected void AcumularValor(ref List<CParValores> Lista, Int32 Pos, Int32 PosColDatos, Int32 Posicion)
+    protected double ObtenerValor(Int32 Pos, Int32 PosColDatos, Int32 Posicion)
     {
       switch (ProveedorBase.Columnas[PosColDatos].Clase)
       {
         case ClaseVariable.Entero:
-          Lista[Pos].ValorElemento += (Int32)ProveedorBase.Columnas[PosColDatos].Valores[Posicion];
+          return (int)ProveedorBase.Columnas[PosColDatos].Valores[Posicion];
           break;
         case ClaseVariable.Real:
-          Lista[Pos].ValorElemento += (double)ProveedorBase.Columnas[PosColDatos].Valores[Posicion];
+          return (double)ProveedorBase.Columnas[PosColDatos].Valores[Posicion];
           break;
         default:
-          Lista[Pos].ValorElemento++;
+          return 1;
           break;
       }
-      Lista[Pos].Cantidad++;
     }
 
     protected const string VALOR_RESTO = "NO_REFERENCIADOS";
 
-    protected List<CParValores> CrearParesValores()
+    protected Task<List<CParValores>> CrearParesValoresAsync()
     {
       // Si hay formula, tratar de ajustar los valores.
       List<CParValores> Respuesta = new List<CParValores>();
@@ -480,9 +488,20 @@ namespace TableroPecasV5.Client.Logicas
       }
 
       // Acumula los valores del dataset.
-      foreach (CLineaComprimida Linea in ProveedorBase.DatosVigentes)
+      try
       {
-        AcumularValor(ref Respuesta, Linea.Codigos[PosColAg], PosColDatos, Linea.Codigos[PosColDatos]);
+        foreach (CLineaComprimida Linea in ProveedorBase.Datos)
+        {
+          Int32 PosVct = Linea.Codigos[PosColAg];
+          Int32 PosVal = Linea.Codigos[PosColDatos];
+          double Valor = ObtenerValor(PosVct, PosColDatos, PosVal);
+          Respuesta[PosVct].ValorElemento += Valor;
+          Respuesta[PosVct].Cantidad++;
+        }
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
       }
 
       foreach (CParValores Par in Respuesta)
@@ -504,7 +523,7 @@ namespace TableroPecasV5.Client.Logicas
         Par.ValorElemento = Valor;
 
       }
-      return Respuesta;
+      return Task.FromResult(Respuesta);
     }
 
     protected void CrearReferenciasLineales(List<CParValores> Pares)
@@ -653,14 +672,14 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    protected void CrearViewerLayer()
+    protected async Task CrearViewerLayerAsync()
     {
       CCapaComodin CapaComodin = new CCapaComodin();
       CapaComodin.Opacidad = (mCapa.Intervalos == ClaseIntervalo.Indicador ? 0.5 : 1);
       CapaComodin.CapaWFS = mCapaWFS;
       CapaComodin.Clase = ClaseCapa.WFS;
       // Crea un valor por cada area. Hasta aca no considera la formula.
-      CapaComodin.Pares = CrearParesValores();
+      CapaComodin.Pares = await CrearParesValoresAsync();
 
       CapaComodin.AgregarFormulaWSS(mCapa, mDatosSC, mListaPrm);
 
@@ -683,10 +702,10 @@ namespace TableroPecasV5.Client.Logicas
 
     protected CProyectoBing mProyectoBing;
 
-    protected void CrearProyectoFicticio()
+    protected async Task CrearProyectoFicticioAsync()
     {
       mProyectoBing = new CProyectoBing();
-      CrearViewerLayer();
+      await CrearViewerLayerAsync();
     }
 
     protected bool mbReubicarCentro = false;
@@ -875,7 +894,7 @@ namespace TableroPecasV5.Client.Logicas
       // determinar valores escala.
       if (mProyectoBing == null)
       {
-        CrearProyectoFicticio();
+        await CrearProyectoFicticioAsync();
       }
       await AjustarReferenciasAsync();
 

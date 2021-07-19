@@ -80,20 +80,13 @@ namespace TableroPecasV5.Client.Logicas
           out Int32 FilaMinima, out Int32 FilaMaxima,
           out Int32 ColumnaMinima, out Int32 ColumnaMaxima)
     {
-      //Int32 Col0;
-      //Int32 Fila0;
-      //UbicarPosicionGrilla(Punto.Abscisa, Punto.Ordenada, out Col0, out Fila0);
-      //ColumnaMinima = Math.Max(Col0-2, 1);
-      //ColumnaMaxima = Math.Min(Col0+2, Respuesta.SegmentosH - 1);
-      //FilaMinima = Math.Max(FilaMinima, 1);
-      //FilaMaxima = Math.Min(FilaMaxima, Respuesta.SegmentosV - 1);
       double Salto = 4 * Math.Sqrt(SaltoAbscisas * SaltoOrdenadas);
       UbicarPosicionGrilla(Punto.Abscisa - Salto, Punto.Ordenada - Salto, out ColumnaMinima, out FilaMinima);
       UbicarPosicionGrilla(Punto.Abscisa + Salto, Punto.Ordenada + Salto, out ColumnaMaxima, out FilaMaxima);
-      ColumnaMinima = Math.Max(ColumnaMinima, 1);
-      ColumnaMaxima = Math.Min(ColumnaMaxima, Respuesta.SegmentosH - 1);
-      FilaMinima = Math.Max(FilaMinima, 1);
-      FilaMaxima = Math.Min(FilaMaxima, Respuesta.SegmentosV - 1);
+      ColumnaMinima = Math.Min(Math.Max(ColumnaMinima, 1), Respuesta.SegmentosH - 1);
+      ColumnaMaxima = Math.Max(1, Math.Min(ColumnaMaxima, Respuesta.SegmentosH - 1));
+      FilaMinima = Math.Min(Math.Max(FilaMinima, 1), Respuesta.SegmentosV - 1);
+      FilaMaxima = Math.Max(1, Math.Min(FilaMaxima, Respuesta.SegmentosV - 1));
     }
 
     private double PixelAbscisa(double Abscisa)
@@ -133,22 +126,7 @@ namespace TableroPecasV5.Client.Logicas
       }
 
       return Math.Cos(Math.PI * DistPunto / (2 * Distancia));
-      //if (Respuesta.Acumulado)
-      //{
-      //  return 1;
-      //}
-      //else
-      //{
-      //  if (Respuesta.Aplanado)
-      //  {
-      //    return Math.Sqrt((Distancia - DistPunto) / Distancia);
-      //  }
-      //  if (Respuesta.Empuntado)
-      //  {
-      //    return (Distancia - DistPunto) * (Distancia - DistPunto) / (Distancia * Distancia);
-      //  }
-      //  return (Distancia - DistPunto) / Distancia;
-      //}
+
     }
 
     private const Int32 SALTOS_ESCALA = 255;
@@ -306,19 +284,6 @@ namespace TableroPecasV5.Client.Logicas
             }
           }
         }
-
-        // Si no es acumulado, determina las medias.
-        //if (!Respuesta.Acumulado)
-        //{
-        //  for (Int32 i = 0; i < Respuesta.Valores.Count; i++)
-        //  {
-        //    if (mCantidadValores[i] > 0)
-        //    {
-        //      Respuesta.Valores[i] /= mCantidadValores[i];
-        //    }
-        //  }
-        //  mCantidadValores.Clear(); // liberar memoria.
-        //}
 
         // Buscar el maximo y minimo.
         Respuesta.Maximo = (from V in Respuesta.Valores

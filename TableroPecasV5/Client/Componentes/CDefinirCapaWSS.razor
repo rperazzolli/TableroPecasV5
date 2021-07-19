@@ -12,7 +12,7 @@
   }
   else
   {
-    @if (ListaCapas == null || ListaCapasWFS == null || HayMensaje)
+    @if (ListaCapas == null || gListaCapasWFS == null || HayMensaje)
     {
       @if (HayMensaje)
       {
@@ -74,11 +74,11 @@
 
             <div class="grilla-superior">
               <div>Capa WFS</div>
-              @if (ListaCapasWFS != null)
+              @if (gListaCapasWFS != null)
               {
                 <div>
                   <Select TValue="int" @bind-SelectedValue="@CapaWFS">
-                    @foreach (CCapaWFSCN Capa in ListaCapasWFS)
+                    @foreach (CCapaWFSCN Capa in gListaCapasWFS)
                     {
                       <SelectItem TValue="int" Value="@Capa.Codigo">@Capa.Descripcion</SelectItem>
                     }

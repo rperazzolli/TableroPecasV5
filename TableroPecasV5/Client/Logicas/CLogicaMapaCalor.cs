@@ -29,6 +29,11 @@ namespace TableroPecasV5.Client.Logicas
       mPosicionMapaCalor = -1;
 		}
 
+    ~CLogicaMapaCalor()
+		{
+      CLogicaBingMaps.gAlHacerViewChange -= FncHizoZoom;
+		}
+
     [Parameter]
     public Plantillas.CLinkContenedorFiltros Filtros { get; set; }
     public async void Dispose()
@@ -46,10 +51,69 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+    private Clases.CTimerRefresco mRefrescador = null;
+    private List<double> mBordes = null;
+
+    private async void RefrescarInterfase()
+    {
+      try
+      {
+        object[] Args = new object[1];
+        Args[0] = mPosicionMapaCalor;
+        try
+        {
+          string Nivel = await JSRuntime.InvokeAsync<string>("ObtenerZoom", Args);
+          Int32 NivelLocal = Int32.Parse(Nivel);
+          Nivel = await JSRuntime.InvokeAsync<string>("ObtenerBordes", Args);
+          mBordes = CRutinas.TextoAListaReales(Nivel);
+          mLngMin = mBordes[0];
+          mLngMax = mBordes[2];
+          mLatMin = mBordes[3];
+          mLatMax = mBordes[1];
+          mLngCentro = (mLngMin + mLngMax) / 2;
+          mLatCentro = (mLatMin + mLatMax) / 2;
+          if (NivelLocal > 0)
+          {
+            mNivelZoom = NivelLocal;
+            mbAjustoZoom = true;
+          }
+          else
+          {
+            return;
+          }
+        }
+        catch (Exception ex)
+        {
+          Rutinas.CRutinas.DesplegarMsg(ex);
+        }
+        await InvokeAsync(() => { StateHasChanged(); });
+      }
+      catch (Exception)
+      {
+      }
+    }
+
+    public void FncHizoZoom(Int32 Posicion, double Zoom)
+		{
+      if (Posicion == mPosicionMapaCalor)
+			{
+        if (mRefrescador == null)
+        {
+          mRefrescador = new Clases.CTimerRefresco();
+          mRefrescador.AlRefrescar += RefrescarInterfase;
+        }
+        mRefrescador.RefrescarPedido();
+      }
+    }
+
 		protected override Task OnInitializedAsync()
 		{
       mCodigoMapa = gCodigoMapa++;
-      Direccion = "MapaCalor" + mCodigoMapa.ToString();
+      if (string.IsNullOrEmpty(Direccion))
+      {
+        Direccion = "MapaCalor" + mCodigoMapa.ToString();
+      }
+      Logicas.CLogicaBingMaps.gAlHacerViewChange += FncHizoZoom;    
 			return base.OnInitializedAsync();
 		}
 
@@ -128,6 +192,7 @@ namespace TableroPecasV5.Client.Logicas
     //}
 
     private CProveedorComprimido mProveedor = null;
+    [Parameter]
     public CProveedorComprimido Proveedor
     {
       get { return mProveedor; }
@@ -245,7 +310,10 @@ namespace TableroPecasV5.Client.Logicas
           double Lat = Proveedor.ExtraerDatoReal(Linea, PosColLat);
           double Long = Proveedor.ExtraerDatoReal(Linea, PosColLng);
           float Valor = (PosColValor >= 0 ? (float)Proveedor.ExtraerDatoReal(Linea, PosColValor) : 1);
-          mPuntosCalor.Add(new CPuntoCalor(Long, Lat, Valor));
+          if (Lat != 0 && Long != 0 && Lat > -998 && Long > -998)
+          {
+            mPuntosCalor.Add(new CPuntoCalor(Long, Lat, Valor));
+          }
         }
       }
     }
@@ -474,53 +542,70 @@ namespace TableroPecasV5.Client.Logicas
 
     private CMapaCalorRN mCreador;
 
-    private void CrearMapaCalor()
+    private Task<bool> CrearMapaCalorAsync()
     {
 
-      if (mPuntosCalor == null)
+      if (mBordes == null)
       {
-        AjustarPuntosCalor();
-      }
 
-      mLatMin = (from P in mPuntosCalor
-                 select P.Ordenada).Min();
-      mLatMax = (from P in mPuntosCalor
-                 select P.Ordenada).Max();
-      mLngMin = (from P in mPuntosCalor
-                 select P.Abscisa).Min();
-      mLngMax = (from P in mPuntosCalor
-                 select P.Abscisa).Max();
+        if (mPuntosCalor == null)
+        {
+          AjustarPuntosCalor();
+        }
+
+        mLatMin = (from P in mPuntosCalor
+                   select P.Ordenada).Min();
+        mLatMax = (from P in mPuntosCalor
+                   select P.Ordenada).Max();
+        mLngMin = (from P in mPuntosCalor
+                   select P.Abscisa).Min();
+        mLngMax = (from P in mPuntosCalor
+                   select P.Abscisa).Max();
 
 
-      mCreador = new CMapaCalorRN();
-      mCreador.Puntos = mPuntosCalor;
-      if (mRespuestaCalor == null)
-      {
-        mRespuestaCalor = new CRespuestaCalor();
-        mRespuestaCalor.Aplanado = false;
-        mRespuestaCalor.Empuntado = false;
-        mRespuestaCalor.Acumulado = true;
-        mRespuestaCalor.FactorDistancia = 1;
+        mCreador = new CMapaCalorRN();
+        mCreador.Puntos = mPuntosCalor;
+        if (mRespuestaCalor == null)
+        {
+          mRespuestaCalor = new CRespuestaCalor();
+          mRespuestaCalor.Aplanado = false;
+          mRespuestaCalor.Empuntado = false;
+          mRespuestaCalor.Acumulado = true;
+          mRespuestaCalor.FactorDistancia = 1;
+        }
+        mRespuestaCalor.PixelsAncho = mLngMax - mLngMin;
+        mRespuestaCalor.PixelsAlto = mLatMax - mLatMin;
+        if (mRespuestaCalor.PixelsAncho < 0.00001)
+        {
+          mRespuestaCalor.Valores.Clear();
+          return Task.FromResult(true);
+        }
+        if (mRespuestaCalor.SegmentosHCfg < 0)
+        {
+          double DimElemento = DeterminarDiscretizacion(
+                mRespuestaCalor.PixelsAncho, mRespuestaCalor.PixelsAlto, 5000);
+          mRespuestaCalor.SegmentosHCfg = (Int32)Math.Floor(mRespuestaCalor.PixelsAncho / DimElemento);
+          mRespuestaCalor.SegmentosVCfg = (Int32)Math.Floor(mRespuestaCalor.PixelsAlto / DimElemento);
+        }
+
+        mRespuestaCalor.AbscisaMinima = mLngMin;
+        mRespuestaCalor.AbscisaMaxima = mLngMax;
+        mRespuestaCalor.OrdenadaMinima = mLatMin;
+        mRespuestaCalor.OrdenadaMaxima = mLatMax;
       }
-      mRespuestaCalor.PixelsAncho = mLngMax - mLngMin;
-      mRespuestaCalor.PixelsAlto = mLatMax - mLatMin;
-      if (mRespuestaCalor.PixelsAncho < 0.00001)
-      {
-        mRespuestaCalor.Valores.Clear();
-        return;
-      }
-      if (mRespuestaCalor.SegmentosHCfg < 0)
-      {
+      else
+			{
+        mRespuestaCalor.PixelsAncho = mBordes[2] - mBordes[0];
+        mRespuestaCalor.PixelsAlto = mBordes[1] -mBordes[3];
         double DimElemento = DeterminarDiscretizacion(
               mRespuestaCalor.PixelsAncho, mRespuestaCalor.PixelsAlto, 5000);
         mRespuestaCalor.SegmentosHCfg = (Int32)Math.Floor(mRespuestaCalor.PixelsAncho / DimElemento);
         mRespuestaCalor.SegmentosVCfg = (Int32)Math.Floor(mRespuestaCalor.PixelsAlto / DimElemento);
+        mRespuestaCalor.AbscisaMinima = mBordes[0];
+        mRespuestaCalor.AbscisaMaxima = mBordes[2];
+        mRespuestaCalor.OrdenadaMinima =mBordes[3];
+        mRespuestaCalor.OrdenadaMaxima = mBordes[1];
       }
-
-      mRespuestaCalor.AbscisaMinima = mLngMin;
-      mRespuestaCalor.AbscisaMaxima = mLngMax;
-      mRespuestaCalor.OrdenadaMinima = mLatMin;
-      mRespuestaCalor.OrdenadaMaxima = mLatMax;
 
       mCreador.Respuesta = mRespuestaCalor;
       string Msg = mCreador.DeterminarMapa();
@@ -532,6 +617,9 @@ namespace TableroPecasV5.Client.Logicas
       }
 
       mCreador.DeterminarCurvas();
+
+      return Task.FromResult(true);
+
     }
 
     private bool mbGraficando = false;
@@ -581,6 +669,15 @@ namespace TableroPecasV5.Client.Logicas
       StateHasChanged();
 		}
 
+    private bool mbAjustoZoom = false;
+
+    private async Task EliminarCurvasAnterioresAsync()
+		{
+      object[] Args = new object[7];
+      Args[0] = mPosicionMapaCalor;
+      await JSRuntime.InvokeAsync<string>("LiberarPushpins", Args);
+    }
+
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
       bool bRedibujar = false;
@@ -618,10 +715,10 @@ namespace TableroPecasV5.Client.Logicas
           }
           else
           {
-            CrearMapaCalor();
+            await CrearMapaCalorAsync();
           }
-          CRutinas.UbicarCentro(Abscisa < -998 ? Contenedores.CContenedorDatos.AnchoPantalla : Ancho,
-              Abscisa < -998 ? (Contenedores.CContenedorDatos.AltoPantalla - 45) : (Alto - 25),
+          CRutinas.UbicarCentro(Abscisa < -998 || Ancho < 0 ? Contenedores.CContenedorDatos.AnchoPantalla : Ancho,
+              Abscisa < -998 || Alto < 25 ? (Contenedores.CContenedorDatos.AltoPantalla - 45) : (Alto - 25),
               mLatMin, mLatMax, mLngMin, mLngMax, out mLatCentro, out mLngCentro, out mNivelZoom);
 
           DatosCompletos = true;
@@ -631,25 +728,25 @@ namespace TableroPecasV5.Client.Logicas
         }
         else
         {
-          if (ReubicarCentro)
+          if (ReubicarCentro || mbAjustoZoom)
           {
             CRutinas.UbicarCentro(Abscisa < -998 ? Contenedores.CContenedorDatos.AnchoPantalla : Ancho,
                 Abscisa < -998 ? (Contenedores.CContenedorDatos.AltoPantalla - 45) : (Alto - 25),
                 mLatMin, mLatMax, mLngMin, mLngMax, out mLatCentro, out mLngCentro, out mNivelZoom);
             ReubicarCentro = false;
           }
-          object[] Args = new object[7];
-          Args[0] = mPosicionMapaCalor;
-          Args[1] = '#' + Direccion;
-          Args[2] = (mLatMax + mLatMin) / 2;
-          Args[3] = (mLngMax + mLngMin) / 2;
-          Args[4] = mNivelZoom;
-          Args[5] = false;
-          Args[6] = false;
           try
           {
             if (mPosicionMapaCalor < 0)
             {
+              object[] Args = new object[7];
+              Args[0] = mPosicionMapaCalor;
+              Args[1] = '#' + Direccion;
+              Args[2] = (mLatMax + mLatMin) / 2;
+              Args[3] = (mLngMax + mLngMin) / 2;
+              Args[4] = mNivelZoom;
+              Args[5] = true;
+              Args[6] = false;
               string CodigoMapa = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
               mPosicionMapaCalor = Int32.Parse(CodigoMapa);
             }
@@ -659,6 +756,12 @@ namespace TableroPecasV5.Client.Logicas
             }
             else
             {
+              if (mbAjustoZoom)
+							{
+                mbAjustoZoom = false;
+                await CrearMapaCalorAsync();
+                await EliminarCurvasAnterioresAsync();
+							}
               await mCreador.DibujarCurvasAsync(JSRuntime, mPosicionMapaCalor);
             }
             //  object[] Args = new object[14];
@@ -700,9 +803,9 @@ namespace TableroPecasV5.Client.Logicas
       {
         mbGraficando = false;
         if (bRedibujar)
-				{
+        {
           StateHasChanged();
-				}
+        }
       }
     }
 

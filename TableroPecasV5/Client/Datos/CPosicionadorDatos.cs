@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Input;
@@ -313,17 +314,103 @@ namespace TableroPecasV5.Client.Datos
       ColAgregada.AgregarValor(mszValorResto);
     }
 
-    private string BuscarPuntoMasCercano(Point Punto, CCapaWFSCN Capa, double Rango, string ValorResto)
+    private string BuscarPuntoMasCercano(Point Punto, CCapaWFSCN Capa, double Rango, string ValorResto,
+        List<CPuntoWFSCN> PuntosOrdenados)
     {
-      CPuntoWFSCN Cercano=  CRutinas.PuntoMasCercano(Capa, Punto, Rango);
+      CPuntoWFSCN Cercano=  CRutinas.PuntoMasCercano(Capa, Punto, Rango, PuntosOrdenados);
       return (Cercano == null ? ValorResto : Cercano.Codigo);
     }
 
-    public string BuscarArea(Point Punto, CCapaWFSCN Capa, string ValorResto)
+    public string BuscarArea(Point Punto, CCapaWFSCN Capa, List<System.Drawing.Rectangle> Rectangulos, string ValorResto)
     {
-      CAreaWFSCN Area = CRutinas.AreaContenedoraPunto(Capa, Punto);
+      CAreaWFSCN Area = CRutinas.AreaContenedoraPunto(Capa, Rectangulos, Punto);
       return (Area == null ? ValorResto : Area.Codigo);
     }
+
+    private Dictionary<Location, Int32> ExtraerDiccionarioPosiciones(CProveedorComprimido Proveedor,
+        Int32 OrdenLng, Int32 OrdenLat)
+    {
+      Dictionary<Location, Int32> Respuesta = new Dictionary<Location, int>();
+      foreach (CLineaComprimida Linea in Proveedor.Datos)
+      {
+        double Abscisa = Proveedor.Columnas[OrdenLng].ValorReal(Linea.Codigos[OrdenLng]);
+        double Ordenada = Proveedor.Columnas[OrdenLat].ValorReal(Linea.Codigos[OrdenLat]);
+        if (!double.IsNaN(Abscisa) && !double.IsNaN(Ordenada) && Abscisa != 0 && Ordenada != 0)
+        {
+          Location Posicion = new Location()
+          {
+            Longitude = Abscisa,
+            Latitude = Ordenada
+          };
+          if (!Respuesta.ContainsKey(Posicion))
+          {
+            Respuesta.Add(Posicion, -1);
+          }
+        }
+      }
+      return Respuesta;
+    }
+
+    private List<CPuntoWFSCN> ExtraerListaPuntosOrdenados(CProveedorComprimido Proveedor,
+        Int32 OrdenLng, Int32 OrdenLat)
+    {
+      List<CPuntoWFSCN> Respuesta = new List<CPuntoWFSCN>();
+      foreach (CLineaComprimida Linea in Proveedor.Datos)
+      {
+        double Abscisa = Proveedor.Columnas[OrdenLng].ValorReal(Linea.Codigos[OrdenLng]);
+        double Ordenada = Proveedor.Columnas[OrdenLat].ValorReal(Linea.Codigos[OrdenLat]);
+        if (!double.IsNaN(Abscisa) && !double.IsNaN(Ordenada))
+        {
+          CPuntoWFSCN Posicion = new CPuntoWFSCN();
+          Posicion.Punto=new CPosicionWFSCN()
+          {
+            X = Abscisa,
+            Y = Ordenada
+          };
+          Respuesta.Add(Posicion);
+        }
+      }
+      Respuesta.Sort(delegate (CPuntoWFSCN L1, CPuntoWFSCN L2)
+        {
+          return (L1.Punto.X == L2.Punto.X ? L1.Punto.Y.CompareTo(L2.Punto.Y) : L1.Punto.X.CompareTo(L2.Punto.X));
+        });
+      for (Int32 i = Respuesta.Count - 1; i > 0; i--)
+      {
+        if (Respuesta[i].Equals(Respuesta[i - 1]))
+        {
+          Respuesta.RemoveAt(i);
+        }
+      }
+      return Respuesta;
+    }
+
+    private List<System.Drawing.Rectangle> mRectangulosAreas = null;
+
+    private static System.Drawing.Rectangle ExtraerRectanguloArea(CAreaWFSCN Area)
+		{
+      System.Drawing.Rectangle Respuesta = new System.Drawing.Rectangle();
+      if (Area != null && Area.Contorno != null && Area.Contorno.Count > 1)
+      {
+        Respuesta.X = (Int32)(from P in Area.Contorno
+                              select P.X).Min();
+        Respuesta.Y = (Int32)(from P in Area.Contorno
+                              select P.Y).Min();
+        Respuesta.Width = (Int32)(from P in Area.Contorno
+                                  select P.X).Max() - Respuesta.X;
+        Respuesta.Height = (Int32)(from P in Area.Contorno
+                                  select P.Y).Max() - Respuesta.Y;
+      }
+      else
+			{
+        Respuesta.X = Int32.MinValue;
+        Respuesta.Y = Int32.MinValue;
+        Respuesta.Width = 0;
+        Respuesta.Height = 0;
+			}
+      return Respuesta;
+    }
+
+    private List<CPuntoWFSCN> mPuntosOrdenados = null;
 
     public void ProcesarAgregadoDeColumnaDesdeCoordenadas(string NombreColumnaAgregada,
           Int32 OrdenLat, Int32 OrdenLng,
@@ -360,26 +447,70 @@ namespace TableroPecasV5.Client.Datos
 
         ColAgregada.DatosSucios = true;
 
+        Dictionary<Location, Int32> Posiciones = null;
+        if (Capa.Elemento == ElementoWFS.Superficie)
+        {
+          mRectangulosAreas = (from A in Capa.Areas
+                               select ExtraerRectanguloArea(A)).ToList();
+          Posiciones = ExtraerDiccionarioPosiciones(Proveedor, OrdenLng, OrdenLat);
+        }
+
+        if (Capa.Elemento == ElementoWFS.Punto)
+        {
+          mPuntosOrdenados = ExtraerListaPuntosOrdenados(Proveedor, OrdenLng, OrdenLat);
+        }
+
         foreach (Datos.CLineaComprimida Linea in Proveedor.Datos)
         {
           double Abscisa = Proveedor.Columnas[OrdenLng].ValorReal(Linea.Codigos[OrdenLng]);
           double Ordenada = Proveedor.Columnas[OrdenLat].ValorReal(Linea.Codigos[OrdenLat]);
-          if (!double.IsNaN(Abscisa) && !double.IsNaN(Ordenada))
+          if (!double.IsNaN(Abscisa) && !double.IsNaN(Ordenada) && Abscisa != 0 && Ordenada != 0)
           {
-            Point Punto = new Point(Abscisa, Ordenada);
-            string Nombre;
-            switch (Capa.Elemento)
+            if (Capa.Elemento == ElementoWFS.Superficie)
             {
-              case ElementoWFS.Punto:
-                Nombre = BuscarPuntoMasCercano(Punto, Capa, Rango, ValorResto);
-                break;
-              case ElementoWFS.Superficie:
-                Nombre = BuscarArea(Punto, Capa, ValorResto);
-                break;
-              default:
-                throw new Exception("No es capa de puntos o areas");
+              Location Posicion = new Location()
+              {
+                Longitude = Abscisa,
+                Latitude = Ordenada
+              };
+
+              Int32 Valor;
+              if (Posiciones.TryGetValue(Posicion, out Valor))
+              {
+                if (Valor < 0)
+                {
+                  string CodigoArea = BuscarArea(new Point(Abscisa, Ordenada), Capa, mRectangulosAreas, ValorResto);
+                  Valor = ColAgregada.PosicionValorIgualTexto(CodigoArea);
+                  Posiciones[Posicion] = Valor;
+                }
+                Linea.Codigos.Add(Valor);
+              }
+              else
+              {
+                Linea.Codigos.Add(ColAgregada.PosicionValorIgualTexto(ValorResto));
+              }
             }
-            Linea.Codigos.Add(ColAgregada.PosicionValorIgualTexto(Nombre));
+            else
+            {
+              Point Punto = new Point(Abscisa, Ordenada);
+              string Nombre;
+              switch (Capa.Elemento)
+              {
+                case ElementoWFS.Punto:
+                  Nombre = BuscarPuntoMasCercano(Punto, Capa, Rango, ValorResto, mPuntosOrdenados);
+                  break;
+                case ElementoWFS.Superficie:
+                  Nombre = BuscarArea(Punto, Capa, mRectangulosAreas, ValorResto);
+                  break;
+                default:
+                  throw new Exception("No es capa de puntos o areas");
+              }
+              Linea.Codigos.Add(ColAgregada.PosicionValorIgualTexto(Nombre));
+            }
+          }
+          else
+					{
+            Linea.Codigos.Add(ColAgregada.PosicionValorIgualTexto(ValorResto));
           }
         }
 
@@ -393,9 +524,20 @@ namespace TableroPecasV5.Client.Datos
 
   }
 
-  public class Location
+  public class Location : IEquatable<Location>
   {
     public double Longitude { get; set; }
     public double Latitude { get; set; }
-  }
+
+    public bool Equals(Location o)
+    {
+      return Longitude == o.Longitude && Latitude == o.Latitude;
+    }
+
+    public override int GetHashCode()
+		{
+      return Longitude.GetHashCode() ^ Latitude.GetHashCode();
+
+    }
+	}
 }

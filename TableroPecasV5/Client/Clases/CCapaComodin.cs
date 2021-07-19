@@ -294,7 +294,7 @@ namespace TableroPecasV5.Client.Clases
       foreach (CAreaWFSCN MacroArea in CapaWFS.Areas)
       {
         CParValores Par = (from P in Pares
-                           where P.CodigoElemento == MacroArea.Codigo.ToUpper()
+                           where P.CodigoElemento.Equals(MacroArea.Codigo, StringComparison.CurrentCultureIgnoreCase)
                            select P).FirstOrDefault();
         if (Par != null)
         {

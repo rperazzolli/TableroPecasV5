@@ -23,22 +23,48 @@
     <div style="display: inline-block;">
       <Check TValue="bool" Style="margin-left: 15px; display: inline-block;" @bind-Checked="@VerLabels">Ver labels</Check>
     </div>
+    <div style="display: inline-block;">
+      <Check TValue="bool" Style="margin-left: 15px; display: inline-block;" @bind-Checked="@VerComoMapaCalor">Mapa de calor</Check>
+    </div>
   </div>
   <div id="@Direccion" style="width: 100%; height: calc(100% - 35px); background: white;">
     <div style="width: 100%; height: 100%; position: absolute; margin: 0px;">
-      <CMapaGradiente @ref="MapaGradiente"
-                      CodigoElementoDimension="@CodigoElementoDimension"
-                      Direccion="@Direccion"
-                      Indicador="@Indicador"
-                      NivelFlotante="10"
-                      Proveedor="@ProveedorDatos"
-                      Abscisa="0"
-                      Ordenada="0"
-                      Ancho="-1"
-                      Alto="-1"
-                      VerLabels="@VerLabels"
-                      Capa="@CapaWSS"
-                      ComoComponente="false" />
+      @if (VerComoMapaCalor)
+      {
+        <CMapaCalor @ref="MapaCalor"
+                    Clase="Plantillas.CGrafV2DatosContenedorBlock.ClaseBlock.MapaCalor"
+                    CodigoCapa="-1"
+                    Direccion="@Direccion"
+                    ClaseOrigen="ClaseElemento.Indicador"
+                    Proveedor="@ProveedorDatos"
+                    Datos="null"
+                    Filtros="null"
+                    Indicador="@Indicador"
+                    CodigoElementoDimension="@CodigoElementoDimension"
+                    Abscisa="0"
+                    Ordenada="0"
+                    ColumnaLat="@NombreColumnaLat"
+                    ColumnaLng="@NombreColumnaLng"
+                    ColumnaValor="@NombreColumnaValor"
+                    Ancho="-1"
+                    Alto="-1" />
+      }
+      else
+      {
+        <CMapaGradiente @ref="MapaGradiente"
+                        CodigoElementoDimension="@CodigoElementoDimension"
+                        Direccion="@Direccion"
+                        Indicador="@Indicador"
+                        NivelFlotante="10"
+                        Proveedor="@ProveedorDatos"
+                        Abscisa="0"
+                        Ordenada="0"
+                        Ancho="-1"
+                        Alto="-1"
+                        VerLabels="@VerLabels"
+                        Capa="@CapaWSS"
+                        ComoComponente="false" />
+      }
     </div>
     @if (EstaLeyendo)
     {
