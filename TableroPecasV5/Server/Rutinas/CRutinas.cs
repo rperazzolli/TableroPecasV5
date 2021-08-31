@@ -282,6 +282,23 @@ namespace TableroPecasV5.Server.Rutinas
       return Respuesta;
 		}
 
+    public static List<Shared.ParCodigos> CopiarParesCodigos(List<WCFBPI.ParCodigos> Vector)
+    {
+      List<Shared.ParCodigos> Respuesta = new List<Shared.ParCodigos>();
+      if (Vector != null)
+      {
+        foreach (WCFBPI.ParCodigos Par in Vector)
+				{
+          Respuesta.Add(new Shared.ParCodigos()
+          {
+            Actual = Par.Actual,
+            Anterior = Par.Anterior
+          });
+				}
+      }
+      return Respuesta;
+    }
+
     public static List<double> CopiarVectorDoubles(List<double> Vector)
     {
       List<double> Respuesta = new List<double>();

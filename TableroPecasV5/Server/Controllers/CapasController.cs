@@ -17,8 +17,6 @@ namespace TableroPecasV5.Server.Controllers
 		[HttpGet("ListarCapasWSS")]
 		public RespuestaCapasWSS ListarCapasWSS(string URL, string Ticket, Int32 ClaseElemento, Int32 CodigoElemento)
 		{
-			Ticket = "PericoElHermoso";
-			URL = "http://192.168.0.101/wcfbpi/wcfbpi.svc";
 			RespuestaCapasWSS Retorno = new RespuestaCapasWSS();
 			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
 			try
@@ -327,6 +325,24 @@ namespace TableroPecasV5.Server.Controllers
 			};
 		}
 
+		private static WCFBPI.CElementoPreguntasWISCN CopiarElementoPreguntaWISBPICN(CElementoPreguntasWISCN Elemento)
+		{
+			return new WCFBPI.CElementoPreguntasWISCN()
+			{
+				Abscisa = Elemento.Abscisa,
+				ClaseWIS = (WCFBPI.ClaseCapa)(Int32)Elemento.ClaseWIS,
+				Codigo = Elemento.Codigo,
+				CodigoArea = Elemento.CodigoArea,
+				CodigoWIS = Elemento.CodigoWIS,
+				Contenidos = (from P in Elemento.Contenidos
+											select ProyectosController.CopiarPreguntaWISBPICN(P)).ToList(),
+				Dimension = Elemento.Dimension,
+				ElementoDimension = Elemento.ElementoDimension,
+				Nombre = Elemento.Nombre,
+				Ordenada = Elemento.Ordenada
+			};
+		}
+
 		private static CCapaWISCompletaCN CopiarCapaWISCompleta(WCFBPI.CCapaWISCompletaCN Capa)
 		{
 			return new CCapaWISCompletaCN()
@@ -339,6 +355,21 @@ namespace TableroPecasV5.Server.Controllers
 				},
 				Vinculos = (from V in Capa.Vinculos
 										select CopiarElementoPreguntaWISCN(V)).ToList()
+			};
+		}
+
+		private static WCFBPI.CCapaWISCompletaCN CopiarCapaWISCompletaBPI(CCapaWISCompletaCN Capa)
+		{
+			return new WCFBPI.CCapaWISCompletaCN()
+			{
+				Capa = new WCFBPI.CCapaWISCN()
+				{
+					Codigo = Capa.Capa.Codigo,
+					CodigoWFS = Capa.Capa.CodigoWFS,
+					Descripcion = Capa.Capa.Descripcion
+				},
+				Vinculos = (from V in Capa.Vinculos
+										select CopiarElementoPreguntaWISBPICN(V)).ToList()
 			};
 		}
 
@@ -818,8 +849,6 @@ namespace TableroPecasV5.Server.Controllers
 		[HttpPost("InsertarCapaWSS")]
 		public RespuestaEnteros InsertarCapaWSS(string URL, string Ticket, [FromBody] CCapaWSSCN Capa)
 		{
-			Ticket = "PericoElHermoso";
-			URL = "http://192.168.0.101/wcfbpi/wcfbpi.svc";
 			RespuestaEnteros Retorno = new RespuestaEnteros();
 			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
 			try
@@ -859,6 +888,34 @@ namespace TableroPecasV5.Server.Controllers
 				{
 					throw new Exception(Respuesta.MensajeError);
 				}
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
+			}
+			return Retorno;
+		}
+
+		[HttpPost("InsertarCapaWIS")]
+		public RespuestaEnteros InsertarCapaWIS(string URL, string Ticket, [FromBody] CCapaWISCompletaCN Capa)
+		{
+			RespuestaEnteros Retorno = new RespuestaEnteros();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				// Task<WCFBPI.CRespuesta> RespAct =	Cliente.VerificarBaseDatosAsync(Ticket);
+				//RespAct.Wait();
+				WCFBPI.CCapaWISCompletaCN CapaBPI = CopiarCapaWISCompletaBPI(Capa);
+				Task<WCFBPI.CRespuestaCodigo> Tarea = Cliente.RegistrarCapaWISAsync(Ticket, CapaBPI);
+				Cliente.VerificarBaseDatosAsync(Ticket);
+				Tarea.Wait();
+				WCFBPI.CRespuestaCodigo Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+				Retorno.Codigos.Add(Respuesta.Codigo);
 			}
 			catch (Exception ex)
 			{

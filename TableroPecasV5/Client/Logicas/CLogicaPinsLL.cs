@@ -57,7 +57,7 @@ namespace TableroPecasV5.Client.Logicas
     public double Ancho = -1000;
     public double Alto = -1000;
     private double mNivelZoom = 0;
-    private bool mbRedimensionar = true;
+//    private bool mbRedimensionar = true;
     public Int32 PosicionMapa = -1;
     public List<IconoPush> Iconos = null;
 

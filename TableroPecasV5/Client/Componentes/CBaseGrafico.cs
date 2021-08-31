@@ -19,6 +19,7 @@ namespace TableroPecasV5.Client.Componentes
 
     public delegate void FncRefrescarContenedor();
     public event FncRefrescarContenedor AlRefrescarHaciaSuperior;
+    public event FncRefrescarContenedor AlCambiarAncho; // se usa en los filtros, para ajustar las bandas.
     public static FncRefrescarContenedor gFncRefresco { get; set; }
 
     private static Int32 gCodigoUnico = 0;
@@ -42,7 +43,14 @@ namespace TableroPecasV5.Client.Componentes
       }
     }
 
+    public bool EstaRedimensionando { get; set; } = false;
 
+    public bool RedimensionableV { get; set; } = false;
+
+    public void DibujarZonaRedibujable()
+		{
+//      qwqw();
+		}
 
     public Int32 NivelPropio { get; set; } = 1;
 
@@ -92,8 +100,24 @@ namespace TableroPecasV5.Client.Componentes
     [Parameter]
     public Int32 Ordenada { get; set; }
 
+    private double mAncho;
+
     [Parameter]
-    public double Ancho { get; set; }
+    public double Ancho
+    {
+      get { return mAncho; }
+      set
+      {
+        if (value != mAncho)
+        {
+          mAncho = value;
+          if (AlCambiarAncho != null)
+					{
+            AlCambiarAncho();
+					}
+        }
+      }
+    }
 
     [Parameter]
     public double Alto { get; set; }

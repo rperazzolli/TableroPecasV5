@@ -1,0 +1,106 @@
+﻿@using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Datos;
+@using TableroPecasV5.Client.Listas;
+@using TableroPecasV5.Client.Logicas;
+@inherits CLogicaDefCapaWIS
+
+<div style="width: 100%; height: 100%; background: lightgray; opacity: 0.5"></div>
+<div style="width: 100%; left: 0px; top: 0px; height: 100%; overflow: hidden; background-color: white; position: absolute;">
+  @if (Aguardando)
+  {
+    <CAguardar />
+  }
+  else
+  {
+    @if (ListaCapas == null || ListaCapasWFS == null || HayMensaje)
+    {
+      @if (HayMensaje)
+      {
+        <div style="width: 100%; height: 100%; background: lightgray; opacity: 0.5; text-align: center; position: absolute;">
+          <div style="vertical-align: middle;">
+            <p>@Mensaje</p>
+            @if (HayBoton)
+            {
+              <button style="width: 80px; height: 25px;" @onclick="@CerrarMsg">Cerrar</button>
+            }
+          </div>
+        </div>
+      }
+      else
+      {
+        <CAguardar />
+      }
+    }
+    else
+    {
+<div style="width: 100%; height: 100%; position: relative; margin: 0px; overflow-x: hidden; overflow-y: auto; display: inline-block; padding: 0px;">
+  <div style="background: #007DFF; height: 29px; width: calc(100% - 10px); text-align: left; margin: 5px; position: relative;">
+    <div style="width: 100%; height: 100%; position: absolute;">
+      <label style="vertical-align: central; margin-left: 5px; font-size: 15px; color: white; position: absolute;">Ubicar datos sobre capas WFS</label>
+      <div style="width: 25px; height: 25px; color: white; position: absolute; margin-left: calc(100% - 25px); margin-top: 0px; text-align: center; vertical-align: central; font-size: 15px; cursor: pointer;" @onclick="@Cerrar">X</div>
+    </div>
+  </div>
+
+  <div style="width: calc(100% - 10px); height: 25px; position: relative; margin-top: 0px; margin-left: 5px; background: lightgray;">
+    <div style="width: 45%; height: 100%; text-align: center; display: inline-block;">
+      <label style="width: 100%;"><b>Gráficos definidos</b></label>
+    </div>
+    <div style="width: 50%; height: 100%; text-align: center; display: inline-block;">
+      <label style="width: 100%;"><b>Datos para capa en edición</b></label>
+    </div>
+  </div>
+
+  <div style="width: 100%; height: calc(100% - 45px); overflow-y: hidden; overflow-x: hidden; position: relative; margin-top: 0px;">
+    <div style="width: 45%; height: 100%; overflow-y: auto; overflow-x: hidden; vertical-align: top; display: inline-block;">
+      @if (ListaCapas != null)
+      {
+        @foreach (CCapaWISCompletaCN Capa in ListaCapas)
+        {
+          <div style="width: 95%; height: 32px; margin-left: 5%;">
+            <p style="@EstiloCapa(Capa)" @onclick="((e) => { SeleccionarWIS(Capa); })">@Capa.Capa.Descripcion</p>
+          </div>
+        }
+      }
+    </div>
+
+    <div style="width: 50%; height: 100%; padding: 5px; overflow-y: auto; vertical-align: top; display: inline-block;">
+      <p />
+      <div class="grilla-superior">
+        <div>Nombre</div>
+        <div>
+          <input style="@EstiloInput" type="text" @bind-value="@NombreCapa" />
+        </div>
+      </div>
+
+      <div class="grilla-superior">
+        <div>Capa WFS</div>
+        @if (ListaCapasWFS != null)
+        {
+          <div>
+            <Select TValue="int" @bind-SelectedValue="@CapaWFS">
+              @foreach (CCapaWFSCN Capa in ListaCapasWFS)
+              {
+                <SelectItem TValue="int" Value="@Capa.Codigo">@Capa.Descripcion</SelectItem>
+              }
+            </Select>
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <p />
+    <p />
+  </div>
+
+  <div style="@EstiloBotones">
+    <button style="width: 180px; height: 25px;" @onclick="@Registrar">Registrar</button>
+    <button style="width: 180px; height: 25px; margin-left: 2px;" @onclick="@Nuevo">Nueva</button>
+    <button style="width: 80px; height: 25px; margin-left: 2px;" disabled="@NoSeleccionado" @onclick="@Borrar">Borrar</button>
+  </div>
+</div>
+    }
+  }
+
+
+</div>

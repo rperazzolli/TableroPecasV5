@@ -129,27 +129,25 @@ namespace TableroPecasV5.Server.Controllers
 			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
 			try
 			{
-				//Task<WCFBPI.CRespuestaEntero> Tarea = Cliente.RegistrarSolapaAsync(Ticket,
-				//	new WCFBPI.CSolapaCN()
-				//	{
-				//		Codigo = Solapa.Codigo,
-				//		Azul = Solapa.Azul,
-				//		Block = Solapa.Block,
-				//		Orden = Solapa.Orden,
-				//		Rojo = Solapa.Rojo,
-				//		Sala = Solapa.Sala,
-				//		Verde = Solapa.Verde
-				//	});
-				//Tarea.Wait();
-				//WCFBPI.CRespuestaEntero Respuesta = Tarea.Result;
-				//if (!Respuesta.RespuestaOK)
-				//{
-				//	throw new Exception(Respuesta.MensajeError);
-				//}
+				Task<WCFBPI.CRespuestaEntero> Tarea = Cliente.RegistrarSolapaAsync(Ticket,
+					new WCFBPI.CSolapaCN()
+					{
+						Codigo = Solapa.Codigo,
+						Azul = Solapa.Azul,
+						Block = Solapa.Block,
+						Orden = Solapa.Orden,
+						Rojo = Solapa.Rojo,
+						Sala = Solapa.Sala,
+						Verde = Solapa.Verde
+					});
+				Tarea.Wait();
+				WCFBPI.CRespuestaEntero Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
 
-				//Retorno.Codigos.Add(Respuesta.CodigoAsociado);
-
-				Retorno.Codigos.Add(99);
+				Retorno.Codigos.Add(Respuesta.CodigoAsociado);
 
 			}
 			catch (Exception ex)

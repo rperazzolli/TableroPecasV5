@@ -24,7 +24,7 @@ namespace TableroPecasV5.Client.Datos
     private CInformacionAlarmaCN mPeriodoEnProceso; // para datos multiples.
     private CProveedorComprimido mProveedorSeleccionado;
     private FncPosicionarsePeriodo mFncPosicionarse;
-    private FncCargoDatasets mFncCargo;
+    private FncCargoDatasets mFncCargo = null;
 
     public CContenedorComprimido()
     {

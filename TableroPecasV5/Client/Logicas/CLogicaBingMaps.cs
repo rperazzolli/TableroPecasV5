@@ -30,7 +30,7 @@ namespace TableroPecasV5.Client.Logicas
       gPunteros.Add(this);
     }
 
-    private Int32 mCodigo = -1;
+    private Int32 mCodigo;
 
 
     [Parameter]
@@ -41,15 +41,74 @@ namespace TableroPecasV5.Client.Logicas
       {
         if (mCodigo != value)
         {
+          mCodigo = value;
           if (mCodigo > 0)
 					{
-            mProyecto = null;
+            _ = CargarProyectoBingAsync();
           }
-          mCodigo = value;
-          StateHasChanged();
         }
       }
     }
+
+    private List<CCapaWFSCN> mListaCapasWFS = null;
+    public List<CCapaWFSCN> ListaCapasWFS
+    {
+      get { return (Selector.ListaCapasWFS == null ? mListaCapasWFS : Selector.ListaCapasWFS); }
+    }
+
+    public List<CCapaWFSCN> ListaCapasWFSFiltradas { get; set; } = null;
+
+    public List<CCapaWISCompletaCN> ListaCapasWIS
+		{
+      get { return Selector.ListaCapasWIS; }
+		}
+
+    public List<CCapaWISCompletaCN> ListaCapasWISFiltradas { get; set; } = null;
+
+    private async Task LeerCapasWFSAsync(bool UnicamenteWFS)
+		{
+      RespuestaCapasGIS Respuesta = await Contenedores.CContenedorDatos.LeerCapasWFSAsync(Http, UnicamenteWFS, true);
+      if (!Respuesta.RespuestaOK)
+			{
+        CRutinas.DesplegarMsg(Respuesta.MsgErr);
+			}
+      else
+			{
+        mListaCapasWFS = Respuesta.CapasWFS;
+			}
+		}
+
+    public void Refrescar()
+		{
+      StateHasChanged();
+		}
+
+    public CLogicaSelCapasWFS Selector { get; set; }
+
+    public bool AgregandoCapas { get; set; } = false;
+    public bool AgregandoCapasWIS { get; set; } = false;
+
+    public async void CerrarDefinicionCapas()
+		{
+      AgregandoCapas = false;
+      await Selector.LeerCapasAsync(true);
+      StateHasChanged();
+		}
+
+    public async void CerrarDefinicionWIS()
+    {
+      AgregandoCapasWIS = false;
+      await Selector.LeerCapasAsync(true);
+      StateHasChanged();
+      ModalCapas.Show();
+    }
+
+    public async void CerrarEdicionCapas()
+		{
+      CerrarMenu();
+      await LeerCapasWFSAsync(true);
+      StateHasChanged();
+		}
 
     [Parameter]
     public double Abscisa { get; set; } = -999;
@@ -70,12 +129,11 @@ namespace TableroPecasV5.Client.Logicas
     public string Direccion { get; set; } = "";
 
     private static Int32 gCodigoMapa = 0;
-    private Int32 mCodigoMapa;
 
-		protected override Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
 		{
-      mCodigo = gCodigoMapa++;
-      Direccion = "ContenedorMapa" + mCodigoMapa.ToString();
+      gCodigoMapa++;
+      Direccion = "ContenedorMapa" + gCodigoMapa.ToString();
 			return base.OnInitializedAsync();
 		}
 
@@ -94,19 +152,50 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
+    private bool mbConfigurando = false;
+    public bool Configurando
+		{
+      get { return mbConfigurando; }
+      set
+			{
+        if (mbConfigurando != value)
+				{
+          mbConfigurando = value;
+          StateHasChanged();
+				}
+			}
+		}
+
+    private bool mbEtiquetas = false;
+    public bool Etiquetas
+    {
+      get { return mbEtiquetas; }
+      set
+      {
+        if (mbEtiquetas != value)
+        {
+          mbEtiquetas = value;
+          StateHasChanged();
+        }
+      }
+    }
+
+
     public string EstiloMapa
     {
       get
       {
         if (Abscisa < -998)
         {
-          return "width: 100%; bottom: 0px; left: 0px; height: " + (Contenedores.CContenedorDatos.AltoPantalla - 0).ToString() + "px; ";
+          return "width: 100%; bottom: 0px; left: 0px; height: " +
+            (Contenedores.CContenedorDatos.AltoPantalla - 0).ToString() + "px; ";
         }
         else
         {
           return "width: " + Math.Floor(Ancho).ToString() + "px; left: " + Math.Floor(Abscisa).ToString() + "px; top: " +
               Math.Floor(Ordenada).ToString() + "px; height: " +
-              Math.Floor(Alto - 0).ToString() + "px; overflow: hidden; background-color: white; position: absolute;";
+              Math.Floor(Alto - 0).ToString() +
+              "px; overflow: hidden; background-color: white; position: absolute;";
         }
       }
     }
@@ -117,13 +206,14 @@ namespace TableroPecasV5.Client.Logicas
       {
         if (Ancho < 1)
         {
-          return "width: 100%; left: 0px; top: 0px; height: 100%; overflow: hidden; background-color: white; position: absolute;";
+          return "width: 100%; left: 0px; top: 40px; height: calc(100% - 40px); overflow: hidden; background-color: white; position: absolute;";
         }
         else
         {
           return "width: " + Math.Floor(Ancho).ToString() + "px; left: " + Math.Floor(Abscisa).ToString() + "px; top: " +
               Math.Floor(Ordenada).ToString() + "px; height: " +
-              Math.Floor(Alto - 25).ToString() + "px; overflow: hidden; background-color: white; position: absolute;";
+              Math.Floor(Alto - 25).ToString() +
+              "px; overflow: hidden; background-color: white; position: absolute;";
         }
       }
     }
@@ -244,6 +334,10 @@ namespace TableroPecasV5.Client.Logicas
         throw new Exception("Al leer mapa " + Respuesta.MsgErr);
       }
 
+      mCodigoLeido = Codigo;
+
+      ReubicarCentro = true;
+
       mProyecto = new CProyectoBing();
       mProyecto.Proyecto = Respuesta.Proyecto;
 
@@ -286,6 +380,9 @@ namespace TableroPecasV5.Client.Logicas
           }
         }
       }
+
+      StateHasChanged();
+
     }
 
     private async Task<CCapaComodin> ConvertirDatosCapaACapaAsync(CDatosCapaComodin Datos, List<CElementoPreguntasWISCN> Preguntas)
@@ -303,7 +400,72 @@ namespace TableroPecasV5.Client.Logicas
       return Respuesta;
     }
 
+    public string NombreMapaNuevo { get; set; } = "";
+    private static Int32 mCodigoNuevo = -1;
+
+    private async Task LimpiarContenidoMapaAsync()
+		{
+      if (mPosicionBingMap >= 0)
+			{
+        object[] Args = new object[1];
+        Args[0] = mPosicionBingMap;
+        try
+        {
+          string PosLocal = await JSRuntime.InvokeAsync<string>("LiberarPushpins", Args);
+        }
+        catch (Exception ex)
+        {
+          CRutinas.DesplegarMsg(ex);
+        }
+      }
+    }
+
+    private async Task RegistrarProyecto(CProyectoBing Proyecto)
+		{
+      var Respuesta = await Http.PostAsJsonAsync<CMapaBingCN>(
+            "api/Proyectos/InsertarProyectoBing?URL=" +
+            Contenedores.CContenedorDatos.UrlBPI +
+            "&Ticket=" + Contenedores.CContenedorDatos.Ticket, Proyecto.Proyecto);
+      if (!Respuesta.IsSuccessStatusCode)
+      {
+        throw new Exception(Respuesta.ReasonPhrase);
+      }
+
+      RespuestaCodigos RespuestaCodigos = await Respuesta.Content.ReadFromJsonAsync<RespuestaCodigos>();
+      if (!RespuestaCodigos.RespuestaOK)
+      {
+        throw new Exception(RespuestaCodigos.MsgErr);
+      }
+
+      Proyecto.Proyecto.Codigo = RespuestaCodigos.ParesDeCodigosMimicos[0].Actual;
+
+    }
+
+    public async void CrearProyecto()
+		{
+      if (NombreMapaNuevo!=null && NombreMapaNuevo.Trim().Length != 0)
+			{
+        await LimpiarContenidoMapaAsync();
+        // Crear el proyecto.
+        CProyectoBing Proyecto = new CProyectoBing();
+        Proyecto.Proyecto.Codigo = mCodigoNuevo--;
+        Proyecto.Proyecto.AbscisaCentro = -27;
+        Proyecto.Proyecto.OrdenadaCentro = -40;
+        Proyecto.Proyecto.NivelZoom = 7;
+        Proyecto.Proyecto.Descripcion = NombreMapaNuevo.Trim();
+        // Registrarlo.
+        await RegistrarProyecto(Proyecto);
+
+        // Entrar a editarlo.
+        Codigo = Proyecto.Proyecto.Codigo;
+        StateHasChanged();
+        CerrarMenu();
+			}
+		}
+
     public Modal ModalMenu { get; set; }
+    public Modal ModalCapas { get; set; }
+    public Modal ModalNewProyecto { get; set; }
 
     public List<CPreguntaPreguntaWISCN> Preguntas { get; set; }
 
@@ -329,7 +491,18 @@ namespace TableroPecasV5.Client.Logicas
 
     public void CerrarMenu()
     {
-      ModalMenu.Hide();
+      if (ModalMenu.Visible)
+      {
+        ModalMenu.Hide();
+      }
+      if (ModalNewProyecto.Visible)
+			{
+        ModalNewProyecto.Hide();
+			}
+      if (ModalCapas.Visible)
+			{
+        ModalCapas.Hide();
+			}
     }
 
     public string EstiloPregunta(CPreguntaPreguntaWISCN Pregunta)
@@ -540,34 +713,117 @@ namespace TableroPecasV5.Client.Logicas
 			{
         return;
 			}
+    }
+
+    public void AbrirEdicionWIS()
+    {
+      ModalCapas.Hide();
+      AgregandoCapasWIS = true;
+      StateHasChanged();
+    }
+
+    public void AbrirEdicionProveedores()
+		{
+      ModalCapas.Hide();
+      AgregandoCapas = true;
+      StateHasChanged();
+		}
+
+    public void CerrarEditarProveedores()
+		{
+      AgregandoCapas = false;
+      ModalCapas.Show();
+      StateHasChanged();
+		}
+
+    public void HacerReportes()
+		{
+
+		}
+
+    public void AgregarCapas()
+    {
+      CerrarMenu();
+      Selector.Contenedor = this;
+      ModalCapas.Show();
+    }
+
+    public void Publicar()
+		{
+
+		}
+                
+    public void Renombrar()
+		{
+
+		}
+                   
+    public void AmpliarEscala()
+		{
+
+		}
+                           
+    public void ReducirEscala()
+		{
+
+		}
+                              
+    public void AgregarElemento()
+		{
+
+		}
+                                 
+    public void Grabar()
+		{
+
+		}
+                                    
+    public void Borrar()
+		{
+
+		}
+                                       
+    public void EditarMetas()
+		{
+
+		}
+                                          
+    public void MostrarAyuda()
+		{
+
+		}
+
+    public void RefrescarCapas()
+		{
+
 		}
 
     private Int32 mCodigoLeido = -1;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-      try
+      if (Codigo <= 0)
       {
-        if ((mProyecto == null || Codigo != mCodigoLeido) && Codigo > 0)
+        if (Codigo < 0)
         {
-          mCodigoLeido = Codigo;
-          await CargarProyectoBingAsync();
-          mProyecto.UbicarCentro(Abscisa < -998 ? Contenedores.CContenedorDatos.AnchoPantalla : Ancho,
-              Abscisa < -998 ? (Contenedores.CContenedorDatos.AltoPantalla - 45) : (Alto - 45));
-        }
-        else
-        {
-          if (ReubicarCentro)
+          if (!ModalNewProyecto.Visible)
           {
-            mProyecto.UbicarCentro(Abscisa < -998 ? Contenedores.CContenedorDatos.AnchoPantalla : Ancho,
-                Abscisa < -998 ? (Contenedores.CContenedorDatos.AltoPantalla - 45) : (Alto - 45));
-            ReubicarCentro = false;
+            ModalNewProyecto.Show();
           }
         }
-
-        if (mPosicionBingMap < 0)
+        return;
+      }
+      try
+      {
+        if (ReubicarCentro)
         {
+          mProyecto.UbicarCentro(Abscisa < -998 ? Contenedores.CContenedorDatos.AnchoPantalla : Ancho,
+              Abscisa < -998 ? (Contenedores.CContenedorDatos.AltoPantalla - 45) : (Alto - 45));
+          ReubicarCentro = false;
+        }
 
+        if (mProyecto != null && mPosicionBingMap < 0 && false)
+        {
           object[] Args = new object[7];
           Args[0] = mPosicionBingMap;
           Args[1] = '#' + Direccion; // mProyecto.LatCentro;
@@ -579,9 +835,18 @@ namespace TableroPecasV5.Client.Logicas
           try
           {
             string PosLocal = await JSRuntime.InvokeAsync<string>("loadMapRetPos", Args);
-            //gAlHacerViewChange = FncProcesarViewChange;
-            //gAlHacerClick = FncProcesarClick;
             mPosicionBingMap = Int32.Parse(PosLocal);
+          }
+          catch (Exception ex)
+          {
+            CRutinas.DesplegarMsg(ex);
+          }
+        }
+
+        if (mProyecto != null && mPosicionBingMap >= 0 && false)
+        {
+          try
+          {
             await mProyecto.DibujarAsync(JSRuntime, mPosicionBingMap);
           }
           catch (Exception ex)
@@ -589,7 +854,7 @@ namespace TableroPecasV5.Client.Logicas
             CRutinas.DesplegarMsg(ex);
           }
         }
-			}
+      }
       catch (Exception ex)
       {
         CRutinas.DesplegarMsg(ex);

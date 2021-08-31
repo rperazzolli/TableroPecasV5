@@ -119,7 +119,7 @@ namespace TableroPecasV5.Client.Logicas
       get
       {
         List<CLineaComprimida> Respuesta = new List<CLineaComprimida>();
-        for (Int32 i=PosicionActual*LINEAS_PAGINA;i<(PosicionActual+1)*LINEAS_PAGINA && i < Proveedor.DatosVigentes.Count; i++)
+        for (Int32 i = PosicionActual * LINEAS_PAGINA; i < (PosicionActual + 1) * LINEAS_PAGINA && i < Proveedor.DatosVigentes.Count; i++)
         {
           Respuesta.Add(Proveedor.DatosVigentes[i]);
         }
@@ -139,7 +139,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       get
       {
-        return "width: " + Math.Floor(Ancho).ToString() + "px; height: " + Math.Floor(Alto-25).ToString() + "px; overflow-x: auto; overflow-y: auto;";
+        return "width: " + Math.Floor(Ancho).ToString() + "px; height: " + Math.Floor(Alto-60).ToString() + "px; overflow-x: auto; overflow-y: auto;";
       }
     }
 

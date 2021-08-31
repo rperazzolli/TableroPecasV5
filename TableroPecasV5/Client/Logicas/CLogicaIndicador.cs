@@ -527,6 +527,18 @@ namespace TableroPecasV5.Client.Logicas
     public static int SEPARACION = 10;
     public static int ABSCISA_INI_TENDENCIAS = 280;
 
+    public bool Redimensionando { get; set; } = false;
+
+    public void MouseMoveRedimensionar(Microsoft.AspNetCore.Components.Web.MouseEventArgs e)
+		{
+
+		}
+
+    public void MouseUpRedimensionar(Microsoft.AspNetCore.Components.Web.MouseEventArgs e)
+    {
+
+    }
+
     public string EstiloAguardando
 		{
       get
@@ -534,6 +546,14 @@ namespace TableroPecasV5.Client.Logicas
         return "position: absolute; left: 0px; top: 0px; background: #BEC9E7; opacity: 1; width: 100%; height: 100%;";
 			}
 		}
+
+    public string EstiloRedimensionar
+    {
+      get
+      {
+        return "position: absolute; left: 0px; top: 0px; background: transparent; opacity: 1; width: 100%; height: 100%;";
+      }
+    }
 
     public string EstiloDetalleAguardando
     {
@@ -574,7 +594,7 @@ namespace TableroPecasV5.Client.Logicas
         return "width: " + ANCHO_PANTALLA_RELOJ.ToString() + "px; height: " + ALTO_PANTALLA_RELOJ.ToString() +
             "px; margin-left: " + AbscisaReloj.ToString() +
             "px; margin-top: " + OrdenadaReloj.ToString() + "px; position: absolute; text-align: center; z-index: " +
-            RelojEncima.ToString() + ";";
+            (RelojEncima ? "1" : "0") + ";";
       }
     }
 
@@ -585,9 +605,9 @@ namespace TableroPecasV5.Client.Logicas
       {
         return "width: " + AnchoTendencia.ToString() + "px; height: " +
           AltoTendencia.ToString() +
-          "px; z-index: " + TendenciasEncima.ToString() +
-          "; margin-left: " + AbscisaTendencia.ToString() +
-          "px; margin-top: "+OrdenadaTendencia.ToString()+"px; position: absolute; text-align: center; overflow: hidden;";
+          "px; margin-left: " + AbscisaTendencia.ToString() +
+          "px; margin-top: " + OrdenadaTendencia.ToString() +
+          "px; position: absolute; text-align: center; overflow: hidden;";
       }
     }
 
@@ -1496,6 +1516,18 @@ namespace TableroPecasV5.Client.Logicas
     }
 
     public void IniciarDragFiltro(Microsoft.AspNetCore.Components.Web.DragEventArgs e, CLinkFiltros Filtro)
+    {
+      mOffsetAbsc = (int)e.ScreenX; // e.OffsetX;
+      mOffsetOrd = (int)e.ScreenY; // e.OffsetY;
+      CambioMedidas(Filtro);
+      mFiltroDrag = Filtro;
+      mLineaDrag = null;
+      mGrillaDrag = null;
+      mGraficoDrag = null;
+      PonerElementoEncima(false, false, false, Filtro.Filtrador.Columna.Orden, -1);
+    }
+
+    public void CerrarDragFiltro(Microsoft.AspNetCore.Components.Web.DragEventArgs e, CLinkFiltros Filtro)
     {
       mOffsetAbsc = (int)e.ScreenX; // e.OffsetX;
       mOffsetOrd = (int)e.ScreenY; // e.OffsetY;

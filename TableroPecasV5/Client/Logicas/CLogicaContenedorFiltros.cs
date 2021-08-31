@@ -355,7 +355,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       if (EsHistograma || EsPuntos)
       {
-        return (ClaseV == ClaseVariable.Real || ClaseV == ClaseVariable.Entero);
+        return true; // (ClaseV == ClaseVariable.Real || ClaseV == ClaseVariable.Entero);
       }
       else
       {
@@ -974,7 +974,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       get
       {
-        return "padding-left: 15px; padding-top: 10px; width: 100 %; bottom: 0px; height: " + (Alto - 70).ToString() +
+        return "padding-left: 15px; padding-top: 10px; width: 100 %; bottom: 0px; height: " + (Alto - 45).ToString() +
           "px; overflow: auto; display: block; box-sizing: inherit; text-align: left; ";
       }
     }
@@ -1345,7 +1345,8 @@ namespace TableroPecasV5.Client.Logicas
     private ModoAgruparDependiente mModoAgrupar = ModoAgruparDependiente.Cantidad;
     public ModoAgruparDependiente AgrupamientoDependiente
     {
-      get { return (mComponente == null ? mModoAgrupar : mComponente.AgrupamientoDependiente); }
+      get { return (mComponente == null || mComponente.AgrupamientoDependiente== ModoAgruparDependiente.NoDefinido
+            ? mModoAgrupar : mComponente.AgrupamientoDependiente); }
       set
       {
         mModoAgrupar = value;

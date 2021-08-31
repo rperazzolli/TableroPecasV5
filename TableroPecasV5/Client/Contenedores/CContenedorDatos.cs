@@ -268,6 +268,37 @@ namespace TableroPecasV5.Client.Contenedores
       }
     }
 
+    public async static Task<Int32> RegistrarCapaWISAsync(HttpClient Http,
+          CCapaWISCompletaCN Capa)
+    {
+      try
+      {
+
+        var Respuesta = await Http.PostAsJsonAsync<CCapaWISCompletaCN>(
+              "api/Capas/InsertarCapaWIS?URL=" +
+              Contenedores.CContenedorDatos.UrlBPI +
+              "&Ticket=" + Contenedores.CContenedorDatos.Ticket, Capa);
+        if (!Respuesta.IsSuccessStatusCode)
+        {
+          throw new Exception(Respuesta.ReasonPhrase);
+        }
+
+        RespuestaEnteros RespuestaCodigo = await Respuesta.Content.ReadFromJsonAsync<RespuestaEnteros>();
+        if (!RespuestaCodigo.RespuestaOK)
+        {
+          throw new Exception(RespuestaCodigo.MsgErr);
+        }
+
+        return RespuestaCodigo.Codigos[0];
+
+      }
+      catch (Exception ex)
+      {
+        CRutinas.DesplegarMsg(ex);
+        return Capa.Capa.Codigo;
+      }
+    }
+
     public async static Task<CVinculoIndicadorCompletoCN> LeerVinculoAsync(HttpClient Http,
           ClaseElemento Clase, Int32 Indicador, string Columna)
     {

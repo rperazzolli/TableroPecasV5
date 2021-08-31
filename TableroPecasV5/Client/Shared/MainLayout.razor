@@ -78,6 +78,10 @@
 
 <Dropdown @ref="MenuMapasBing" Style="@EstiloMapasBing">
   <DropdownMenu>
+    @if (Contenedores.CContenedorDatos.EsAdministrador)
+    {
+      <DropdownItem Value="-1" Clicked="@(e => @AbrirMapaBing(-1))" Style="font-size: 12px; font-weight: bold;">Nuevo mapa</DropdownItem>
+    }
     @if (Contenedores.CContenedorDatos.ListaMapas != null)
     {
       @foreach (CMapaBingCN Mapa in Contenedores.CContenedorDatos.ListaMapas)
@@ -116,7 +120,6 @@
     }
   </DropdownMenu>
 </Dropdown>
-
 
 
 @code {

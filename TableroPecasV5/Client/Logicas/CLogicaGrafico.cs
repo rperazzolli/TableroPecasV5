@@ -1532,7 +1532,7 @@ namespace TableroPecasV5.Client.Logicas
           await mContexto.ClearRectAsync(0, 0, AnchoGrafico, AltoGrafico);
           await mContexto.SetFillStyleAsync("white");
           await mContexto.FillRectAsync(0, 0, AnchoGrafico, AltoGrafico);
-          CGraficoBarrasApiladas GrBarrasApi = new CGraficoBarrasApiladas();
+//          CGraficoBarrasApiladas GrBarrasApi = new CGraficoBarrasApiladas();
 
           if (CanvasGraficoDer != null)
           {
@@ -1542,6 +1542,10 @@ namespace TableroPecasV5.Client.Logicas
                 mDatosApilados, mPilas, Detallado);
           }
         }
+        catch (Exception ex)
+				{
+          CRutinas.DesplegarMsg(ex);
+				}
         finally
         {
           await mContexto.EndBatchAsync();
@@ -1820,10 +1824,10 @@ namespace TableroPecasV5.Client.Logicas
                 finally
                 {
                   await mContexto.EndBatchAsync();
-                  if (firstRender && Superior != null && EvSeleccionarGrafico != null)
-                  {
-                    EvSeleccionarGrafico(this);
-                  }
+                  //if (firstRender && Superior != null && EvSeleccionarGrafico != null)
+                  //{
+                  //  EvSeleccionarGrafico(this);
+                  //}
                 }
 
               }

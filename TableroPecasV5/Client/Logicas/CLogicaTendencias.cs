@@ -674,7 +674,7 @@ namespace TableroPecasV5.Client.Logicas
     {
       get
       {
-        return "width:100%; height: 100%; position: absolute; margin: 0px; background-color: #c0c0c0c0; z-index: 4; visibility: " +
+        return "width:100%; height: 100%; position: absolute; margin: 0px; background-color: #c0c0c0c0; visibility: " +
             (mbMostrarAguarda ? "visible;" : "hidden;");
       }
     }

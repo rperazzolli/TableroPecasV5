@@ -16,8 +16,6 @@ using Blazorise;
 using TableroPecasV5.Client.Clases;
 using TableroPecasV5.Client.Componentes;
 using TableroPecasV5.Client.Rutinas;
-using TableroPecasV5.Client.Clases;
-using TableroPecasV5.Shared;
 
 namespace TableroPecasV5.Client.Logicas
 {

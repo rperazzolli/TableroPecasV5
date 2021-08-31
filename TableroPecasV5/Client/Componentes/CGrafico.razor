@@ -3,7 +3,8 @@
 
 <div class="dropdown"
      style="width: 100%; height: 100%; text-align: left; display: block; overflow: hidden; position: absolute; margin: 0px;"
-     @onload="@AlCompletar" @onmousedown="@EventoMouseAbajo" ondragover="event.preventDefault();"
+     @onload="@AlCompletar" @onmousedown="@EventoMouseAbajo"
+     ondragover="event.preventDefault();"
      @ondrop="RecibirDrop">
   <div style="width: 100%; height: 25px; text-align: left; display: block; position: absolute; margin: 0px; background-color: whitesmoke;"
        />
@@ -93,6 +94,8 @@
       }
     </div>
   }
+
+  <CRedimensionar/>
 
 </div>
 

@@ -818,7 +818,7 @@ namespace TableroPecasV5.Client.Datos
           DatosBarraApilada Elemento = new DatosBarraApilada()
           {
             Nombre = Barra.Nombre,
-            ValorTotal = Barra.Valor
+            ValorTotal = 0 //Barra.Valor
           };
           Respuesta.Add(Elemento);
         }

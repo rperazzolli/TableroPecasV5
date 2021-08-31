@@ -59,7 +59,7 @@ namespace TableroPecasV5.Client.Logicas
 		[Parameter]
 		public Int32 ElementoDimension { get; set; } = -1;
 
-		private bool mbVinculosCompletos = false;
+		private bool mbVinculosCompletos;
 
 		private static Int32 gCodigoUnico = 0;
 		public Int32 CodigoPropio = -1;

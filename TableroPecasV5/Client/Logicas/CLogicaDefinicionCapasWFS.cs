@@ -140,7 +140,7 @@ namespace TableroPecasV5.Client.Logicas
 		}
 
 		[CascadingParameter]
-		public CLogicaDefinirProveedoresWFS CapaProveedor { get; set; }
+		public CLogicaBingMaps CapaProveedor { get; set; }
 
 		public Int32 CodigoElementosCapa
 		{
@@ -401,7 +401,7 @@ namespace TableroPecasV5.Client.Logicas
 		{
 			if (CapaProveedor != null)
 			{
-				CapaProveedor.CerrarCapas();
+				CapaProveedor.CerrarDefinicionCapas();
 			}
 		}
 

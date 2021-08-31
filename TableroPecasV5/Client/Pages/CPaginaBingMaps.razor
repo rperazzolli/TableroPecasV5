@@ -1,15 +1,89 @@
 ﻿@page "/BingMaps/{Codigo:int}"
 @using TableroPecasV5.Shared;
+@using TableroPecasV5.Client.Componentes;
 @inherits Logicas.CLogicaBingMaps
 
-<div id="ContenedorMapa" style="@EstiloMapa"></div>
-
-<div id="@Direccion" style="@EstiloMapaComponente">
-  @if (Proyecto == null)
+<div id="ContenedorMapa" style="@EstiloMapa">
+  @if (Ancho < 1)
   {
-    <TableroPecasV5.Client.Componentes.CAguardar/>
+    <div style="height: 40px; width: 100%; background-color: whitesmoke;">
+      <div style="height: 25px; position: absolute; top: 7px; display: inline-block;">
+        <input type="checkbox" @bind-value="@Configurando" style="margin-left: 15px; margin-right: 5px;" />
+        <span>Configurando</span>
+        <button style="margin-left: 15px; margin-right: 5px; width: 80px;" @onclick="@HacerReportes">Reporte</button>
+        @if (Configurando)
+        {
+          <input type="checkbox" @bind-value="@Etiquetas" style="margin-left: 15px; margin-right: 5px;" />
+          <span>Ver etiquetas</span>
+          <button style="margin-left: 5px; margin-right: 0px; width: 80px;" @onclick="@AgregarCapas">Capas</button>
+          <button style="margin-left: 5px; margin-right: 0px; width: 80px;" @onclick="@Publicar">Publicar</button>
+          <button style="margin-left: 5px; margin-right: 0px; width: 80px;" @onclick="@Renombrar">Renombrar</button>
+          @*<span style="margin-left: 15px; margin-right: 0px;">Escala fuente</span>
+            <button style="margin-left: 5px; margin-right: 0px; width: 25px;" @onclick="@AmpliarEscala">+</button>
+            <button style="margin-left: 5px; margin-right: 0px; width: 25px;" @onclick="@ReducirEscala">-</button>*@
+          <button style="margin-left: 5px; margin-right: 0px; width: 80px;" @onclick="@AgregarElemento">Agregar</button>
+          <button style="margin-left: 5px; margin-right: 0px; width: 80px;" @onclick="@Grabar">Registrar</button>
+          <button style="margin-left: 5px; margin-right: 0px; width: 80px;" @onclick="@Borrar">Borrar</button>
+          <button style="margin-left: 5px; margin-right: 0px; width: 80px;" @onclick="@EditarMetas">Metas</button>
+          <button style="margin-left: 5px; margin-right: 0px; width: 80px;" @onclick="@MostrarAyuda">Ayuda</button>
+        }
+      </div>
+    </div>
   }
 </div>
+
+<div id="@Direccion" style="@EstiloMapaComponente">
+  @if (Proyecto == null && Codigo > 0)
+  {
+    <TableroPecasV5.Client.Componentes.CAguardar />
+  }
+</div>
+
+@if (AgregandoCapas)
+{
+  <div style="position: absolute; left: 0px; top: 0px;
+      width: 100%; height: 100%; margin: 0px;">
+    <div style="position: absolute; left: 0px; top: 0px; background: #BEC9E7; opacity: 0.5;
+      width: 100%; height: 100%; margin: 0px;" />
+    <div style="width: 760px; height: 400px; opacity: 1; top: 20%; left: calc(50% - 380px); position: absolute; background-color: white;">
+      <CascadingValue Value="this">
+        <CDefinirProveedoresWFS Desplazado="false" />
+      </CascadingValue>
+    </div>
+  </div>
+}
+
+@if (AgregandoCapasWIS)
+{
+  <div style="position: absolute; left: 0px; top: 0px;
+      width: 100%; height: 100%; margin: 0px;">
+    <div style="position: absolute; left: 0px; top: 0px; background: #BEC9E7; opacity: 0.5;
+      width: 100%; height: 100%; margin: 0px;" />
+    <div style="width: 760px; height: 400px; opacity: 1; top: 20%; left: calc(50% - 380px); position: absolute; background-color: white;">
+      <CascadingValue Value="this">
+        <CDefCapaWIS/>
+      </CascadingValue>
+    </div>
+  </div>
+}
+
+<Modal @ref="ModalCapas">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true" Size="ModalSize.Large">
+    <ModalHeader>
+      <ModalTitle>Definir capas visibles</ModalTitle>
+    </ModalHeader>
+    <ModalBody Style="background-color: whitesmoke;">
+      <div style="width: 765px; height: 400px; margin: 0px;">
+        <FrmSelCapasWFS @ref="Selector" />
+      </div>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@RefrescarCapas">Abrir</Button>
+      <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarMenu">Cerrar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
 
 <Modal @ref="ModalMenu">
   <ModalBackdrop />
@@ -34,8 +108,27 @@
       </Field>
     </ModalBody>
     <ModalFooter Style="display: inline-block; text-align: center;">
-      <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarMenu">Cerrar</Button>
       <Button style="width: 50px;" Color="Color.Primary" Clicked="@Moverse">Abrir</Button>
+      <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarMenu">Cerrar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+<Modal @ref="ModalNewProyecto">
+  <ModalBackdrop />
+  <ModalContent IsCentered="true">
+    <ModalHeader>
+      <ModalTitle>Definir nuevo mapa</ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <Field>
+        <Label>Nombre del mapa a crear</Label>
+        <TextEdit @bind-Text="@NombreMapaNuevo" />
+      </Field>
+    </ModalBody>
+    <ModalFooter Style="display: inline-block; text-align: center;">
+      <Button style="width: 50px;" Color="Color.Primary" Clicked="@CrearProyecto">Crear</Button>
+      <Button style="width: 50px;" Color="Color.Secondary" Clicked="@CerrarMenu">Abortar</Button>
     </ModalFooter>
   </ModalContent>
 </Modal>

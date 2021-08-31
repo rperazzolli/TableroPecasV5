@@ -3,13 +3,12 @@
 
 @using TableroPecasV5.Shared
 @inherits TableroPecasV5.Client.Logicas.CLogicaIndicadores
-
 @*<div style="margin: 0px; height: 25px; display: inline-block; width: 100%;" class="tab">
-  <button style="@EstiloComando(1)" class="tab">Indicadores</button>
-  <button style="@EstiloComando(2)" class="tab">Salas de reunión</button>
-  <button style="@EstiloComando(3)" class="tab">Mapas</button>
-  <button style="@EstiloComando(4)" class="tab">Mímicos</button>
-</div>*@
+    <button style="@EstiloComando(1)" class="tab">Indicadores</button>
+    <button style="@EstiloComando(2)" class="tab">Salas de reunión</button>
+    <button style="@EstiloComando(3)" class="tab">Mapas</button>
+    <button style="@EstiloComando(4)" class="tab">Mímicos</button>
+  </div>*@
 
 <div style="margin: 0px; height: 50px">
   <div class="form" style="margin: 10px 25px 10px 25px; height: 25px;">
@@ -23,6 +22,14 @@
     </div>
   </div>
 </div>
+
+@*<div style="width: 700px; height: 400px;">
+  <TableroPecasV5.Client.Componentes.FrmSelCapasWFS />
+</div>*@
+
+@*<div style="width: 700px; height: 400px;">
+  <TableroPecasV5.Client.Componentes.CCfgProvWFS />
+</div>*@
 
 <div style="padding-left: 25px; width: 100%; bottom: 0px; height: calc(100vh - 74px); overflow: auto; display: block; box-sizing: inherit;">
   @foreach (CDatoIndicador Indicador in ListaIndicadores)

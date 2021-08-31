@@ -12,9 +12,9 @@ namespace TableroPecasV5.Client.Clases
   public delegate void FncRefrescarCapas(CProyectoBing Proyecto);
   public class CProyectoBing
   {
-    public event FncRefrescarCapas AlRefrescarCapas;
+    //public event FncRefrescarCapas AlRefrescarCapas;
 
-    private CCapaComodin mCapaEnProceso;
+    //private CCapaComodin mCapaEnProceso;
 
     public CProyectoBing()
     {

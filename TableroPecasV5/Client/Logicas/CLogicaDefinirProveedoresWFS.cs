@@ -21,8 +21,22 @@ namespace TableroPecasV5.Client.Logicas
 			}
 		}
 
+		[Parameter]
+		public bool Desplazado { get; set; } = true;
+
 		[CascadingParameter]
 		public ComponentBase Contenedor { get; set; }
+
+		public string EstiloDesplazado
+		{
+			get
+			{
+				return (Desplazado ?
+					"width: 80%; height: 80%; position: absolute; overflow: hidden; margin-left: 10%; margin-top: 25px; background: white; " :
+					"width: 100%; height: 100%; position: absolute; overflow: hidden; margin-left: 0%; margin-top: 0px; background: white; "
+					);
+			}
+		}
 
 		public void CerrarCapas()
 		{
@@ -173,6 +187,10 @@ namespace TableroPecasV5.Client.Logicas
 				if (Contenedor is CLogicaVinculadorWFS VinculadorWFS)
 				{
 					VinculadorWFS.CerrarEditarProveedoresWFS();
+				}
+				if (Contenedor is CLogicaBingMaps Mapa)
+				{
+					Mapa.CerrarEditarProveedores();
 				}
 			}
 		}

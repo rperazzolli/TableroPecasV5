@@ -377,6 +377,19 @@ namespace TableroPecasV5.Server.Controllers
 			};
 		}
 
+		public static WCFBPI.CPreguntaPreguntaWISCN CopiarPreguntaWISBPICN(CPreguntaPreguntaWISCN Pregunta)
+		{
+			return new WCFBPI.CPreguntaPreguntaWISCN()
+			{
+				Clase = (WCFBPI.ClaseDetalle)((Int32)Pregunta.Clase),
+				Codigo = Pregunta.Codigo,
+				CodigoDimension = Pregunta.CodigoDimension,
+				CodigoElemento = Pregunta.CodigoElemento,
+				CodigoElementoDimension = Pregunta.CodigoElementoDimension,
+				CodigoPregunta = Pregunta.CodigoPregunta
+			};
+		}
+
 		public static List<CElementoPreguntasWISCN> ConvertirPreguntas(List<WCFBPI.CElementoPreguntasWISCN> PreguntasWCF)
 		{
 			return (from P in PreguntasWCF
@@ -537,6 +550,120 @@ namespace TableroPecasV5.Server.Controllers
 			finally
 			{
 				Cliente.Close();
+			}
+			return Retorno;
+		}
+
+		private static WCFBPI.CCapaBingCN CopiarCapaBingBPI(CCapaBingCN Capa)
+		{
+			return new WCFBPI.CCapaBingCN()
+			{
+				Azul = Capa.Azul,
+				Clase = (WCFBPI.ClaseCapa)((Int32)Capa.Clase),
+				Codigo = Capa.Codigo,
+				CodigoCapa = Capa.CodigoCapa,
+				Opacidad = Capa.Opacidad,
+				Orden = Capa.Orden,
+				Rojo = Capa.Rojo,
+				Verde = Capa.Verde
+			};
+		}
+
+		private static List<WCFBPI.CCapaBingCN> CopiarCapasBingBPI(List<CCapaBingCN> Capas)
+		{
+			List<WCFBPI.CCapaBingCN> Respuesta = new List<WCFBPI.CCapaBingCN>();
+			foreach (CCapaBingCN Capa in Capas)
+			{
+				Respuesta.Add(CopiarCapaBingBPI(Capa));
+			}
+			return Respuesta;
+		}
+
+		private static List<WCFBPI.CPreguntaPreguntaWISCN> CopiarContenidosBingBPI(
+			    List<CPreguntaPreguntaWISCN> Contenidos)
+		{
+			List<WCFBPI.CPreguntaPreguntaWISCN> Respuesta = new List<WCFBPI.CPreguntaPreguntaWISCN>();
+			foreach (CPreguntaPreguntaWISCN Contenido in Contenidos)
+			{
+				Respuesta.Add(new WCFBPI.CPreguntaPreguntaWISCN()
+				{
+					Clase = (WCFBPI.ClaseDetalle)((Int32)Contenido.Clase),
+					Codigo = Contenido.Codigo,
+					CodigoDimension = Contenido.CodigoDimension,
+					CodigoElemento = Contenido.CodigoElemento,
+					CodigoElementoDimension = Contenido.CodigoElementoDimension,
+					CodigoPregunta = Contenido.CodigoPregunta
+				});
+			}
+			return Respuesta;
+		}
+
+		private static WCFBPI.CElementoPreguntasWISCN CopiarPreguntaBingBPI(CElementoPreguntasWISCN Pregunta)
+		{
+			return new WCFBPI.CElementoPreguntasWISCN()
+			{
+				Abscisa = Pregunta.Abscisa,
+				ClaseWIS = (WCFBPI.ClaseCapa)((Int32)Pregunta.Abscisa),
+				Codigo = Pregunta.Codigo,
+				CodigoArea = Pregunta.CodigoArea,
+				CodigoWIS = Pregunta.CodigoWIS,
+				Contenidos = CopiarContenidosBingBPI(Pregunta.Contenidos),
+				Dimension = Pregunta.Dimension,
+				ElementoDimension = Pregunta.ElementoDimension,
+				Nombre = Pregunta.Nombre,
+				Ordenada = Pregunta.Ordenada
+			};
+		}
+
+		private static List<WCFBPI.CElementoPreguntasWISCN> CopiarPreguntasBingBPI(List<CElementoPreguntasWISCN> Preguntas)
+		{
+			List<WCFBPI.CElementoPreguntasWISCN> Respuesta = new List<WCFBPI.CElementoPreguntasWISCN>();
+			foreach (CElementoPreguntasWISCN Pregunta in Preguntas)
+			{
+				Respuesta.Add(CopiarPreguntaBingBPI(Pregunta));
+			}
+			return Respuesta;
+		}
+
+		private static WCFBPI.CMapaBingCN CopiarProyectoBingBPI(CMapaBingCN Proyecto)
+		{
+			return new WCFBPI.CMapaBingCN()
+			{
+				Codigo = Proyecto.Codigo,
+				Descripcion = Proyecto.Descripcion,
+				AbscisaCentro = Proyecto.AbscisaCentro,
+				OrdenadaCentro = Proyecto.OrdenadaCentro,
+				NivelZoom = Proyecto.NivelZoom,
+				Autor = Proyecto.Autor,
+				Capas = CopiarCapasBingBPI(Proyecto.Capas),
+				Preguntas = CopiarPreguntasBingBPI(Proyecto.Preguntas),
+				Publicador = Proyecto.Publicador
+			};																										
+		}
+
+		[HttpPost("InsertarProyectoBing")]
+		public RespuestaCodigos InsertarProyectoBing(string URL, string Ticket, [FromBody] CMapaBingCN Proyecto)
+		{
+			RespuestaCodigos Retorno = new RespuestaCodigos();
+			WCFBPI.WCFBPIClient Cliente = CRutinas.ObtenerClienteWCF(URL);
+			try
+			{
+				WCFBPI.CMapaBingCN ProyectoBPI = CopiarProyectoBingBPI(Proyecto);
+				Task<WCFBPI.CRespuestaCodigos> Tarea = Cliente.RegistrarProyectoBingAsync(Ticket, ProyectoBPI);
+				Tarea.Wait();
+				WCFBPI.CRespuestaCodigos Respuesta = Tarea.Result;
+				if (!Respuesta.RespuestaOK)
+				{
+					throw new Exception(Respuesta.MensajeError);
+				}
+				Retorno.ParesDeCodigosMimicos = CRutinas.CopiarParesCodigos(Respuesta.ParesDeCodigosMimicos);
+				Retorno.ParesDeCodigosPreguntas = CRutinas.CopiarParesCodigos(Respuesta.ParesDeCodigosPreguntas);
+				Retorno.ParesDeCodigosWFS = CRutinas.CopiarParesCodigos(Respuesta.ParesDeCodigosWFS);
+			}
+			catch (Exception ex)
+			{
+				Retorno.RespuestaOK = false;
+				Retorno.MsgErr = CRutinas.TextoMsg(ex);
 			}
 			return Retorno;
 		}

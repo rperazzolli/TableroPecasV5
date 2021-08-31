@@ -49,7 +49,30 @@ namespace TableroPecasV5.Client.Logicas
       }
     }
 
-    [CascadingParameter]
+    private void Refrescar(object Referencia)
+		{
+      mFiltrador.AjustarAnchoBandasAzules(Ancho - 65);
+      StateHasChanged();
+		}
+
+    private double mAncho0 = 185;
+
+		protected override Task OnAfterRenderAsync(bool firstRender)
+		{
+      if (AlCambiarAncho == null)
+			{
+        AlCambiarAncho = Refrescar;
+			}
+      mFiltrador.AjustarAnchoBandasAzules(Ancho - 65);
+      if (Ancho != mAncho0)
+			{
+        mAncho0 = Ancho;
+        StateHasChanged();
+			}
+			return base.OnAfterRenderAsync(firstRender);
+		}
+
+		[CascadingParameter]
     Logicas.CLogicaIndicador Pagina { get; set; }
 
     public int AbscisaAbajo { get; set; }
@@ -322,7 +345,7 @@ namespace TableroPecasV5.Client.Logicas
 
         OrdenarElementos();
 
-        mFiltrador.AjustarAnchoBandasAzules(120);
+        mFiltrador.AjustarAnchoBandasAzules(Ancho - 65);
 
         AjustarCantidades();
 

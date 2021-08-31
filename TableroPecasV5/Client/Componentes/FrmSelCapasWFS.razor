@@ -1,0 +1,76 @@
+﻿@using TableroPecasV5.Shared;
+@inherits Logicas.CLogicaSelCapasWFS
+
+<div style="width: 100%; height: 100%; background-color: whitesmoke; font-size: 10px;">
+
+  <div style="width: 100%; height: 100%; display: inline-block; margin-left: 3%;">
+    <div style="width: 35%; height: 100%; display: inline-block;">
+      <div style="width: 100%; height: 35px; display: inline-block;">
+        <span style="margin-left: 15px;">Filtro</span>
+        <input type="text" style="width: 80px; margin-left: 5px; height: 22px; font-size: 10px;" @bind-value="@FiltroCapas" />
+      </div>
+      <div style="width: 100%; height: 35px; display: inline-block;">
+        <input type="checkbox" style="margin-left: 5px; vertical-align: bottom;" @bind-value="@TodasLasCapas" />
+        Todas
+        <input type="checkbox" style="margin-left: 5px; vertical-align: bottom; " @bind-value="@CapasWMS" />
+        WMS
+        <input type="checkbox" style="margin-left: 5px; vertical-align: bottom;" @bind-value="@CapasWFS" />
+        WFS
+        <input type="checkbox" style="margin-left: 5px; vertical-align: bottom;" @bind-value="@CapasWIS" />
+        WIS
+      </div>
+      <div style="width: 100%; height: calc(100% - 105px); display: inline-block; background-color: white; overflow-y: auto; overflow-x: hidden;">
+        @if (TodasLasCapas || CapasWMS)
+        {
+          foreach (CCapaWMSCN Capa in ListaCapasWMSFiltradas)
+          {
+            <p style="cursor: pointer;" @onclick="@((e) => { SeleccionarCapaWMS(Capa);})">@Capa.Descripcion</p>
+          }
+        }
+        @if (ListaCapasWFS != null && (TodasLasCapas || CapasWFS))
+        {
+          foreach (CCapaWFSCN Capa in ListaCapasWFSFiltradas)
+          {
+            <p style="cursor: pointer;" @onclick="@((e) => { SeleccionarCapaWFS(Capa); })">@Capa.Descripcion</p>
+          }
+        }
+        @if (TodasLasCapas || CapasWIS)
+        {
+          foreach (CCapaWISCompletaCN Capa in ListaCapasWISFiltradas)
+          {
+            <p style="cursor: pointer;" @onclick="@((e) => { SeleccionarCapaWIS(Capa);})">@Capa.Capa.Descripcion</p>
+          }
+        }
+      </div>
+      <div style="width: 100%; height: 35px; display: inline-block;">
+        <span style="margin-left: 15px; display: inline-block">Agregar</span>
+        <span style="font-size: 10px; color: blue; text-decoration: underline; cursor: pointer; margin-left: 10px;" @onclick="@AgregarProveedoresGIS">Proveedores</span>
+        <span style="font-size: 10px; color: blue; text-decoration: underline; cursor: pointer; margin-left: 10px; " @onclick="@AgregarCapasWIS">CapasWIS</span>
+        @*<button style="display: inline-block; width: 75px;" @onclick="@AgregarProveedoresGIS">Proveedores</button>
+          <button style="display: inline-block; width: 50px;" @onclick="@AgregarCapasWIS">Capas WIS</button>*@
+      </div>
+    </div>
+    <div style="width: 60%; height: 100%; display: inline-block;">
+      <div style="width: 100%; height: 25px; display: table; text-align: center;">
+        <span style="font-weight: 600; display: table-cell; vertical-align: middle;">Capas disponibles</span>
+      </div>
+      <div style="width: 100%; height: calc(100% - 25px); display: inline-block; background-color: white;">
+      </div>
+      @*<div style="width: 100%; height: 35px; display: block; text-align: right;">
+        <button style="display: inline-block; width: 75px; height: 25px;" @onclick="@Registrar">Registrar</button>
+        <button style="display: inline-block; width: 50px; height: 25px;" @onclick="@Cerrar">Cerrar</button>
+      </div>*@
+    </div>
+  </div>
+
+  @*@if (AgregandoCapas)
+  {
+    <div style="width: 100%; height: 100%; background: #007DFF; opacity: 0.5; position: absolute; top: 0px; left: 0px;">
+      <div style="position: absolute; top: 0%; left: calc(50% - 350px); width: 700px; height: 500px; opacity: 1; background-color: white;">
+        <CascadingValue Value="this">
+          <CDefinirProveedoresWFS Desplazado="false"/>
+        </CascadingValue>
+      </div>
+    </div>
+  }*@
+</div>
